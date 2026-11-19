@@ -1,15 +1,18 @@
 id: collections
 name: "Early Delinquency Collections (EMI)"
-goal: "Recover bounced retail EMIs (1-30 DPD), negotiate valid PTPs, dispatch instant UPI payment links, audit RBI compliance, and escalate exceptions to human teams."
+goal: "Recover bounced retail EMIs (1-30 DPD), verify borrower identity, negotiate valid PTPs, audit RBI compliance, dispatch instant UPI payment links, and escalate exceptions to human teams."
 success_metric: "recovery_pct"
-policy_file: "policies/collections_policy.txt"
+policy_file: "policies/collections_rules.yaml"
 sample_data_file: "data/sample_book.csv"
 
 human_escalation_rules:
+  - condition: "record.data.get('identity_verified') is False"
+    target_desk: "Fraud Prevention & Identity Verification Desk"
+    reason: "Borrower failed 4-digit loan ID verification; zero debt disclosure"
   - condition: "record.data.get('intent') == 'dispute'"
     target_desk: "Dispute Resolution Desk (Ops)"
     reason: "Borrower asserts prior payment or ledger error"
-  - condition: "record.data.get('intent') == 'hardship'"
+  - condition: "record.data.get('intent') == 'hardship' and not record.data.get('needs_approval')"
     target_desk: "Credit Committee (Hardship Desk)"
     reason: "Borrower seeks interest waiver or loan restructuring"
   - condition: "record.data.get('audit_pass') is False"
@@ -31,32 +34,43 @@ steps:
     retry_limit: 3
     on_failure: "escalate"
     input_fields: ["language", "customer_name", "phone", "amount_due"]
-    output_fields: ["consent_played", "transcript", "cost_inr"]
+    output_fields: ["consent_played", "transcript", "cost_inr", "identity_verified"]
 
   - id: decision
     name: "Policy Decision & Negotiation"
     agent: "Decision"
     retry_limit: 3
     on_failure: "escalate"
+    condition: "record.status not in ('escalated', 'failed')"
     input_fields: ["transcript", "amount_due", "policy_file"]
     output_fields: ["intent", "sentiment", "offer_made", "ptp_date", "confidence"]
 
-  - id: action
-    name: "UPI Link & WhatsApp Dispatch"
-    agent: "Action"
+  - id: human_approval
+    name: "Credit Authority Sign-Off"
+    agent: "HumanApproval"
     retry_limit: 3
     on_failure: "escalate"
-    condition: "record.status != 'escalated'"
-    input_fields: ["amount_due", "ptp_date", "language", "loan_id"]
-    output_fields: ["payment_link", "payment_status"]
+    condition: "record.data.get('needs_approval') is True"
+    input_fields: ["shortfall_amount", "amount_due"]
+    output_fields: ["approval_decision", "approved_by"]
 
   - id: compliance
     name: "RBI Fair Practices Audit"
     agent: "Compliance"
     retry_limit: 3
     on_failure: "escalate"
-    input_fields: ["transcript", "consent_played", "ptp_date"]
+    condition: "record.status not in ('awaiting_approval', 'failed')"
+    input_fields: ["transcript", "consent_played", "ptp_date", "identity_verified"]
     output_fields: ["audit_pass", "audit_reason"]
+
+  - id: action
+    name: "UPI Link & WhatsApp Dispatch"
+    agent: "Action"
+    retry_limit: 3
+    on_failure: "escalate"
+    condition: "record.status not in ('escalated', 'awaiting_approval', 'failed') and record.data.get('audit_pass') is True"
+    input_fields: ["amount_due", "ptp_date", "language", "loan_id"]
+    output_fields: ["payment_link", "payment_status"]
 
   - id: reporter
     name: "Portfolio Sync & Metrics"

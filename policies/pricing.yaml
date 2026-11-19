@@ -1,0 +1,11 @@
+rates:
+  stt_cost_per_minute: 0.49
+  tts_cost_per_1000_chars: 1.00
+  llm_token_rate: null
+footnotes:
+  cost_label: "estimated from published rates"
+  llm_footnote: "excludes LLM tokens"
+benchmarks:
+  industry_call_centre_cost: 52.00
+  industry_field_visit_cost: 250.00
+  benchmark_label: "reported by other sources"

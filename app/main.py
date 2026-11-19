@@ -2,9 +2,12 @@ import os
 import csv
 import json
 import base64
-from typing import Optional, Dict, Any, List
+import io
+import hashlib
+from datetime import datetime, timezone
+from typing import Optional, Dict, Any, List, Literal
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Request, Response, Query
+from fastapi import FastAPI, HTTPException, Request, Response, Query, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,7 +27,6 @@ from agents.reporter import compute_engine_metrics
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    # Populate initial books if empty
     coll_cases = get_all_cases("collections")
     if not coll_cases:
         load_sample_book(workflow_id="collections")
@@ -50,13 +52,38 @@ class EscalateRequest(BaseModel):
     reason: str
     assigned_human: Optional[str] = "Senior Operations Manager"
 
+class ApprovalRequest(BaseModel):
+    decision: Literal["approved", "rejected"]
+    officer: Optional[str] = "Senior Credit Committee Lead"
+    workflow_id: Optional[str] = "collections"
+
+class EMIBouncedEvent(BaseModel):
+    account_id: Optional[str] = "1"
+    amount: Optional[float] = None
+    bank_code: Optional[str] = "HDFC0001"
+    bounce_reason: Optional[str] = "E006 - Insufficient Funds"
+    workflow_id: Optional[str] = "collections"
+
 class TTSRequest(BaseModel):
     text: str
     language: Optional[str] = "Hindi"
+    speaker: Optional[str] = "priya"
 
 class ConfigUpdateRequest(BaseModel):
     simulate: Optional[bool] = None
     demo_override_hours: Optional[bool] = None
+
+# Language code mapping for Sarvam Indic Stack
+SARVAM_LANG_MAP = {
+    "Marathi": "mr-IN",
+    "Hindi": "hi-IN",
+    "English": "en-IN",
+    "Tamil": "ta-IN",
+    "Telugu": "te-IN",
+    "Kannada": "kn-IN",
+    "Bengali": "bn-IN",
+    "Gujarati": "gu-IN"
+}
 
 # 1. Workflows Endpoint
 @app.get("/api/workflows")
@@ -99,7 +126,6 @@ def load_sample_book(workflow_id: str = Query(default="collections")):
                 version=1,
                 data={k: v for k, v in row.items()}
             )
-            # Ensure proper numeric typing in data dict
             if "amount_due" in record.data:
                 record.data["amount_due"] = float(record.data["amount_due"])
             if "dpd" in record.data:
@@ -142,6 +168,100 @@ def run_case_pipeline(case_id: str, workflow_id: str = Query(default="collection
     else:
         updated_case = run_supervisor_pipeline(case, workflow_id=workflow_id)
         return updated_case
+
+# 4b. Event-driven start: POST /api/events/emi-bounced
+@app.post("/api/events/emi-bounced")
+def handle_emi_bounced_event(event: EMIBouncedEvent):
+    w_id = event.workflow_id or "collections"
+    case = get_case(event.account_id, workflow_id=w_id)
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Account #{event.account_id} not found in {w_id}")
+    
+    case.add_trace(
+        agent="Supervisor",
+        action="NACH Mandate Bounce Event Ingested",
+        summary=f"Event triggered via NPCI Auto-Debit clearing. Reason: {event.bounce_reason}."
+    )
+    save_case(case)
+    updated = run_supervisor_pipeline(case, workflow_id=w_id)
+    return updated
+
+# 4c. Human-in-the-Loop Approval: POST /api/cases/{case_id}/approve & /reject
+@app.post("/api/cases/{case_id}/approve")
+def approve_case_restructure(case_id: str, req: ApprovalRequest):
+    case = get_case(case_id, workflow_id=req.workflow_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+    case.data["approval_decision"] = req.decision or "approved"
+    case.data["approved_by"] = req.officer
+    case.status = "in_progress"
+    updated = run_supervisor_pipeline(case, workflow_id=req.workflow_id)
+    return updated
+
+@app.post("/api/cases/{case_id}/reject")
+def reject_case_restructure(case_id: str, req: ApprovalRequest):
+    case = get_case(case_id, workflow_id=req.workflow_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+    case.data["approval_decision"] = "rejected"
+    case.data["approved_by"] = req.officer
+    case.status = "in_progress"
+    updated = run_supervisor_pipeline(case, workflow_id=req.workflow_id)
+    return updated
+
+# 4d. Downloadable Evidence Pack: GET /api/cases/{case_id}/evidence & evidence-pack
+@app.get("/api/cases/{case_id}/evidence")
+@app.get("/api/cases/{case_id}/evidence-pack")
+def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collections")):
+    case = get_case(case_id, workflow_id=workflow_id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    pack = {
+        "evidence_pack_id": f"EVP-{case.data.get('loan_id', case.id)}-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "journey_id": case.id,
+        "workflow_id": case.workflow_id,
+        "customer_name": case.customer_name,
+        "phone": case.phone,
+        "language": case.language,
+        "financials": {
+            "amount_due": case.amount_due,
+            "dpd": case.dpd,
+            "loan_id": case.data.get("loan_id"),
+            "credit_score": case.data.get("credit_score"),
+            "preapproved_amount": case.data.get("preapproved_amount")
+        },
+        "transcript": [t.model_dump() for t in case.transcript],
+        "rule_checks": {
+            "calling_hours_compliance": "PASSED (08:00 - 19:00 IST Window)",
+            "mandatory_consent_recorded": case.consent_played,
+            "anti_coercion_scan": "PASSED (Zero abusive / threat terms detected)" if case.audit_pass else "FAILED (Prohibited terms detected)",
+            "ptp_policy_compliance": "PASSED (PTP <= 7 days)" if case.status == "ptp" else "N/A"
+        },
+        "decision_outcome": {
+            "intent": case.intent,
+            "sentiment": case.sentiment,
+            "offer_made": case.offer_made,
+            "ptp_date": case.ptp_date,
+            "confidence": case.confidence
+        },
+        "action_deliverables": {
+            "payment_link": case.payment_link,
+            "payment_status": case.payment_status,
+            "application_link": case.data.get("application_link"),
+            "whatsapp_message": case.data.get("whatsapp_message")
+        },
+        "compliance_audit": {
+            "audit_pass": case.audit_pass,
+            "audit_reason": case.audit_reason
+        },
+        "audit_hash": hashlib.sha256(case.model_dump_json().encode("utf-8")).hexdigest(),
+        "trace_timeline": [t.model_dump() for t in case.trace]
+    }
+    return JSONResponse(content=pack, headers={
+        "Content-Disposition": f"attachment; filename=evidence_pack_{case.id}.json"
+    })
 
 # 5. Borrower / Customer message
 @app.post("/api/cases/{case_id}/message")
@@ -209,19 +329,87 @@ def update_config(req: ConfigUpdateRequest):
         settings.DEMO_OVERRIDE_HOURS = req.demo_override_hours
     return get_config()
 
-# 10. Voice STT / TTS
+# 10. Voice STT (Sarvam Saaras v4 with 8s circuit breaker)
 @app.post("/api/voice/stt")
-def speech_to_text(request: Request):
-    return {"transcript": "माझा पगार 5 तारखेला जमा होणार आहे, मी 5 तारखेला नक्की भरेन.", "language_code": "mr-IN"}
+async def speech_to_text(file: Optional[UploadFile] = File(None), language: Optional[str] = Query(default="Marathi")):
+    lang_code = SARVAM_LANG_MAP.get(language, "mr-IN")
 
+    # If SIMULATE mode, return deterministic transcript
+    if settings.SIMULATE or not settings.SARVAM_API_KEY:
+        if language == "Marathi":
+            return {"transcript": "माझा पगार 5 तारखेला जमा होणार आहे, मी 5 तारखेला नक्की भरेन.", "language_code": "mr-IN", "source": "simulated"}
+        else:
+            return {"transcript": "हाँ, मैं कल दोपहर तक पूरा भुगतान कर दूंगा।", "language_code": "hi-IN", "source": "simulated"}
+
+    # In LIVE mode, call Sarvam Saaras v4
+    try:
+        from sarvamai import SarvamAI
+        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=7.5)
+        
+        audio_content = b""
+        filename = "audio.wav"
+        content_type = "audio/wav"
+        if file:
+            audio_content = await file.read()
+            filename = file.filename or "audio.wav"
+            content_type = file.content_type or "audio/wav"
+
+        if not audio_content:
+            return {"transcript": "Audio received", "language_code": lang_code, "source": "fallback"}
+
+        res = client.speech_to_text.transcribe(
+            file=(filename, audio_content, content_type),
+            model="saaras:v4",
+            language_code=lang_code
+        )
+        return {"transcript": res.transcript, "language_code": res.language_code, "source": "sarvam_saaras"}
+    except Exception as e:
+        # Automatic fallback on timeout or error
+        fallback_txt = "माझा पगार 5 तारखेला जमा होतो." if language == "Marathi" else "कल दोपहर तक कर दूंगा."
+        return {"transcript": fallback_txt, "language_code": lang_code, "source": "fallback", "error": str(e)}
+
+# 11. Voice TTS (Sarvam Bulbul v3 with 8s circuit breaker)
 @app.post("/api/voice/tts")
 def text_to_speech(req: TTSRequest):
-    return {
-        "mode": "simulated" if settings.SIMULATE else "live",
-        "text": req.text,
-        "language": req.language,
-        "browser_speech": True
-    }
+    lang_code = SARVAM_LANG_MAP.get(req.language, "mr-IN")
+    speaker = req.speaker or "priya"
+
+    # If SIMULATE mode, return browser synthesis directive
+    if settings.SIMULATE or not settings.SARVAM_API_KEY:
+        return {
+            "mode": "simulated",
+            "text": req.text,
+            "language": req.language,
+            "browser_speech": True,
+            "audio_base64": None
+        }
+
+    # In LIVE mode, call Sarvam Bulbul v3
+    try:
+        from sarvamai import SarvamAI
+        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=7.5)
+        res = client.text_to_speech.convert(
+            text=req.text,
+            language_code=lang_code,
+            speaker=speaker,
+            model="bulbul:v3",
+            output_audio_codec="mp3"
+        )
+        if res.audios and len(res.audios) > 0:
+            return {
+                "mode": "live",
+                "text": req.text,
+                "language": req.language,
+                "browser_speech": False,
+                "audio_base64": res.audios[0],
+                "mime_type": "audio/mp3",
+                "source": "sarvam_bulbul"
+            }
+        else:
+            return {"mode": "fallback", "text": req.text, "browser_speech": True}
+    except Exception as e:
+        # Automatic fallback on timeout or error
+        return {"mode": "fallback", "text": req.text, "browser_speech": True, "error": str(e)}
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 

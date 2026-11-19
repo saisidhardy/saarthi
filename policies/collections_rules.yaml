@@ -1,0 +1,52 @@
+calling_hours:
+  start_ist: "08:00"
+  end_ist: "19:00"
+  demo_override: true
+  description: "RBI guideline: Outbound recovery calls permitted strictly between 08:00 and 19:00 IST."
+
+identity_verification:
+  mandatory: true
+  field: "loan_id"
+  digits_to_verify: 4
+  max_attempts: 2
+  on_failure: "terminate_zero_disclosure"
+
+negotiation:
+  max_ptp_days: 7
+  min_part_payment_pct: 30.0
+  max_shortfall_without_approval: 10000.0
+  waiver_allowed_autonomous: false
+
+compliance_guardrails:
+  forbidden_phrases:
+    - "पुलिस"
+    - "police"
+    - "जेल"
+    - "jail"
+    - "court"
+    - "कोर्ट"
+    - "बेशर्म"
+    - "चोर"
+    - "चीटर"
+    - "धोखेबाज"
+    - "बेइज्जत"
+    - "मोहल्ले"
+    - "fir"
+    - "arrest"
+    - "gunda"
+  third_party_disclosure_prohibited: true
+  mandatory_consent: true
+
+human_escalation_triggers:
+  dispute:
+    target_desk: "Dispute Resolution Desk (Ops)"
+    reason: "Borrower asserts payment already debited or disputes ledger"
+  hardship:
+    target_desk: "Credit Committee (Hardship & Restructure)"
+    reason: "Medical emergency, job loss, or interest waiver request"
+  compliance_failure:
+    target_desk: "Chief Compliance Officer"
+    reason: "Violation of RBI Fair Practices Code"
+  identity_failure:
+    target_desk: "Fraud Prevention & Identity Verification Desk"
+    reason: "Identity verification failed twice with zero disclosure"

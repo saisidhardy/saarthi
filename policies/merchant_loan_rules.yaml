@@ -1,0 +1,15 @@
+qualification:
+  min_credit_score: 700
+  min_monthly_qr_volume: 50000.0
+  max_preapproved_amount: 500000.0
+  interest_rate_pct: 10.5
+
+negotiation:
+  rate_reduction_allowed: false
+  escalate_on_counter_offer: true
+
+documents_required:
+  - "Last 6 months bank statement / Paytm merchant QR ledger"
+  - "Aadhaar Card"
+  - "PAN Card"
+  - "Shop / Business Electricity Bill or Udhyam Registration"

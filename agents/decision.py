@@ -115,15 +115,33 @@ def _deterministic_negotiate_collections(record: JourneyRecord, text: str, today
         record.assigned_human = "Dispute Resolution Desk (Ops)"
         return record
 
-    # 2. Hardship / Waiver detection
+    # 2. Hardship / Waiver / Restructure detection
     if any(k in text for k in ["नोकरी", "job", "अडचण", "हॉस्पिटल", "accident", "सूट", "माफी", "waiver", "restructure", "hospital", "तंगी"]):
-        record.intent = "hardship"
-        record.sentiment = "anxious"
-        record.status = "escalated"
-        record.confidence = 0.95
-        record.offer_made = "Hardship detected: Borrower seeks EMI restructuring/waiver. Flagged for human review."
-        record.assigned_human = "Credit Committee (Hardship Desk)"
-        return record
+        # Shortfall calculation: if borrower needs relief above Rs 10,000
+        shortfall = record.amount_due - min(record.amount_due * 0.3, 10000.0)
+        if shortfall > 10000.0 and record.data.get("approval_decision") is None:
+            record.intent = "hardship"
+            record.sentiment = "anxious"
+            record.status = "awaiting_approval"
+            record.data["needs_approval"] = True
+            record.data["shortfall_amount"] = shortfall
+            record.confidence = 0.96
+            record.offer_made = f"Restructure requested: Shortfall of ₹{shortfall:,.2f} exceeds ₹10,000 threshold. Paused for Human Approval."
+            return record
+        elif record.data.get("approval_decision") == "approved":
+            record.intent = "ptp"
+            record.status = "ptp"
+            record.offer_made = f"Restructure approved by Credit Committee: Balance of ₹{shortfall:,.2f} restructured."
+            record.confidence = 0.98
+            return record
+        else:
+            record.intent = "hardship"
+            record.sentiment = "anxious"
+            record.status = "escalated"
+            record.confidence = 0.95
+            record.offer_made = "Hardship detected: Borrower seeks EMI restructuring/waiver. Flagged for human review."
+            record.assigned_human = "Credit Committee (Hardship Desk)"
+            return record
 
     # 3. Avoidance detection
     if any(k in text for k in ["मीटिंग", "meeting", "busy", "बाद में", "फोन काटो", "काट दिया", "disconnect"]):

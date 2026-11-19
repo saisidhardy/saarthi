@@ -117,6 +117,10 @@ def run_step_with_retry(
     return record
 
 def check_human_escalation_rules(record: JourneyRecord, workflow: WorkflowDefinition):
+    # If journey is explicitly paused for human-in-the-loop approval, do not override
+    if record.status == "awaiting_approval":
+        return
+
     for rule in workflow.human_escalation_rules:
         if evaluate_condition(rule.condition, record) and record.status != "escalated":
             record.status = "escalated"
@@ -158,6 +162,10 @@ def run_supervisor_pipeline(
         check_human_escalation_rules(record, workflow)
         save_case(record)
 
+        if record.status == "awaiting_approval":
+            logger.info(f"Journey {record.id} paused awaiting human approval.")
+            break
+
         if record.status in ("failed", "escalated") and step.on_failure == "stop":
             break
 
@@ -190,6 +198,10 @@ def run_supervisor_pipeline_stream(
         check_human_escalation_rules(record, workflow)
         save_case(record)
         yield record
+
+        if record.status == "awaiting_approval":
+            logger.info(f"Journey {record.id} paused awaiting human approval.")
+            break
 
         if record.status in ("failed", "escalated") and step.on_failure == "stop":
             break

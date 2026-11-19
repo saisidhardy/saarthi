@@ -1,12 +1,12 @@
 id: loan_sales
 name: "Pre-Approved Personal Loan Sales"
-goal: "Qualify prime retail leads for instant personal loans, explain terms in borrower's language, collect document checklist, and hand off exceptions to human managers."
+goal: "Qualify prime retail leads for instant personal loans, research bureau capacity, evaluate offer sanction, and conduct vernacular outreach with document dispatch."
 success_metric: "qualified_leads"
 policy_file: "policies/loan_sales_policy.txt"
 sample_data_file: "data/sales_leads.csv"
 
 human_escalation_rules:
-  - condition: "record.data.get('intent') == 'hardship' or 'negotiate' in str(record.data.get('offer_made')).lower()"
+  - condition: "record.data.get('intent') == 'hardship' or 'negotiat' in str(record.data.get('offer_made')).lower()"
     target_desk: "Senior Relationship Manager (Elite Sales)"
     reason: "Lead requested custom rate concession or specialized loan product"
   - condition: "record.data.get('audit_pass') is False"
@@ -14,51 +14,34 @@ human_escalation_rules:
     reason: "TRAI or misrepresentation flag triggered during pitch"
 
 steps:
-  - id: intake
-    name: "Lead Profile Qualification"
+  - id: lead
+    name: "Lead Intake & Qualification"
     agent: "Intake"
     retry_limit: 3
     on_failure: "escalate"
-    input_fields: ["credit_score", "preapproved_amount", "customer_name"]
-    output_fields: ["risk_note", "tone_hint", "best_call_window"]
+    input_fields: ["customer_name", "credit_score", "preapproved_amount"]
+    output_fields: ["tone_hint", "best_call_window"]
 
-  - id: conversation
-    name: "Sales Pitch & Consent"
-    agent: "Conversation"
+  - id: research
+    name: "Credit Bureau Research"
+    agent: "Research"
     retry_limit: 3
     on_failure: "escalate"
-    input_fields: ["language", "customer_name", "preapproved_amount"]
-    output_fields: ["consent_played", "transcript", "cost_inr"]
+    input_fields: ["credit_score", "preapproved_amount"]
+    output_fields: ["bureau_tier", "income_multiplier"]
 
-  - id: decision
-    name: "Offer Sanction & Eligibility"
+  - id: offer
+    name: "Sanction Terms & Decision"
     agent: "Decision"
     retry_limit: 3
     on_failure: "escalate"
-    input_fields: ["transcript", "preapproved_amount", "policy_file"]
+    input_fields: ["preapproved_amount", "policy_file"]
     output_fields: ["intent", "sentiment", "offer_made", "confidence"]
 
-  - id: action
-    name: "WhatsApp Doc Checklist Dispatch"
-    agent: "Action"
+  - id: outreach
+    name: "Conversational Outreach & Doc Dispatch"
+    agent: "Outreach"
     retry_limit: 3
     on_failure: "escalate"
-    condition: "record.status != 'escalated' and record.status != 'contacted'"
-    input_fields: ["preapproved_amount", "language"]
-    output_fields: ["application_link", "docs_requested"]
-
-  - id: compliance
-    name: "TRAI & Sales Ethics Audit"
-    agent: "Compliance"
-    retry_limit: 3
-    on_failure: "escalate"
-    input_fields: ["transcript", "consent_played"]
-    output_fields: ["audit_pass", "audit_reason"]
-
-  - id: reporter
-    name: "Pipeline Conversion Attribution"
-    agent: "Reporter"
-    retry_limit: 3
-    on_failure: "continue"
-    input_fields: []
-    output_fields: ["macro_metrics"]
+    input_fields: ["language", "customer_name", "preapproved_amount"]
+    output_fields: ["application_link", "docs_requested", "whatsapp_message"]

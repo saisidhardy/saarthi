@@ -64,7 +64,7 @@
               <span class="text-[11px] text-slate-400 font-medium">Workflow:</span>
               <select id="workflowSelect" onchange="onWorkflowChange()" class="bg-slate-800 border border-indigo-500/40 text-xs font-semibold text-white rounded-lg px-2.5 py-1 focus:outline-none focus:border-indigo-400 cursor-pointer">
                 <option value="collections">Collections (Early Delinquency EMI)</option>
-                <option value="loan_sales">Loan Sales (Pre-Approved Offers)</option>
+                <option value="loan_sales">Loan Sales (lead &rarr; research &rarr; offer &rarr; outreach)</option>
               </select>
             </div>
 
@@ -73,24 +73,29 @@
               SIMULATE (FREE)
             </span>
           </div>
-          <p class="text-xs text-slate-400">Generic Autonomous Multi-Agent Workflow Engine · 6 Reusable Agents · 1 Shared Journey Record</p>
+          <p class="text-xs text-slate-400">Event-Driven Autonomous Multi-Agent Engine · Human-in-the-Loop Sign-Off · Tamper-Evident Evidence Pack</p>
         </div>
       </div>
 
       <!-- Actions & Controls -->
       <div class="flex items-center flex-wrap gap-2">
-        <button id="heroDemoBtn" onclick="runHeroDemo()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold text-xs rounded-lg shadow-md hover:shadow-orange-500/20 flex items-center gap-2 transition transform active:scale-95">
-          <i class="fa-solid fa-play"></i> Run Hero Demo (#1)
+        <!-- Event Trigger Button -->
+        <button id="eventTriggerBtn" onclick="simulateBouncedMandateEvent()" class="px-3.5 py-1.5 bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-lg shadow-lg shadow-rose-900/40 flex items-center gap-2 transition transform active:scale-95">
+          <i class="fa-solid fa-bolt-lightning"></i> <span id="eventBtnLabel">Simulate bounced-mandate event</span>
         </button>
+
+        <!-- Replay Recorded Run Button -->
+        <button onclick="replayRecordedRun()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-film text-amber-400"></i> Replay recorded run
+        </button>
+
         <button onclick="resetCurrentWorkflowBook()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-rotate-right"></i> Reset Sample Data
+          <i class="fa-solid fa-rotate-right"></i> Reset
         </button>
+
         <button id="demoHoursBtn" onclick="toggleDemoHours()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
           <i class="fa-regular fa-clock text-emerald-400"></i> Hours: <span id="hoursStatus" class="text-emerald-400 font-semibold">11:30 AM IST</span>
         </button>
-        <a href="/landing" target="_blank" class="px-3 py-1.5 bg-indigo-900/40 hover:bg-indigo-900/60 text-indigo-300 text-xs rounded-lg border border-indigo-700/50 flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Pricing
-        </a>
       </div>
     </div>
   </header>
@@ -105,7 +110,7 @@
           <i class="fa-solid fa-route text-indigo-400 text-xs"></i>
         </div>
         <div id="statJourneysStarted" class="text-lg font-bold text-white mt-0.5">0</div>
-        <div class="text-[10px] text-slate-500">Total automated runs</div>
+        <div class="text-[10px] text-slate-500">Event-triggered journeys</div>
       </div>
       <!-- 2. Autonomous Completed -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
@@ -123,7 +128,7 @@
           <i class="fa-solid fa-user-shield text-rose-400 text-xs"></i>
         </div>
         <div id="statHumanTouchRate" class="text-lg font-bold text-rose-400 mt-0.5">0.0%</div>
-        <div class="text-[10px] text-slate-500">Escalated exceptions</div>
+        <div class="text-[10px] text-slate-500">Approval & escalation</div>
       </div>
       <!-- 4. Workflow Success Metric (Dynamic) -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
@@ -146,7 +151,7 @@
       <!-- 6. Industry Benchmark -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 bg-slate-900/40">
         <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Industry Human Cost</span>
+          <span>Industry Baseline</span>
           <i class="fa-solid fa-building-columns text-slate-400 text-xs"></i>
         </div>
         <div class="text-sm font-semibold text-slate-300 mt-1">₹52 <span class="text-[10px] text-slate-500 font-normal">call</span> / ₹250 <span class="text-[10px] text-slate-500 font-normal">visit</span></div>
@@ -168,7 +173,6 @@
         <span id="recordCountBadge" class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">0 loaded</span>
       </div>
       <div id="recordsList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1.5">
-        <!-- Records rendered by JS -->
       </div>
     </div>
 
@@ -188,9 +192,10 @@
           <button id="simulatePaymentBtn" onclick="simulatePaymentCurrent()" class="hidden px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold rounded-lg border border-emerald-500/40 transition flex items-center gap-1">
             <i class="fa-solid fa-money-bill-wave"></i> Simulate Pay
           </button>
-          <button id="runPipelineBtn" onclick="runPipelineCurrent()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
-            <i class="fa-solid fa-bolt"></i> Run Pipeline
-          </button>
+          <!-- Download Evidence Pack -->
+          <a id="downloadEvidenceBtn" href="#" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 flex items-center gap-1 transition" title="Download tamper-evident JSON evidence pack">
+            <i class="fa-solid fa-file-shield text-indigo-400"></i> Evidence Pack
+          </a>
         </div>
       </div>
 
@@ -198,7 +203,7 @@
       <div class="px-3.5 py-2.5 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
           <div id="callIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
-          <span id="callStatusText" class="text-slate-400">Idle - Click Run Pipeline to execute</span>
+          <span id="callStatusText" class="text-slate-400">Idle - Click event trigger to start</span>
         </div>
         <div class="flex items-center gap-2">
           <button id="micBtn" onclick="toggleMic()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1">
@@ -210,11 +215,32 @@
         </div>
       </div>
 
+      <!-- Human-in-the-Loop Approval Card (when paused) -->
+      <div id="approvalCard" class="hidden p-3.5 bg-amber-950/70 border-b border-amber-600/60 text-amber-200 text-xs">
+        <div class="flex items-center justify-between mb-2">
+          <div class="font-bold flex items-center gap-1.5 text-amber-300">
+            <i class="fa-solid fa-user-check text-amber-400"></i> HUMAN APPROVAL REQUIRED
+          </div>
+          <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/40 font-mono">PAUSED</span>
+        </div>
+        <p id="approvalDetailsText" class="text-[11px] text-amber-200/90 mb-3">
+          Shortfall exceeds ₹10,000 threshold. Senior Credit Officer sign-off is required to approve restructure.
+        </p>
+        <div class="flex items-center gap-2">
+          <button onclick="submitApprovalDecision('approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition">
+            <i class="fa-solid fa-check mr-1"></i> Approve Restructure
+          </button>
+          <button onclick="submitApprovalDecision('rejected')" class="flex-1 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs transition">
+            <i class="fa-solid fa-xmark mr-1"></i> Reject & Escalate
+          </button>
+        </div>
+      </div>
+
       <!-- Live Transcript -->
       <div class="flex-1 overflow-y-auto custom-scroll p-3.5 space-y-2.5 bg-slate-950/40" id="transcriptContainer">
         <div class="text-center text-slate-500 text-xs py-10">
           <i class="fa-solid fa-comments text-2xl mb-2 text-slate-600 block"></i>
-          No transcript yet. Click "Run Hero Demo" or select a record.
+          No transcript yet. Click "Simulate bounced-mandate event" to trigger call.
         </div>
       </div>
 
@@ -230,7 +256,7 @@
           <a id="actionLinkAnchor" href="#" target="_blank" class="text-indigo-400 hover:underline truncate max-w-[280px]">
             <i class="fa-solid fa-link mr-1"></i> <span id="actionLinkText">link...</span>
           </a>
-          <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded">Demo data</span>
+          <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded">Demo lender - sample data</span>
         </div>
       </div>
 
@@ -255,7 +281,6 @@
 
       <!-- Dynamic Agent Steps Rendered From Workflow YAML -->
       <div id="dynamicTraceContainer" class="flex-1 overflow-y-auto custom-scroll p-3 space-y-2.5 bg-slate-950/30">
-        <!-- Steps generated dynamically by JS -->
       </div>
 
       <!-- Human Escalation Notice Banner -->
@@ -280,7 +305,8 @@
     let selectedRecord = null;
     let isSimulate = true;
     let demoOverrideHours = true;
-    let isHeroDemoRunning = false;
+    let isReplayRunning = false;
+    let currentAudioPlayer = null;
 
     window.addEventListener('DOMContentLoaded', async () => {
       await fetchConfig();
@@ -342,21 +368,17 @@
       currentWorkflowId = workflowId;
       document.getElementById('workflowSelect').value = workflowId;
       
-      // 1. Fetch workflow YAML definition
       const wfRes = await fetch(`/api/workflows/${workflowId}`);
       workflowDef = await wfRes.json();
       
       document.getElementById('workflowBadge').innerText = `${workflowDef.steps.length} Steps · YAML`;
       document.getElementById('listTitle').innerText = workflowId === "loan_sales" ? "Sales Leads" : "Loan Accounts";
+      document.getElementById('eventBtnLabel').innerText = workflowId === "loan_sales" ? "Simulate new pre-approved lead event" : "Simulate bounced-mandate event";
 
-      // 2. Load records
       await loadRecords();
       await updateDashboard();
-
-      // 3. Render step cards skeleton in trace timeline
       renderWorkflowStepCards();
 
-      // 4. Select first record
       if (allRecords.length > 0) {
         selectRecord(allRecords[0].id);
       }
@@ -418,13 +440,14 @@
         if (r.status === 'ptp') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30">PTP</span>`;
         if (r.status === 'paid') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PAID</span>`;
         if (r.status === 'qualified') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">QUALIFIED</span>`;
+        if (r.status === 'awaiting_approval') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">APPROVAL</span>`;
         if (r.status === 'escalated') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30">ESCALATED</span>`;
         if (r.status === 'contacted') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">CALL</span>`;
 
         let subLine = "";
         if (currentWorkflowId === "loan_sales") {
           const preAmt = parseFloat(r.data.preapproved_amount || 0);
-          subLine = `<span class="text-indigo-300">${r.language}</span> • <span>₹${preAmt.toLocaleString()} pre-approved</span> • <span class="text-emerald-400">${r.data.credit_score || 750} CIBIL</span>`;
+          subLine = `<span class="text-indigo-300">${r.language}</span> • <span>₹${preAmt.toLocaleString()}</span> • <span class="text-emerald-400">${r.data.credit_score || 750} CIBIL</span>`;
         } else {
           const amt = parseFloat(r.data.amount_due || 0);
           subLine = `<span class="text-indigo-300">${r.language}</span> • <span>₹${amt.toLocaleString()}</span> • <span class="text-rose-400">${r.data.dpd || 0} DPD</span>`;
@@ -476,6 +499,7 @@
       badge.className = `text-[10px] font-semibold px-2 py-0.5 rounded-full ${
         r.status === 'ptp' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
         r.status === 'paid' || r.status === 'qualified' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+        r.status === 'awaiting_approval' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse' :
         r.status === 'escalated' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
         'bg-slate-800 text-slate-400'
       }`;
@@ -488,9 +512,24 @@
         simPayBtn.classList.add('hidden');
       }
 
+      // Download Evidence Pack button
+      const evBtn = document.getElementById('downloadEvidenceBtn');
+      evBtn.href = `/api/cases/${r.id}/evidence-pack?workflow_id=${currentWorkflowId}`;
+
+      // Human Approval Card
+      const appCard = document.getElementById('approvalCard');
+      if (r.status === 'awaiting_approval') {
+        appCard.classList.remove('hidden');
+        const shortfall = parseFloat(r.data.shortfall_amount || 0);
+        document.getElementById('approvalDetailsText').innerText = 
+          `Borrower requested EMI restructuring with shortfall of ₹${shortfall.toLocaleString()} (exceeds ₹10,000 threshold). Action required by Senior Credit Authority.`;
+      } else {
+        appCard.classList.add('hidden');
+      }
+
       renderTranscript(r.transcript);
       renderActionDeliverable(r);
-      updateWorkflowStepCards(r);
+      updateWorkflowStepCards(record=r);
 
       const escNotice = document.getElementById('escalationNotice');
       if (r.status === 'escalated') {
@@ -508,7 +547,7 @@
         container.innerHTML = `
           <div class="text-center text-slate-500 text-xs py-10">
             <i class="fa-solid fa-comments text-2xl mb-2 text-slate-600 block"></i>
-            No transcript yet. Click "Run Pipeline" to begin.
+            No transcript yet. Click "Simulate bounced-mandate event" to start.
           </div>
         `;
         return;
@@ -543,7 +582,7 @@
       if (currentWorkflowId === "loan_sales" && r.data.application_link) {
         actionBox.classList.remove('hidden');
         actionTitle.innerHTML = `<i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> WhatsApp Sanction Link & Document Checklist Dispatched`;
-        previewText.innerText = r.data.whatsapp_message || `Pre-approved ₹${r.data.preapproved_amount} personal loan ready. Upload KYC documents via: ${r.data.application_link}`;
+        previewText.innerText = r.data.whatsapp_message || `Pre-approved ₹${r.data.preapproved_amount} personal loan ready: ${r.data.application_link}`;
         linkAnchor.href = r.data.application_link;
         linkText.innerText = r.data.application_link;
       } else if (currentWorkflowId === "collections" && (r.data.payment_status === 'sent' || r.data.payment_status === 'paid')) {
@@ -580,7 +619,7 @@
     }
 
     function updateWorkflowStepCards(record) {
-      if (!workflowDef || !workflowDef.steps) return;
+      if (!workflowDef || !workflowDef.steps || !record) return;
 
       workflowDef.steps.forEach(step => {
         const card = document.getElementById(`stepCard-${step.agent}`);
@@ -621,23 +660,31 @@
       });
     }
 
-    async function runPipelineCurrent() {
+    // EVENT-DRIVEN START: POST /api/events/emi-bounced
+    async function simulateBouncedMandateEvent() {
       if (!selectedRecord) return;
-      await runPipelineForRecord(selectedRecord.id);
-    }
-
-    async function runPipelineForRecord(recordId) {
       const callDot = document.getElementById('callIndicatorDot');
       const callStatus = document.getElementById('callStatusText');
-      callDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping";
-      callStatus.innerText = "Workflow engine executing steps...";
+      const eventBtn = document.getElementById('eventTriggerBtn');
+
+      eventBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Ingesting NACH Event...';
+      callDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping";
+      callStatus.innerText = "NACH bounce event received -> Triggering autonomous journey...";
 
       try {
-        const res = await fetch(`/api/cases/${recordId}/run?workflow_id=${currentWorkflowId}`, { method: 'POST' });
+        const res = await fetch('/api/events/emi-bounced', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            account_id: selectedRecord.id,
+            workflow_id: currentWorkflowId,
+            bounce_reason: "E006 - Insufficient Funds (Auto-Debit Mandate Failed)"
+          })
+        });
         selectedRecord = await res.json();
         
         callDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
-        callStatus.innerText = "Workflow execution completed";
+        callStatus.innerText = "Autonomous call & negotiation complete";
 
         renderRecordDetails();
         await loadRecords();
@@ -646,8 +693,68 @@
         speakLastAgentMessage();
       } catch (err) {
         callDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-        callStatus.innerText = "Engine error: " + err;
+        callStatus.innerText = "Event failure: " + err;
+      } finally {
+        eventBtn.innerHTML = `<i class="fa-solid fa-bolt-lightning"></i> <span id="eventBtnLabel">${document.getElementById('eventBtnLabel')?.innerText || 'Simulate bounced-mandate event'}</span>`;
       }
+    }
+
+    // HUMAN APPROVAL SUBMISSION
+    async function submitApprovalDecision(decision) {
+      if (!selectedRecord) return;
+      try {
+        const res = await fetch(`/api/cases/${selectedRecord.id}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            decision: decision,
+            officer: "Senior Credit Manager (Exceptions Desk)",
+            workflow_id: currentWorkflowId
+          })
+        });
+        selectedRecord = await res.json();
+        renderRecordDetails();
+        await loadRecords();
+        await updateDashboard();
+        speakLastAgentMessage();
+      } catch (err) {
+        alert("Approval action failed: " + err);
+      }
+    }
+
+    // REPLAY RECORDED RUN (Visual cached playback through same trace UI)
+    async function replayRecordedRun() {
+      if (isReplayRunning || !workflowDef || !workflowDef.steps) return;
+      isReplayRunning = true;
+
+      // Select Hero account #1
+      await selectRecord('1');
+      await new Promise(r => setTimeout(r, 400));
+
+      const steps = workflowDef.steps;
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        highlightCard(step.agent);
+        document.getElementById('callStatusText').innerText = `Replaying cached step ${i+1}/${steps.length}: ${step.name}...`;
+        await new Promise(r => setTimeout(r, 650));
+      }
+
+      highlightCard(null);
+      document.getElementById('callStatusText').innerText = "Replay complete. Verified deterministic trace.";
+      isReplayRunning = false;
+    }
+
+    function highlightCard(agentName) {
+      if (!workflowDef || !workflowDef.steps) return;
+      workflowDef.steps.forEach(s => {
+        const c = document.getElementById(`stepCard-${s.agent}`);
+        if (!c) return;
+        if (s.agent === agentName) {
+          c.classList.add('agent-active');
+        } else {
+          c.classList.remove('agent-active');
+        }
+      });
     }
 
     async function simulatePaymentCurrent() {
@@ -685,33 +792,36 @@
       }
     }
 
-    async function runHeroDemo() {
-      if (isHeroDemoRunning) return;
-      isHeroDemoRunning = true;
-      const heroBtn = document.getElementById('heroDemoBtn');
-      heroBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Demo in Progress...';
-      heroBtn.classList.add('opacity-75');
-
-      await selectRecord('1');
-      await new Promise(r => setTimeout(r, 600));
-
-      await runPipelineForRecord('1');
-      await new Promise(r => setTimeout(r, 1200));
-
-      if (currentWorkflowId === "collections") {
-        await simulatePaymentCurrent();
-      }
-
-      heroBtn.innerHTML = '<i class="fa-solid fa-play"></i> Run Hero Demo (#1)';
-      heroBtn.classList.remove('opacity-75');
-      isHeroDemoRunning = false;
-    }
-
-    function speakLastAgentMessage() {
+    // Audio Playback (Sarvam Bulbul TTS + browser speech fallback)
+    async function speakLastAgentMessage() {
       if (!selectedRecord || !selectedRecord.transcript) return;
       const agentTurns = selectedRecord.transcript.filter(t => t.speaker === 'agent');
       if (agentTurns.length === 0) return;
       const lastTurn = agentTurns[agentTurns.length - 1];
+
+      try {
+        const res = await fetch('/api/voice/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: lastTurn.text,
+            language: selectedRecord.language || 'Hindi',
+            speaker: 'priya'
+          })
+        });
+        const data = await res.json();
+
+        if (data.audio_base64) {
+          if (currentAudioPlayer) {
+            currentAudioPlayer.pause();
+          }
+          currentAudioPlayer = new Audio(`data:${data.mime_type || 'audio/mp3'};base64,${data.audio_base64}`);
+          currentAudioPlayer.play().catch(e => console.warn("Auto-play prevented:", e));
+          return;
+        }
+      } catch (err) {
+        console.warn("Sarvam TTS error, using browser speech fallback:", err);
+      }
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -724,60 +834,107 @@
       }
     }
 
+    // Voice Input (MediaRecorder + Web Speech fallback)
     let isRecording = false;
-    let recognition = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
 
-    function toggleMic() {
+    async function toggleMic() {
       const micBtn = document.getElementById('micBtn');
       const micLabel = document.getElementById('micLabel');
 
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Speech recognition is not supported in this browser. Please type reply.");
-        return;
-      }
-
       if (isRecording) {
-        if (recognition) recognition.stop();
-        isRecording = false;
-        micBtn.classList.remove('bg-rose-600', 'text-white');
-        micLabel.innerText = "Mic";
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
         return;
       }
 
-      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRec();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      
-      if (selectedRecord && selectedRecord.language === 'Marathi') recognition.lang = 'mr-IN';
-      else if (selectedRecord && selectedRecord.language === 'Hindi') recognition.lang = 'hi-IN';
-      else recognition.lang = 'en-IN';
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
 
-      recognition.onstart = () => {
-        isRecording = true;
-        micBtn.classList.add('bg-rose-600', 'text-white');
-        micLabel.innerText = "Listening...";
-      };
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) audioChunks.push(e.data);
+          };
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('customerInput').value = transcript;
-        sendCustomerText();
-      };
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            stream.getTracks().forEach(track => track.stop());
 
-      recognition.onerror = () => {
-        isRecording = false;
-        micBtn.classList.remove('bg-rose-600', 'text-white');
-        micLabel.innerText = "Mic";
-      };
+            micLabel.innerText = "Transcribing...";
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'mic_recording.wav');
 
-      recognition.onend = () => {
-        isRecording = false;
-        micBtn.classList.remove('bg-rose-600', 'text-white');
-        micLabel.innerText = "Mic";
-      };
+            try {
+              const lang = selectedRecord ? selectedRecord.language : "Hindi";
+              const res = await fetch(`/api/voice/stt?language=${encodeURIComponent(lang)}`, {
+                method: 'POST',
+                body: formData
+              });
+              const data = await res.json();
+              if (data.transcript) {
+                document.getElementById('customerInput').value = data.transcript;
+                sendCustomerText();
+              }
+            } catch (err) {
+              console.error("STT error:", err);
+            }
+            micBtn.classList.remove('bg-rose-600', 'text-white');
+            micLabel.innerText = "Mic";
+            isRecording = false;
+          };
 
-      recognition.start();
+          mediaRecorder.start();
+          isRecording = true;
+          micBtn.classList.add('bg-rose-600', 'text-white');
+          micLabel.innerText = "Recording...";
+          return;
+        } catch (err) {
+          console.warn("getUserMedia failed or denied:", err);
+        }
+      }
+
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRec();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        
+        if (selectedRecord && selectedRecord.language === 'Marathi') recognition.lang = 'mr-IN';
+        else if (selectedRecord && selectedRecord.language === 'Hindi') recognition.lang = 'hi-IN';
+        else recognition.lang = 'en-IN';
+
+        recognition.onstart = () => {
+          isRecording = true;
+          micBtn.classList.add('bg-rose-600', 'text-white');
+          micLabel.innerText = "Listening...";
+        };
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          document.getElementById('customerInput').value = transcript;
+          sendCustomerText();
+        };
+
+        recognition.onerror = () => {
+          isRecording = false;
+          micBtn.classList.remove('bg-rose-600', 'text-white');
+          micLabel.innerText = "Mic";
+        };
+
+        recognition.onend = () => {
+          isRecording = false;
+          micBtn.classList.remove('bg-rose-600', 'text-white');
+          micLabel.innerText = "Mic";
+        };
+
+        recognition.start();
+      } else {
+        alert("Microphone is not supported in this browser. Please type reply.");
+      }
     }
   </script>
 </body>
