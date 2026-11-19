@@ -36,14 +36,23 @@ steps:
     input_fields: ["language", "customer_name", "phone", "amount_due"]
     output_fields: ["consent_played", "transcript", "cost_inr", "identity_verified"]
 
-  - id: decision
-    name: "Policy Decision & Negotiation"
-    agent: "Decision"
+  - id: negotiation
+    name: "Entity Extraction & PTP Proposal"
+    agent: "Negotiation"
     retry_limit: 3
     on_failure: "escalate"
     condition: "record.status not in ('escalated', 'failed')"
-    input_fields: ["transcript", "amount_due", "policy_file"]
-    output_fields: ["intent", "sentiment", "offer_made", "ptp_date", "confidence"]
+    input_fields: ["transcript", "amount_due"]
+    output_fields: ["llm_proposal", "understood_chips"]
+
+  - id: policy_engine
+    name: "Deterministic Policy Engine"
+    agent: "PolicyEngine"
+    retry_limit: 3
+    on_failure: "escalate"
+    condition: "record.status not in ('failed',)"
+    input_fields: ["llm_proposal", "policy_file"]
+    output_fields: ["policy_decision", "policy_firewall"]
 
   - id: human_approval
     name: "Credit Authority Sign-Off"
@@ -55,21 +64,21 @@ steps:
     output_fields: ["approval_decision", "approved_by"]
 
   - id: compliance
-    name: "RBI Fair Practices Audit"
+    name: "Conduct Rules & Compliance Gate"
     agent: "Compliance"
     retry_limit: 3
     on_failure: "escalate"
     condition: "record.status not in ('awaiting_approval', 'failed')"
-    input_fields: ["transcript", "consent_played", "ptp_date", "identity_verified"]
+    input_fields: ["transcript", "ai_disclosure_played", "recording_disclosure_played", "identity_verified"]
     output_fields: ["audit_pass", "audit_reason"]
 
   - id: action
-    name: "UPI Link & WhatsApp Dispatch"
+    name: "Lender Escrow UPI Link & WhatsApp"
     agent: "Action"
     retry_limit: 3
     on_failure: "escalate"
     condition: "record.status not in ('escalated', 'awaiting_approval', 'failed') and record.data.get('audit_pass') is True"
-    input_fields: ["amount_due", "ptp_date", "language", "loan_id"]
+    input_fields: ["amount_due", "ptp_date", "language", "loan_id", "policy_decision"]
     output_fields: ["payment_link", "payment_status"]
 
   - id: reporter

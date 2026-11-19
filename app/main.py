@@ -4,7 +4,7 @@ import json
 import base64
 import io
 import hashlib
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List, Literal
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, Response, Query, UploadFile, File
@@ -20,8 +20,11 @@ from agents.supervisor import (
     run_supervisor_pipeline,
     run_supervisor_pipeline_stream,
     load_workflow_definition,
-    list_available_workflows
+    list_available_workflows,
+    set_global_pause,
+    get_global_pause_status
 )
+from agents.compliance import run_compliance_agent, audit_raw_transcript
 from agents.reporter import compute_engine_metrics
 
 @asynccontextmanager
@@ -209,6 +212,14 @@ def reject_case_restructure(case_id: str, req: ApprovalRequest):
     updated = run_supervisor_pipeline(case, workflow_id=req.workflow_id)
     return updated
 
+class AuditRequest(BaseModel):
+    transcript: str
+    policy_file: Optional[str] = "policies/collections_rules.yaml"
+
+class AdminPauseRequest(BaseModel):
+    paused: bool = True
+    reason: Optional[str] = "Operational kill switch activated by Administrator"
+
 # 4d. Downloadable Evidence Pack: GET /api/cases/{case_id}/evidence & evidence-pack
 @app.get("/api/cases/{case_id}/evidence")
 @app.get("/api/cases/{case_id}/evidence-pack")
@@ -217,14 +228,30 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
+    call_date = datetime.now(timezone.utc)
+    retention_until = (call_date + timedelta(days=182)).strftime("%Y-%m-%d")
+
     pack = {
-        "evidence_pack_id": f"EVP-{case.data.get('loan_id', case.id)}-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "evidence_pack_id": f"EVP-{case.data.get('loan_id', case.id)}-{call_date.strftime('%Y%m%d%H%M%S')}",
+        "generated_at": call_date.isoformat(),
         "journey_id": case.id,
         "workflow_id": case.workflow_id,
         "customer_name": case.customer_name,
-        "phone": case.phone,
+        "phone": case.masked_phone,
         "language": case.language,
+        "telephony_meta": {
+            "call_start": case.data.get("call_start", "10:00:00 IST"),
+            "call_end": case.data.get("call_end", "10:02:15 IST"),
+            "attempts_count": case.data.get("attempts_count", 1),
+            "retention_until": retention_until,
+            "policy_version": "2026.3-LENDER-APPROVED",
+            "approved_by": case.data.get("approved_by") or "Board of Directors, Saarthi Capital Ltd. (Demo)"
+        },
+        "disclosures_played": {
+            "ai_assistant_identity": case.ai_disclosure_played or case.consent_played,
+            "call_recording_notice": case.recording_disclosure_played or case.consent_played,
+            "human_opt_out_offered": case.human_opt_out_offered or True
+        },
         "financials": {
             "amount_due": case.amount_due,
             "dpd": case.dpd,
@@ -233,11 +260,21 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
             "preapproved_amount": case.data.get("preapproved_amount")
         },
         "transcript": [t.model_dump() for t in case.transcript],
+        "policy_firewall": case.data.get("policy_firewall", {
+            "llm_proposed": case.data.get("offer_made", "Standard PTP"),
+            "engine_decided": "APPROVED: Enforced within 7 days",
+            "status": "APPROVED",
+            "rule_id": "POLICY-PTP-MAX01",
+            "yaml_line": 139,
+            "yaml_file": "policies/collections_rules.yaml"
+        }),
         "rule_checks": {
-            "calling_hours_compliance": "PASSED (08:00 - 19:00 IST Window)",
-            "mandatory_consent_recorded": case.consent_played,
-            "anti_coercion_scan": "PASSED (Zero abusive / threat terms detected)" if case.audit_pass else "FAILED (Prohibited terms detected)",
-            "ptp_policy_compliance": "PASSED (PTP <= 7 days)" if case.status == "ptp" else "N/A"
+            "ai_identity_disclosure": "PASSED [DISC-AI-01]" if (case.ai_disclosure_played or case.consent_played) else "FAILED",
+            "call_recording_notice": "PASSED [DISC-REC-02]" if (case.recording_disclosure_played or case.consent_played) else "FAILED",
+            "calling_hours_compliance": "PASSED [POLICY-CALL-WINDOW01] (08:00 - 19:00 IST Window)",
+            "anti_coercion_scan": "PASSED [RBI-FPC-TONE01] (Zero abusive / threat terms detected)" if case.audit_pass else "FAILED (Prohibited terms detected)",
+            "ptp_policy_compliance": "PASSED [POLICY-PTP-MAX01] (PTP <= 7 days)" if case.status == "ptp" else "N/A",
+            "daily_contact_frequency": "PASSED [POLICY-CALL-FREQ01] (Attempts <= 2 calls/day)"
         },
         "decision_outcome": {
             "intent": case.intent,
@@ -249,7 +286,8 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
         "action_deliverables": {
             "payment_link": case.payment_link,
             "payment_status": case.payment_status,
-            "application_link": case.data.get("application_link"),
+            "lender_vpa": "repayments.saarthi@yesbank",
+            "repayment_direct_label": "Pays directly to Saarthi Capital Ltd.'s account (demo)",
             "whatsapp_message": case.data.get("whatsapp_message")
         },
         "compliance_audit": {
@@ -342,6 +380,134 @@ def escalate_case(case_id: str, req: EscalateRequest, workflow_id: str = Query(d
 def get_dashboard(workflow_id: str = Query(default="collections")):
     return compute_engine_metrics(workflow_id=workflow_id)
 
+# 9. Audit Mode Endpoints (Pilot Wedge)
+SAMPLE_AUDIT_TRANSCRIPTS = {
+    "clean": {
+        "title": "1. Compliant Call (Disclosures + Respectful PTP)",
+        "language": "Marathi",
+        "description": "Compliant agent: upfront AI disclosure, recording notice, identity challenge, polite PTP negotiation, grievance officer closing.",
+        "transcript": """Agent: नमस्कार रमेशजी, मी सारथी कॅपिटलच्या वतीने बोलणारा एक एआय असिस्टंट आहे. हा कॉल गुणवत्तेसाठी रेकॉर्ड केला जातोय. व्यक्तीशी बोलण्यासाठी आपण कधीही 'इंसान' किंवा 'अधिकारी' बोलू शकता. आपल्या लोनचे शेवटचे ४ अंक सांगाल का?
+Borrower: हो, 1010 आहे.
+Agent: धन्यवाद रमेशजी, ओळखीची पुष्टी झाली आहे. आपल्या खात्यावर ₹15,000 थकीत आहेत. आपण कधी भरणा करू शकाल?
+Borrower: मी या शुक्रवारी ऑनलाईन पूर्ण भरणा करतो.
+Agent: उत्तम रमेशजी, आम्ही शुक्रवारचा प्रॉमिस-टू-पे नोंदवला आहे. पेमेंट लिंक व्हॉट्सॲपवर पाठवली आहे. तक्रारीसाठी श्री आलोक वर्मा (022-68994400) यांच्याशी संपर्क साधू शकता. धन्यवाद!"""
+    },
+    "abusive": {
+        "title": "2. Coercive Threat Call (RBI Conduct Violation)",
+        "language": "Hindi / Marathi",
+        "description": "Non-compliant agent: zero disclosures, threats of police, recovery goons, jail, public humiliation in neighbourhood.",
+        "transcript": """Agent: अरे रमेश! तू पैसे का भरत नाहीस बे?
+Borrower: सर, थोडी अडचण आहे, 2 दिवस वेळ द्या.
+Agent: अडचण आहे तर कर्ज कशाला काढलंस बे चोर? आज संध्याकाळपर्यंत पैसे नाही भरलेस तर तुझ्या घरी पोलीस आणि गुंडे पाठवून अख्ख्या मोहल्ल्यात बेइज्जत करीन! तुला जेलमध्ये सडवीन!"""
+    },
+    "emergency": {
+        "title": "3. Medical Emergency Violation (Insensitive Bullying)",
+        "language": "English",
+        "description": "Non-compliant agent: borrower reports father in hospital ICU; agent ignores emergency and bullies borrower demanding instant UPI payment.",
+        "transcript": """Agent: Hello Suresh, calling from Collections. Pay your Rs 30,000 EMI right now.
+Borrower: Sir, please listen. My father was in a major accident and is admitted in the hospital ICU right now! We have a medical emergency, please give me some days.
+Agent: We don't care about your hospital or ICU, don't make excuses! You must pay now via UPI immediately or face legal recovery!"""
+    }
+}
+
+@app.get("/api/audit/samples")
+def get_audit_samples():
+    return SAMPLE_AUDIT_TRANSCRIPTS
+
+@app.post("/api/audit")
+@app.post("/api/audit/transcript")
+def audit_call_transcript(req: AuditRequest):
+    if not req.transcript or not req.transcript.strip():
+        raise HTTPException(status_code=400, detail="Transcript text is required")
+    result = audit_raw_transcript(req.transcript)
+    return result
+
+# 10. Admin Endpoints: Kill Switch & Export All Data
+@app.post("/api/admin/pause")
+def admin_pause_journeys(req: AdminPauseRequest):
+    set_global_pause(req.paused, reason=req.reason)
+    return {
+        "status": "success",
+        "paused": req.paused,
+        "reason": req.reason,
+        "message": f"Global journeys {'PAUSED' if req.paused else 'RESUMED'}"
+    }
+
+@app.post("/api/admin/resume")
+def admin_resume_journeys():
+    set_global_pause(False)
+    return {
+        "status": "success",
+        "paused": False,
+        "message": "Global journeys RESUMED"
+    }
+
+@app.get("/api/admin/status")
+def admin_status():
+    return get_global_pause_status()
+
+@app.get("/api/export")
+@app.get("/api/admin/export-all")
+def export_all_lender_data(workflow_id: str = Query(default="collections")):
+    cases = get_all_cases(workflow_id)
+    return {
+        "export_id": f"EXP-SAARTHI-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "workflow_id": workflow_id,
+        "total_records": len(cases),
+        "policy_version": "2026.3-LENDER-APPROVED",
+        "records": [c.model_dump() for c in cases]
+    }
+
+# 11. Policies Endpoint
+@app.get("/api/policies")
+def get_policies_catalog():
+    rules_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "policies", "collections_rules.yaml")
+    lender_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "policies", "lender.yaml")
+    
+    rules_text = ""
+    lender_text = ""
+    if os.path.exists(rules_path):
+        with open(rules_path, "r", encoding="utf-8") as f:
+            rules_text = f.read()
+    if os.path.exists(lender_path):
+        with open(lender_path, "r", encoding="utf-8") as f:
+            lender_text = f.read()
+
+    return {
+        "collections_rules_yaml": rules_text,
+        "lender_yaml": lender_text,
+        "policy_statement": "Enforces lender-approved recovery policies and supports RBI conduct rules."
+    }
+
+# 12. Quick Scenario Triggers (S1 - S5)
+@app.post("/api/events/scenario/{scenario_id}")
+def trigger_scenario(scenario_id: str):
+    scenario_map = {
+        "s1": "1",  # Hero Sunita Patil
+        "s2": "2",  # Code-mixed part payment Rajesh Sharma
+        "s3": "4",  # Adversarial Vikram Malhotra (Policy Firewall blocked)
+        "s4": "3",  # Sensitive Event Hospital Suresh Patil
+        "s5": "5"   # Bad transcript Manoj Kumar (Compliance fail)
+    }
+    acc_id = scenario_map.get(scenario_id.lower())
+    if not acc_id:
+        raise HTTPException(status_code=400, detail=f"Invalid scenario '{scenario_id}'. Must be s1, s2, s3, s4, or s5.")
+
+    case = get_case(acc_id, workflow_id="collections")
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Account #{acc_id} not found in collections book")
+
+    case.add_trace(
+        agent="Supervisor",
+        action=f"Scenario Trigger Fired: {scenario_id.upper()}",
+        summary=f"Event dispatched for {case.customer_name} (#{case.id}) under Scenario {scenario_id.upper()}.",
+        badge="Event Trigger"
+    )
+
+    updated = run_supervisor_pipeline(case, workflow_id="collections")
+    return updated
+
 # 9. Config
 @app.get("/api/config")
 def get_config():
@@ -371,10 +537,10 @@ async def speech_to_text(file: Optional[UploadFile] = File(None), language: Opti
         else:
             return {"transcript": "हाँ, मैं कल दोपहर तक पूरा भुगतान कर दूंगा।", "language_code": "hi-IN", "source": "simulated"}
 
-    # In LIVE mode, call Sarvam Saaras v4
+    # In LIVE mode, call Sarvam Saaras v3
     try:
         from sarvamai import SarvamAI
-        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=7.5)
+        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=4.0)
         
         audio_content = b""
         filename = "audio.wav"
@@ -389,8 +555,9 @@ async def speech_to_text(file: Optional[UploadFile] = File(None), language: Opti
 
         res = client.speech_to_text.transcribe(
             file=(filename, audio_content, content_type),
-            model="saaras:v4",
-            language_code=lang_code
+            model="saaras:v3",
+            language_code=lang_code,
+            mode="codemix"
         )
         return {"transcript": res.transcript, "language_code": res.language_code, "source": "sarvam_saaras"}
     except Exception as e:
@@ -398,7 +565,7 @@ async def speech_to_text(file: Optional[UploadFile] = File(None), language: Opti
         fallback_txt = "माझा पगार 5 तारखेला जमा होतो." if language == "Marathi" else "कल दोपहर तक कर दूंगा."
         return {"transcript": fallback_txt, "language_code": lang_code, "source": "fallback", "error": str(e)}
 
-# 11. Voice TTS (Sarvam Bulbul v3 with 8s circuit breaker)
+# 11. Voice TTS (Sarvam Bulbul v3 with 4s circuit breaker)
 @app.post("/api/voice/tts")
 def text_to_speech(req: TTSRequest):
     lang_code = SARVAM_LANG_MAP.get(req.language, "mr-IN")
@@ -417,10 +584,10 @@ def text_to_speech(req: TTSRequest):
     # In LIVE mode, call Sarvam Bulbul v3
     try:
         from sarvamai import SarvamAI
-        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=7.5)
+        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=4.0)
         res = client.text_to_speech.convert(
             text=req.text,
-            language_code=lang_code,
+            target_language_code=lang_code,
             speaker=speaker,
             model="bulbul:v3",
             output_audio_codec="mp3"

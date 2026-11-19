@@ -1,34 +1,57 @@
+import os
+import yaml
 import hashlib
 from typing import Optional, Dict, Any
 from app.models import JourneyRecord, WorkflowStep
 
+LENDER_YAML_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "policies", "lender.yaml")
+
+def load_lender_config() -> Dict[str, Any]:
+    if os.path.exists(LENDER_YAML_PATH):
+        try:
+            with open(LENDER_YAML_PATH, "r", encoding="utf-8") as f:
+                return yaml.safe_load(f) or {}
+        except Exception:
+            pass
+    return {
+        "lender_info": {"lender_name": "Saarthi Capital Ltd."},
+        "repayment_routing": {"lender_vpa": "repayments.saarthi@yesbank", "display_name": "Saarthi Capital Repayments"},
+        "grievance_redressal": {
+            "principal_nodal_officer": {
+                "name": "Mr. Alok Verma",
+                "email": "nodal.officer@saarthicapital.demo",
+                "phone": "+91-22-6899-4400"
+            }
+        }
+    }
+
 COLLECTIONS_WHATSAPP_TEMPLATES = {
     "Marathi": """प्रिय {name}जी,
-सारथी फायनान्शिअल सोबत बोलल्याबद्दल धन्यवाद. आपल्या विनंतीनुसार लोन खाते {loan_id} च्या ₹{amount} देय रकमेसाठी PTP तारीख {ptp_date} नोंदवली आहे.
+सारथी कॅपिटल सोबत बोलल्याबद्दल धन्यवाद. आपल्या विनंतीनुसार लोन खाते {loan_id} च्या ₹{amount} भरण्यासाठी PTP तारीख {ptp_date} नोंदवली आहे.
 
-तात्काळ किंवा देय तारखेपूर्वी भरणा करण्यासाठी खालील अधिकृत UPI लिंक वापरा:
+हे पेमेंट थेट सावकाराच्या अधिकृत बँक खात्यात ({vpa}) जमा होते. खालील सुरक्षित UPI लिंक वापरा:
 {link}
 
-(टीप: हे केवळ प्रात्यक्षिक डेटा आहे - Demo lender sample data)""",
+तक्रार निवारण अधिकारी: {pno_name} ({pno_email} | फोन: {pno_phone}).
+(टीप: प्रात्यक्षिक डेटा - Demo lender sample data. Pays directly to {lender}'s account)""",
 
     "Hindi": """प्रिय {name} जी,
-सारथी फाइनेंशियल से बात करने के लिए धन्यवाद। आपके लोन खाते {loan_id} के ₹{amount} बकाया के लिए PTP तारीख {ptp_date} दर्ज कर ली गई है।
+सारथी कैपिटल से बात करने के लिए धन्यवाद। आपके लोन खाते {loan_id} के ₹{amount} भुगतान हेतु PTP तारीख {ptp_date} दर्ज कर ली गई है।
 
-भुगतान करने के लिए इस सुरक्षित UPI लिंक का उपयोग करें:
+यह भुगतान सीधे ऋणदाता के अधिकृत बैंक खाते ({vpa}) में जमा होता है। सुरक्षित UPI लिंक:
 {link}
 
-(नोट: यह केवल डेमो डेटा है - Demo lender sample data)""",
+शिकायत निवारण अधिकारी: {pno_name} ({pno_email} | फोन: {pno_phone})।
+(नोट: डेमो डेटा - Demo lender sample data. Pays directly to {lender}'s account)""",
 
     "English": """Dear {name},
-Thank you for speaking with Saarthi Financial. As agreed, your Promise-to-Pay (PTP) for loan account {loan_id} of ₹{amount} is scheduled for {ptp_date}.
+Thank you for speaking with Saarthi Capital. As agreed, your Promise-to-Pay (PTP) for loan {loan_id} of ₹{amount} is scheduled for {ptp_date}.
 
-Use this secure UPI link to complete your payment:
+This payment is credited directly into the lender's designated account ({vpa}). Complete payment using this secure link:
 {link}
 
-(Note: Demo lender - sample data only. No real money moves.)""",
-
-    "Tamil": """அன்புள்ள {name},
-சாரதி ஃபைனான்சியலில் பேசியதற்கு நன்றி. கடன் கணக்கு {loan_id}-க்கான ₹{amount} PTP பதிவு செய்யப்பட்டது: {link}"""
+Principal Grievance Officer: {pno_name} ({pno_email} | Phone: {pno_phone}).
+(Note: Demo lender sample data. Pays directly to {lender}'s account)"""
 }
 
 SALES_WHATSAPP_TEMPLATES = {
@@ -66,13 +89,21 @@ def generate_idempotency_key(record: JourneyRecord) -> str:
 
 def run_action_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None, context: Optional[Dict[str, Any]] = None) -> JourneyRecord:
     """
-    Generic Action Agent:
-    - Generates idempotent transaction/application links
-    - Prepares localized WhatsApp template message
-    - Updates payment / application status
-    - Handles escalation dispatch for disputes/hardships
+    Action Agent:
+    - Accepts ONLY a valid PolicyDecision object issued by the Policy Engine.
+    - Resolves UPI link directly to lender's VPA from policies/lender.yaml.
+    - Saarthi NEVER receives, pools, or routes borrower money.
+    - Prepares localized WhatsApp template message with Grievance Officer details.
     """
     workflow_id = record.workflow_id or (context.get("workflow_id") if context else "collections")
+    lender_cfg = load_lender_config()
+    lender_name = lender_cfg.get("lender_info", {}).get("lender_name", "Saarthi Capital Ltd.")
+    lender_vpa = lender_cfg.get("repayment_routing", {}).get("lender_vpa", "repayments.saarthi@yesbank")
+    pno = lender_cfg.get("grievance_redressal", {}).get("principal_nodal_officer", {})
+
+    record.data["lender_vpa"] = lender_vpa
+    record.data["lender_name"] = lender_name
+    record.data["repayment_direct_label"] = f"Pays directly to {lender_name}'s account (demo)"
 
     # If already escalated in collections or sales
     if record.status == "escalated":
@@ -80,9 +111,22 @@ def run_action_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None,
         record.add_trace(
             agent="Action",
             action="Case Escalation Dispatched to Human Officer",
-            summary=f"Created CRM Ticket #{ticket_id}. Routed to {record.assigned_human or 'Floor Manager'} with complete transcript & context."
+            summary=f"Created CRM Ticket #{ticket_id}. Routed to {record.assigned_human or 'Floor Manager'} with complete transcript & context.",
+            badge="Retry/Escalate"
         )
         return record
+
+    # Hard Policy Firewall Enforcement: Check PolicyDecision
+    if workflow_id == "collections":
+        decision_data = record.data.get("policy_decision")
+        if decision_data and not decision_data.get("action_permitted"):
+            record.add_trace(
+                agent="Action",
+                action="Execution Halted - No Engine Permit",
+                summary=f"Action blocked by Policy Firewall: {decision_data.get('reason')}",
+                badge="Policy Firewall"
+            )
+            return record
 
     idem_key = generate_idempotency_key(record)
 
@@ -104,14 +148,21 @@ def run_action_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None,
 
         record.add_trace(
             agent="Action",
-            action="Pre-Approved Loan Sanction & Document Checklist Dispatched",
-            summary=f"Issued Digital Application Link ({app_link[:32]}...). WhatsApp document checklist dispatched in {record.language}."
+            action="Pre-Approved Loan Sanction Dispatched",
+            summary=f"Issued Digital Application Link ({app_link[:32]}...). WhatsApp document checklist dispatched in {record.language}.",
+            badge="Event Trigger"
         )
         return record
 
     # Collections Action
+    effective_amt = record.amount_due
+    decision_data = record.data.get("policy_decision")
+    if decision_data and decision_data.get("effective_amount"):
+        effective_amt = float(decision_data["effective_amount"])
+
+    # UPI deep link directly to regulated lender's escrow account
     if not record.payment_link:
-        record.payment_link = f"upi://pay?pa=saarthi.demolender@yesbank&pn=Demo+Lender+(Sample+Data)&am={record.amount_due:.2f}&tr={idem_key}&cu=INR"
+        record.payment_link = f"upi://pay?pa={lender_vpa}&pn=Saarthi+Capital+Repayments&am={effective_amt:.2f}&tr={idem_key}&cu=INR"
     
     record.payment_status = "sent"
 
@@ -119,16 +170,22 @@ def run_action_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None,
     wa_msg = COLLECTIONS_WHATSAPP_TEMPLATES[lang].format(
         name=record.customer_name,
         loan_id=record.data.get("loan_id", "LN-GEN"),
-        amount=f"{record.amount_due:,.2f}",
+        amount=f"{effective_amt:,.2f}",
         ptp_date=record.ptp_date or "Immediate",
-        link=record.payment_link
+        vpa=lender_vpa,
+        link=record.payment_link,
+        pno_name=pno.get("name", "Mr. Alok Verma"),
+        pno_email=pno.get("email", "nodal.officer@saarthicapital.demo"),
+        pno_phone=pno.get("phone", "+91-22-6899-4400"),
+        lender=lender_name
     )
     record.data["whatsapp_message"] = wa_msg
 
     record.add_trace(
         agent="Action",
         action="Idempotent UPI Payment Link & WhatsApp Template Dispatched",
-        summary=f"Generated UPI deep link ({record.payment_link[:32]}...). Composed WhatsApp message in {record.language}. Payment status set to 'SENT'."
+        summary=f"Generated UPI deep link ({record.payment_link[:34]}...) resolving directly to {lender_vpa}. WhatsApp notice dispatched with Grievance Officer details. Payment status set to 'SENT'.",
+        badge="Event Trigger"
     )
 
     return record

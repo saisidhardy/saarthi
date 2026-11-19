@@ -64,7 +64,7 @@ class SarvamService:
         self.tts_chars: int = 0
         self.llm_tokens: int = 0
         self.call_count: int = 0
-        self.timeout_sec: float = 8.0
+        self.timeout_sec: float = 4.0
 
     def _get_headers(self) -> Dict[str, str]:
         return {
@@ -80,8 +80,8 @@ class SarvamService:
         fallback_text: str = "मी 5 तारखेला पैसे भरेन."
     ) -> Dict[str, Any]:
         """
-        Speech-to-Text via Sarvam Saaras API (POST /speech-to-text).
-        With 8s circuit-breaker and automatic fallback.
+        Speech-to-Text via Sarvam Saaras v3 API (POST /speech-to-text) with mode="codemix".
+        With 4s circuit-breaker and automatic fallback.
         """
         duration_est = max(len(audio_bytes) / 32000.0, 1.5)  # estimate 16kHz 16-bit mono
         self.stt_seconds += duration_est
@@ -95,7 +95,7 @@ class SarvamService:
             lang = None if language_code == "unknown" else language_code
             res = client.speech_to_text.transcribe(
                 file=('audio.wav', audio_bytes, 'audio/wav'),
-                model="saaras:v4",
+                model="saaras:v3",
                 language_code=lang,
                 mode=mode
             )

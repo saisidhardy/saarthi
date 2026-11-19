@@ -1,8 +1,6 @@
 from typing import List, Optional, Literal, Dict, Any
-from pydantic import BaseModel, Field
 from datetime import datetime, timezone
-
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, computed_field
 
 class TranscriptItem(BaseModel):
     speaker: str  # 'agent' | 'borrower' | 'system' | 'customer'
@@ -14,6 +12,32 @@ class TraceItem(BaseModel):
     action: str
     ts: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     summary: str
+    badge: Optional[str] = None  # e.g. 'Event Trigger', 'Policy Firewall', 'Review/Critique', 'Human-in-the-loop'
+
+class LLMProposal(BaseModel):
+    intent: str = "ptp"  # 'ptp' | 'part_payment' | 'hardship' | 'dispute' | 'avoidance' | 'adversarial'
+    offered_amount: Optional[float] = None
+    date_phrase: Optional[str] = None
+    waiver_requested: bool = False
+    requested_days: Optional[int] = None
+    sentiment: str = "neutral"
+    confidence: float = 0.95
+    raw_response: Optional[str] = None
+
+class PolicyDecision(BaseModel):
+    status: str  # 'APPROVED' | 'CLAMPED' | 'BLOCKED' | 'ESCALATED' | 'SENSITIVE_PAUSE'
+    rule_id: str  # e.g. 'POLICY-WAIVER-NO01', 'POLICY-PTP-MAX01', 'FAIR-PRAC-SENS01'
+    yaml_line: int  # Line number in collections_rules.yaml
+    yaml_file: str = "policies/collections_rules.yaml"
+    effective_amount: float
+    effective_date: Optional[str] = None
+    reason: str
+    needs_human: bool = False
+    assigned_human: Optional[str] = None
+    do_not_contact_until: Optional[str] = None
+    action_permitted: bool = False
+    llm_proposed_summary: str
+    engine_decision_summary: str
 
 class JourneyRecord(BaseModel):
     id: str
@@ -40,7 +64,15 @@ class JourneyRecord(BaseModel):
             
             # Populate data dict from incoming collections fields if not already in data
             data = values.get("data", {})
-            for k in ["amount_due", "due_date", "dpd", "loan_id", "risk_note", "tone_hint", "best_call_window", "consent_played", "intent", "sentiment", "offer_made", "ptp_date", "confidence", "payment_link", "payment_status", "audit_pass", "audit_reason"]:
+            for k in [
+                "amount_due", "due_date", "dpd", "loan_id", "risk_note", "tone_hint", 
+                "best_call_window", "consent_played", "ai_disclosure_played", 
+                "recording_disclosure_played", "human_opt_out_offered", "third_party_contact",
+                "do_not_contact_until", "attempts_count", "call_start", "call_end",
+                "preferred_contact_window", "intent", "sentiment", "offer_made", 
+                "ptp_date", "confidence", "payment_link", "payment_status", 
+                "audit_pass", "audit_reason"
+            ]:
                 if k in values:
                     data[k] = values[k]
             values["data"] = data
@@ -71,6 +103,7 @@ class JourneyRecord(BaseModel):
     def due_date(self, val: str):
         self.data["due_date"] = val
 
+    @computed_field
     @property
     def dpd(self) -> int:
         return int(self.data.get("dpd", 0))
@@ -79,6 +112,7 @@ class JourneyRecord(BaseModel):
     def dpd(self, val: int):
         self.data["dpd"] = int(val)
 
+    @computed_field
     @property
     def loan_id(self) -> str:
         return str(self.data.get("loan_id", ""))
@@ -87,6 +121,7 @@ class JourneyRecord(BaseModel):
     def loan_id(self, val: str):
         self.data["loan_id"] = val
 
+    @computed_field
     @property
     def risk_note(self) -> str:
         return str(self.data.get("risk_note", ""))
@@ -95,6 +130,7 @@ class JourneyRecord(BaseModel):
     def risk_note(self, val: str):
         self.data["risk_note"] = val
 
+    @computed_field
     @property
     def tone_hint(self) -> str:
         return str(self.data.get("tone_hint", ""))
@@ -103,6 +139,7 @@ class JourneyRecord(BaseModel):
     def tone_hint(self, val: str):
         self.data["tone_hint"] = val
 
+    @computed_field
     @property
     def best_call_window(self) -> str:
         return str(self.data.get("best_call_window", "10:00 - 12:00 IST"))
@@ -111,6 +148,7 @@ class JourneyRecord(BaseModel):
     def best_call_window(self, val: str):
         self.data["best_call_window"] = val
 
+    @computed_field
     @property
     def consent_played(self) -> bool:
         return bool(self.data.get("consent_played", False))
@@ -119,6 +157,7 @@ class JourneyRecord(BaseModel):
     def consent_played(self, val: bool):
         self.data["consent_played"] = bool(val)
 
+    @computed_field
     @property
     def intent(self) -> str:
         return str(self.data.get("intent", "none"))
@@ -127,6 +166,7 @@ class JourneyRecord(BaseModel):
     def intent(self, val: str):
         self.data["intent"] = val
 
+    @computed_field
     @property
     def sentiment(self) -> str:
         return str(self.data.get("sentiment", "neutral"))
@@ -135,6 +175,7 @@ class JourneyRecord(BaseModel):
     def sentiment(self, val: str):
         self.data["sentiment"] = val
 
+    @computed_field
     @property
     def offer_made(self) -> Optional[str]:
         return self.data.get("offer_made")
@@ -143,6 +184,7 @@ class JourneyRecord(BaseModel):
     def offer_made(self, val: Optional[str]):
         self.data["offer_made"] = val
 
+    @computed_field
     @property
     def ptp_date(self) -> Optional[str]:
         return self.data.get("ptp_date")
@@ -151,6 +193,7 @@ class JourneyRecord(BaseModel):
     def ptp_date(self, val: Optional[str]):
         self.data["ptp_date"] = val
 
+    @computed_field
     @property
     def confidence(self) -> float:
         return float(self.data.get("confidence", 0.0))
@@ -159,6 +202,7 @@ class JourneyRecord(BaseModel):
     def confidence(self, val: float):
         self.data["confidence"] = float(val)
 
+    @computed_field
     @property
     def payment_link(self) -> Optional[str]:
         return self.data.get("payment_link")
@@ -167,6 +211,7 @@ class JourneyRecord(BaseModel):
     def payment_link(self, val: Optional[str]):
         self.data["payment_link"] = val
 
+    @computed_field
     @property
     def payment_status(self) -> str:
         return str(self.data.get("payment_status", "none"))
@@ -175,6 +220,7 @@ class JourneyRecord(BaseModel):
     def payment_status(self, val: str):
         self.data["payment_status"] = val
 
+    @computed_field
     @property
     def audit_pass(self) -> Optional[bool]:
         return self.data.get("audit_pass")
@@ -183,6 +229,7 @@ class JourneyRecord(BaseModel):
     def audit_pass(self, val: Optional[bool]):
         self.data["audit_pass"] = val
 
+    @computed_field
     @property
     def audit_reason(self) -> Optional[str]:
         return self.data.get("audit_reason")
@@ -191,12 +238,66 @@ class JourneyRecord(BaseModel):
     def audit_reason(self, val: Optional[str]):
         self.data["audit_reason"] = val
 
-    def add_trace(self, agent: str, action: str, summary: str):
+    @computed_field
+    @property
+    def ai_disclosure_played(self) -> bool:
+        return bool(self.data.get("ai_disclosure_played", False))
+
+    @ai_disclosure_played.setter
+    def ai_disclosure_played(self, val: bool):
+        self.data["ai_disclosure_played"] = bool(val)
+
+    @computed_field
+    @property
+    def recording_disclosure_played(self) -> bool:
+        return bool(self.data.get("recording_disclosure_played", False))
+
+    @recording_disclosure_played.setter
+    def recording_disclosure_played(self, val: bool):
+        self.data["recording_disclosure_played"] = bool(val)
+
+    @computed_field
+    @property
+    def human_opt_out_offered(self) -> bool:
+        return bool(self.data.get("human_opt_out_offered", False))
+
+    @human_opt_out_offered.setter
+    def human_opt_out_offered(self, val: bool):
+        self.data["human_opt_out_offered"] = bool(val)
+
+    @computed_field
+    @property
+    def third_party_contact(self) -> bool:
+        return bool(self.data.get("third_party_contact", False))
+
+    @third_party_contact.setter
+    def third_party_contact(self, val: bool):
+        self.data["third_party_contact"] = bool(val)
+
+    @computed_field
+    @property
+    def do_not_contact_until(self) -> Optional[str]:
+        return self.data.get("do_not_contact_until")
+
+    @do_not_contact_until.setter
+    def do_not_contact_until(self, val: Optional[str]):
+        self.data["do_not_contact_until"] = val
+
+    @computed_field
+    @property
+    def masked_phone(self) -> str:
+        clean = self.phone.replace(" ", "").replace("-", "")
+        if len(clean) >= 4:
+            return "XXXXXX" + clean[-4:]
+        return "XXXXXX"
+
+    def add_trace(self, agent: str, action: str, summary: str, badge: Optional[str] = None):
         self.trace.append(TraceItem(
             agent=agent,
             action=action,
             ts=datetime.now(timezone.utc).strftime("%H:%M:%S UTC"),
-            summary=summary
+            summary=summary,
+            badge=badge
         ))
         self.version += 1
 

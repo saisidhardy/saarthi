@@ -2,6 +2,7 @@ import os
 import yaml
 import time
 import logging
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, Generator, List
 from app.models import JourneyRecord, WorkflowDefinition, WorkflowStep, CaseFile
 from app.database import save_case
@@ -10,6 +11,20 @@ from agents.registry import get_agent
 logger = logging.getLogger("saarthi.engine")
 
 WORKFLOWS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "workflows")
+
+GLOBAL_PAUSE_STATE: Dict[str, Any] = {
+    "paused": False,
+    "reason": None,
+    "paused_at": None
+}
+
+def set_global_pause(paused: bool, reason: Optional[str] = None):
+    GLOBAL_PAUSE_STATE["paused"] = paused
+    GLOBAL_PAUSE_STATE["reason"] = reason if paused else None
+    GLOBAL_PAUSE_STATE["paused_at"] = datetime.now(timezone.utc).isoformat() if paused else None
+
+def get_global_pause_status() -> Dict[str, Any]:
+    return dict(GLOBAL_PAUSE_STATE)
 
 def load_workflow_definition(workflow_id: str = "collections") -> WorkflowDefinition:
     """
@@ -145,6 +160,17 @@ def run_supervisor_pipeline(
     workflow = load_workflow_definition(w_id)
     record.workflow_id = workflow.id
 
+    if GLOBAL_PAUSE_STATE["paused"]:
+        record.status = "paused"
+        record.add_trace(
+            agent="Supervisor",
+            action="Kill Switch Activated - Journey Halted",
+            summary=f"All journeys halted by Administrator. Reason: {GLOBAL_PAUSE_STATE['reason'] or 'Emergency kill switch activated'}.",
+            badge="Policy Firewall"
+        )
+        save_case(record)
+        return record
+
     context = {
         "workflow_id": workflow.id,
         "policy_file": workflow.policy_file,
@@ -182,6 +208,17 @@ def run_supervisor_pipeline_stream(
     w_id = workflow_id or record.workflow_id or "collections"
     workflow = load_workflow_definition(w_id)
     record.workflow_id = workflow.id
+
+    if GLOBAL_PAUSE_STATE["paused"]:
+        record.status = "paused"
+        record.add_trace(
+            agent="Supervisor",
+            action="Kill Switch Activated - Journey Halted",
+            summary=f"All journeys halted by Administrator. Reason: {GLOBAL_PAUSE_STATE['reason'] or 'Emergency kill switch activated'}.",
+            badge="Policy Firewall"
+        )
+        save_case(record)
+        return record
 
     context = {
         "workflow_id": workflow.id,

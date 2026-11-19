@@ -72,6 +72,16 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
         # Average cost per contact (computed live from actual usage and pricing.yaml rates)
         avg_cost_contact = round(total_cost / max(started_count, 1), 2) if started_count > 0 else live_pricing.get("cost_per_contact_inr", 1.68)
 
+        blocked_by_policy = sum(
+            1 for r in records 
+            if r.data.get("policy_firewall", {}).get("status") == "BLOCKED" or r.audit_pass is False
+        )
+        lang_split = {}
+        for r in records:
+            lang_split[r.language] = lang_split.get(r.language, 0) + 1
+
+        ptp_conv_pct = round(((ptp_count + paid_count) / max(started_count, 1)) * 100, 1) if started_count > 0 else 0.0
+
         return EngineMetrics(
             workflow_id="collections",
             workflow_name="Early Delinquency Collections (EMI)",
@@ -91,6 +101,9 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
                 "ptps": ptp_count,
                 "paid": paid_count,
                 "escalated": human_touch_count,
+                "blocked_by_policy": blocked_by_policy,
+                "ptp_conversion_pct": ptp_conv_pct,
+                "language_split": lang_split,
                 "recovery_pct": recovery_pct,
                 "our_cost_per_contact": avg_cost_contact,
                 "cost_label": live_pricing.get("cost_label", "estimated from published rates"),

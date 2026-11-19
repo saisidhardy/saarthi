@@ -1,20 +1,147 @@
-calling_hours:
-  start_ist: "08:00"
-  end_ist: "19:00"
-  demo_override: true
-  description: "RBI guideline: Outbound recovery calls permitted strictly between 08:00 and 19:00 IST."
+# lender-owned, board-approved policy (demo)
+policy_meta:
+  policy_version: "2026.3-LENDER-APPROVED"
+  policy_name: "Early Delinquency & Borrower Conduct Policy"
+  approved_by: "Board of Directors, Saarthi Capital Ltd."
+  effective_date: "2026-04-01"
+  governance_statement: "Enforces lender-approved recovery policies and supports RBI conduct rules."
+
+opening_disclosures:
+  ai_disclosure:
+    mandatory: true
+    rule_id: "DISC-AI-01"
+    phrase_en: "I am an AI assistant calling on behalf of Saarthi Capital"
+    phrase_hi: "मैं सारथी कैपिटल की ओर से बोल रहा एक एआई असिस्टेंट हूँ"
+    phrase_mr: "मी सारथी कॅपिटलच्या वतीने बोलणारा एक एआय असिस्टंट आहे"
+  recording_disclosure:
+    mandatory: true
+    rule_id: "DISC-REC-02"
+    phrase_en: "This call is recorded for quality and regulatory compliance"
+    phrase_hi: "यह कॉल गुणवत्ता और अनुपालन निगरानी के लिए रिकॉर्ड की जा रही है"
+    phrase_mr: "हा कॉल गुणवत्ता आणि नियामक सुरक्षेसाठी रेकॉर्ड केला जातोय"
+  human_opt_out:
+    mandatory: true
+    rule_id: "DISC-HUMAN-03"
+    phrase_en: "You can say 'human' anytime to speak with a person"
+    phrase_hi: "किसी भी समय किसी व्यक्ति से बात करने के लिए 'इंसान' या 'अधिकारी' बोलें"
+    phrase_mr: "व्यक्तीशी बोलण्यासाठी कधीही 'इंसान' किंवा 'अधिकारी' बोला"
+  human_escalation_keywords:
+    - "human"
+    - "agent"
+    - "person"
+    - "representative"
+    - "इंसान"
+    - "अधिकारी"
+    - "एजेंट"
+    - "व्यक्ति"
+    - "माणूस"
+    - "अधिकारी"
+    - "प्रतिनिधी"
+    - "adhikari"
+    - "manus"
 
 identity_verification:
   mandatory: true
+  rule_id: "RBI-PRIVACY-ID01"
   field: "loan_id"
   digits_to_verify: 4
   max_attempts: 2
   on_failure: "terminate_zero_disclosure"
+  third_party_contact:
+    prohibit_disclosure: true
+    polite_termination: true
+    retry_after_hours: 24  # lender-configurable: no retry for 24h
+    log_event: "third_party_contact"
+
+sensitive_event_pause:
+  rule_id: "FAIR-PRAC-SENS01"
+  policy_instruction: "Immediate stop upon bereavement, hospitalization, medical emergency, natural calamity, or wedding. Express concern, no negotiation, no payment link, set do_not_contact_until 7 days."
+  do_not_contact_days: 7  # demo default 7 days, lender-configurable
+  allow_negotiation: false
+  allow_payment_link: false
+  target_desk: "Sensitive Care & Compassionate Follow-up Desk"
+  triggers:
+    bereavement:
+      - "death"
+      - "passed away"
+      - "funeral"
+      - "demise"
+      - "मृत्यू"
+      - "निधन"
+      - "वारले"
+      - "मयत"
+      - "क्रियाकर्म"
+    medical_emergency:
+      - "hospital"
+      - "हॉस्पिटल"
+      - "hospitalised"
+      - "hospitalized"
+      - "icu"
+      - "accident"
+      - "अपघात"
+      - "दवाखाना"
+      - "ऍडमिट"
+      - "एडमिट"
+      - "बीमार"
+      - "गंभीर"
+      - "operation"
+      - "इलाज"
+    calamity:
+      - "flood"
+      - "earthquake"
+      - "cyclone"
+      - "पूर"
+      - "भूकंप"
+      - "आपत्ती"
+      - "आपदा"
+      - "आग"
+    marriage_function:
+      - "wedding"
+      - "marriage"
+      - "लग्न"
+      - "शादी"
+      - "विवाह"
+
+distress_path:
+  rule_id: "FAIR-PRAC-DISTRESS01"
+  triggers:
+    - "job loss"
+    - "lost my job"
+    - "नोकरी गेली"
+    - "काम छूट गया"
+    - "salary delay"
+    - "पगार झाला नाही"
+    - "salary nahi aayi"
+    - "business loss"
+    - "धंद्यात तोटा"
+  promise_waiver: false  # Promise NO waiver
+  permitted_options:
+    - "Short grace-period extension (strictly within policy limit of 7 days)"
+    - "Affordable upfront part-payment (>= 30%) with remainder committed within 7 days"
+    - "Direct handover to certified human credit counsellor for restructuring review"
+  pre_escalation_record_required: true
+  target_desk: "Credit Restructuring & Financial Counselling Desk"
+
+contact_rules:
+  calling_hours_ist:
+    start_ist: "08:00"
+    end_ist: "19:00"
+    demo_override: true
+    description: "Supports RBI recovery window: Outbound contacts permitted between 08:00 and 19:00 IST."
+  max_calls_per_day: 2  # demo default 2, lender-configurable; do not present as regulatory number
+  honour_preferred_contact_window: true
+  authorized_parties_only:
+    - "borrower"
+    - "co_borrower"
+    - "guarantor"
 
 negotiation:
+  rule_id_ptp_max: "POLICY-PTP-MAX01"
   max_ptp_days: 7
+  rule_id_part_min: "POLICY-PART-MIN01"
   min_part_payment_pct: 30.0
   max_shortfall_without_approval: 10000.0
+  rule_id_waiver_prohibited: "POLICY-WAIVER-NO01"
   waiver_allowed_autonomous: false
 
 compliance_guardrails:
@@ -37,16 +164,12 @@ compliance_guardrails:
   third_party_disclosure_prohibited: true
   mandatory_consent: true
 
-human_escalation_triggers:
-  dispute:
-    target_desk: "Dispute Resolution Desk (Ops)"
-    reason: "Borrower asserts payment already debited or disputes ledger"
-  hardship:
-    target_desk: "Credit Committee (Hardship & Restructure)"
-    reason: "Medical emergency, job loss, or interest waiver request"
-  compliance_failure:
-    target_desk: "Chief Compliance Officer"
-    reason: "Violation of RBI Fair Practices Code"
-  identity_failure:
-    target_desk: "Fraud Prevention & Identity Verification Desk"
-    reason: "Identity verification failed twice with zero disclosure"
+evidence_retention:
+  retention_months: 6  # call_date + 6 months
+  tamper_evident_sha256: true
+
+admin_controls:
+  kill_switch:
+    allow_global_pause: true
+  data_export:
+    formats: ["json", "csv"]

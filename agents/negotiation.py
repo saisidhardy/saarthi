@@ -1,167 +1,237 @@
 import os
-import json
 import re
-from datetime import datetime, timedelta, timezone
-from typing import Optional
-from app.models import CaseFile
+import json
+from datetime import datetime, timedelta, timezone, date
+from typing import Optional, Dict, Any
+from app.models import JourneyRecord, WorkflowStep, LLMProposal
 from app.config import settings
+from services.sarvam import sarvam_service
 
-POLICY_PROMPT = """You are the Negotiation Agent for Saarthi, an AI collections teammate for Indian lenders.
-You analyze the borrower conversation and apply strict lending policy:
-1. Allowed PTP (Promise-to-Pay) date: Strictly up to 7 days from today.
-2. Part payment: Permitted ONLY if borrower pays >= 30% of total amount due immediately, and the remainder within 7 days.
-3. Hardship / Waivers: ANY request for interest waiver, EMI restructuring, or penalty cancellation MUST be classified as intent='hardship' and status='escalated'. NEVER promise or approve any waiver.
-4. Disputes: ANY claim of prior payment, incorrect ledger, or bank debit must be classified as intent='dispute' and status='escalated'.
-5. Avoidance: Busy, hang-up, refusing to talk -> intent='avoidance', status='contacted'.
-
-You must respond ONLY with valid JSON in this schema:
-{
-    "intent": "ptp" | "hardship" | "dispute" | "avoidance",
-    "sentiment": "cooperative" | "anxious" | "hostile" | "neutral",
-    "offer_made": "string summary of approved offer or escalation note",
-    "ptp_date": "YYYY-MM-DD" or null,
-    "confidence": float between 0.0 and 1.0,
-    "status": "ptp" | "escalated" | "contacted",
-    "escalation_reason": "string or null"
-}
-"""
-
-def run_negotiation_agent(case: CaseFile) -> CaseFile:
+def extract_amount_from_speech(text: str, total_due: float, loan_id: Optional[str] = None) -> Optional[float]:
     """
-    Negotiation Agent:
-    - Analyzes dialogue against formal lending rules
-    - Computes PTP feasibility, part-payment validity, or detects dispute/hardship
-    - Operates in SIMULATE mode (deterministic policy) or LIVE mode (Sarvam-105B) with auto-fallback
+    Extracts numerical payment amounts from spoken Hinglish/Marathi text.
+    Handles 'half', '10k', '₹10,000', '2500', full payment phrases ('पूर्ण', 'सर्व', 'पूरा', 'full').
+    Explicitly filters out loan_id digits (e.g. 1001, 1002) so identity verification numbers aren't confused with money.
     """
-    today = datetime.now(timezone.utc).date()
-    max_ptp_date = today + timedelta(days=7)
+    clean = text.lower()
+    
+    # 1. Full payment indicators in Marathi, Hindi, English
+    if any(k in clean for k in ["पूर्ण", "पूरा", "पूरे", "all", "full", "complete", "संपूर्ण", "सर्व", "सगळे", "नक्की सर्व", "full payment"]):
+        return total_due
 
-    # Compile borrower text
-    borrower_texts = [t.text for t in case.transcript if t.speaker == "borrower"]
-    full_borrower_dialogue = " ".join(borrower_texts).lower()
+    # 2. Check for half / 50%
+    if any(k in clean for k in ["half", "आधा", "निम्मे", "50%"]):
+        return round(total_due * 0.5, 2)
+    
+    # 3. 10k style
+    k_match = re.search(r"(\d+(?:\.\d+)?)\s*k\b", clean)
+    if k_match:
+        return float(k_match.group(1)) * 1000.0
 
-    if not settings.SIMULATE and settings.SARVAM_API_KEY:
+    # 4. Extract loan digits to ignore (e.g. 1001, 1002)
+    loan_digits = ""
+    if loan_id:
+        loan_digits = re.sub(r"\D", "", str(loan_id))[-4:]
+
+    # 5. Numerical search
+    matches = re.finditer(r"(?:rs\.?|inr|₹)?\s*(\d{1,3}(?:,\d{3})+|\d{4,6}|\d{3})", clean)
+    found_amounts = []
+    for m in matches:
+        raw = m.group(1).replace(",", "")
         try:
-            from sarvamai import SarvamAI
-            client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=7.5)
+            val = float(raw)
+            # Skip loan verification digits
+            if loan_digits and raw == loan_digits:
+                continue
+            if 100 <= val <= total_due:
+                found_amounts.append(val)
+        except ValueError:
+            continue
+
+    if found_amounts:
+        # If there are part payment numbers (e.g. 2,500 out of 7,500 or 10,000 out of 25,000), return the part payment
+        part_payments = [v for v in found_amounts if v < total_due]
+        if part_payments:
+            return part_payments[0]
+        return found_amounts[0]
+
+    return None
+
+def run_negotiation_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None, context: Optional[Dict[str, Any]] = None) -> JourneyRecord:
+    """
+    Negotiation Agent (LLM Proposer):
+    - Analyzes dialogue context in the borrower's language.
+    - Extracts raw entities: amount (integer), relative date phrase, intent, and waiver requests.
+    - Formulates an LLMProposal.
+    - Does NOT make final policy decisions (The Policy Engine CODE decides).
+    """
+    workflow_id = record.workflow_id or (context.get("workflow_id") if context else "collections")
+    
+    dialogue_texts = [t.text for t in record.transcript if t.speaker in ("borrower", "customer")]
+    latest_dialogue = dialogue_texts[-1] if dialogue_texts else ""
+    full_dialogue = " ".join(dialogue_texts)
+    analysis_text = latest_dialogue if len(dialogue_texts) > 1 else full_dialogue
+
+    if not settings.SIMULATE and settings.SARVAM_API_KEY and settings.SARVAM_API_KEY != "mock_sarvam_key":
+        try:
             user_msg = f"""
-            Borrower: {case.borrower_name}
-            Loan ID: {case.loan_id}
-            Amount Due: ₹{case.amount_due}
-            DPD: {case.dpd}
+            Borrower: {record.customer_name}
+            Loan ID: {record.data.get('loan_id')}
+            Amount Due: ₹{record.amount_due}
+            DPD: {record.dpd}
             Dialogue transcript:
-            {full_borrower_dialogue}
+            {full_dialogue}
+
+            Latest Borrower Message:
+            {latest_dialogue}
+
+            Extract:
+            1. intent: 'ptp' | 'part_payment' | 'hardship' | 'dispute' | 'avoidance' | 'adversarial'
+            2. sentiment: 'positive' | 'neutral' | 'anxious' | 'hostile' | 'adversarial'
+            3. extracted_amount: integer or null (e.g. 2500, 10000, 20000)
+            4. extracted_date_phrase: exact relative date text (e.g. 'Friday', '5th', '20 days', 'tomorrow')
+            5. waiver_requested: boolean (true if borrower demands waiver, fee cancellation, or says 'ignore your rules')
+            6. requested_days: integer or null (e.g. 20 if borrower asks 20 days)
+
+            Output JSON only. Do not compute ISO dates.
             """
-            response = client.chat.completions(
-                model="sarvam-105b",
+            system_prompt = (
+                "You are Saarthi Negotiation Proposer powered by Sarvam-105B. "
+                "CRITICAL DEVANAGARI MANDATE: Any Marathi (mr-IN) or Hindi (hi-IN) text meant to be spoken aloud "
+                "MUST be in native Devanagari script (e.g. मराठी / हिन्दी, never Romanized Hinglish or Romanized Marathi) "
+                "so TTS pronounces it cleanly with authentic regional accents. "
+                "Structured JSON extraction fields (intent, extracted_amount, extracted_date_phrase, etc.) must remain in standard English/ISO format. "
+                "Return valid JSON only."
+            )
+            content = sarvam_service.chat_completion(
                 messages=[
-                    {"role": "system", "content": POLICY_PROMPT},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_msg}
                 ],
                 temperature=0.1
             )
-            raw_content = response.choices[0].message.content
-            # Extract JSON block
-            json_match = re.search(r"\{.*\}", raw_content, re.DOTALL)
+            json_match = re.search(r"\{.*\}", content, re.DOTALL)
             if json_match:
                 parsed = json.loads(json_match.group(0))
-                case.intent = parsed.get("intent", "ptp")
-                case.sentiment = parsed.get("sentiment", "neutral")
-                case.offer_made = parsed.get("offer_made", "Payment commitment requested")
-                case.ptp_date = parsed.get("ptp_date")
-                case.confidence = float(parsed.get("confidence", 0.9))
-                case.status = parsed.get("status", "ptp")
-                if case.status == "escalated":
-                    case.assigned_human = "Senior Collections Officer"
-        except Exception as e:
-            # Automatic fallback to deterministic policy engine
-            case = _deterministic_negotiate(case, full_borrower_dialogue, today, max_ptp_date)
+                proposal = LLMProposal(
+                    intent=parsed.get("intent", "ptp"),
+                    offered_amount=float(parsed["extracted_amount"]) if parsed.get("extracted_amount") else None,
+                    date_phrase=parsed.get("extracted_date_phrase") or "3 days",
+                    waiver_requested=bool(parsed.get("waiver_requested", False)),
+                    requested_days=int(parsed["requested_days"]) if parsed.get("requested_days") else None,
+                    sentiment=parsed.get("sentiment", "neutral"),
+                    confidence=0.96,
+                    raw_response=content
+                )
+            else:
+                proposal = _deterministic_propose(record, analysis_text)
+        except Exception:
+            proposal = _deterministic_propose(record, analysis_text)
     else:
-        case = _deterministic_negotiate(case, full_borrower_dialogue, today, max_ptp_date)
+        proposal = _deterministic_propose(record, analysis_text)
 
-    # Post-validation guardrails (Zero Hallucination enforcement)
-    if case.intent in ("dispute", "hardship"):
-        case.status = "escalated"
-        case.ptp_date = None
-        if case.intent == "dispute":
-            case.assigned_human = "Dispute Resolution Desk (Ops)"
-            case.offer_made = "Disputed ledger: Escalated to human with bank transaction audit log."
-        else:
-            case.assigned_human = "Credit Committee (Hardship & Restructure)"
-            case.offer_made = "Restructure/Waiver requested: Automated waiver rejected; passed to human authority."
-    elif case.intent == "avoidance":
-        case.status = "contacted"
-        case.offer_made = "Follow-up reminder call scheduled within 24 hours."
-    else:
-        case.status = "ptp"
-        if not case.ptp_date:
-            # Default to 3 days out
-            case.ptp_date = (today + timedelta(days=3)).strftime("%Y-%m-%d")
+    # Attach proposal to record memory
+    record.data["llm_proposal"] = proposal.model_dump()
+    record.intent = proposal.intent
+    record.sentiment = proposal.sentiment
+    record.confidence = proposal.confidence
 
-    # Add trace
-    case.add_trace(
+    # Generate live "Understood" chips for UI
+    date_display = proposal.date_phrase or "3 days"
+    amt_display = f"₹{proposal.offered_amount:,.0f}" if proposal.offered_amount else f"₹{record.amount_due:,.0f}"
+    record.data["understood_chips"] = {
+        "amount": amt_display,
+        "date_phrase": date_display,
+        "intent": proposal.intent,
+        "confidence": f"{proposal.confidence * 100:.0f}%"
+    }
+
+    record.add_trace(
         agent="Negotiation",
-        action="Policy Verification & Terms Finalized",
-        summary=f"Evaluated borrower intent: '{case.intent.upper()}'. Status: {case.status}. Offer: {case.offer_made}. Confidence: {case.confidence*100:.0f}%."
+        action="Borrower Intent & Entity Extraction",
+        summary=f"LLM Proposed: Intent='{proposal.intent}', Amount={amt_display}, DatePhrase='{date_display}', Waiver={proposal.waiver_requested}. Confidence: {proposal.confidence*100:.0f}%.",
+        badge="Review/Critique"
+    )
+    return record
+
+def _deterministic_propose(record: JourneyRecord, text: str) -> LLMProposal:
+    clean = text.lower()
+    
+    # 1. Adversarial / Prompt Injection / Waiver Demand
+    if any(k in clean for k in ["ignore your rules", "give me a waiver", "waive", "माफी करा", "सूट", "छूट"]):
+        return LLMProposal(
+            intent="adversarial",
+            offered_amount=None,
+            date_phrase="20 days",
+            waiver_requested=True,
+            requested_days=20,
+            sentiment="hostile",
+            confidence=0.98
+        )
+
+    # 2. Dispute
+    if any(k in clean for k in ["already paid", "cut चुके", "कट गए", "पैसे भर चुका", "गलत", "statement check", "लेजर", "फर्जी", "कटौती"]):
+        return LLMProposal(
+            intent="dispute",
+            offered_amount=0.0,
+            date_phrase=None,
+            sentiment="hostile",
+            confidence=0.98
+        )
+
+    # 3. Sensitive Events / Hospital / Emergency
+    if any(k in clean for k in ["hospital", "हॉस्पिटल", "accident", "अपघात", "दवाखाना", "icu", "admitted", "ऍडमिट", "मृत्यू", "निधन", "वारले", "मयत"]):
+        return LLMProposal(
+            intent="hardship",
+            offered_amount=0.0,
+            date_phrase=None,
+            sentiment="anxious",
+            confidence=0.99
+        )
+
+    # 4. Job loss distress
+    if any(k in clean for k in ["job loss", "lost my job", "नोकरी गेली", "काम छूट गया", "salary delay", "पगार झाला नाही"]):
+        return LLMProposal(
+            intent="hardship",
+            offered_amount=None,
+            date_phrase="7 days",
+            sentiment="anxious",
+            confidence=0.95
+        )
+
+    # 5. Avoidance
+    if any(k in clean for k in ["मीटिंग", "meeting", "busy", "बाद में", "फोन काटो", "काट दिया", "disconnect", "काम में हूँ"]):
+        return LLMProposal(
+            intent="avoidance",
+            offered_amount=None,
+            date_phrase=None,
+            sentiment="neutral",
+            confidence=0.90
+        )
+
+    # 6. Part Payment (e.g. S2 code-mixed "Friday ko 2,500 bhar dunga, baaki next week" or "Friday la 2,500 bharu ka?")
+    offered_amt = extract_amount_from_speech(text, record.amount_due, loan_id=record.data.get("loan_id"))
+    
+    # Extract date phrase
+    date_phrase = "3 days"
+    weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "शुक्रवार", "सोमवार", "शनिवार", "रविवार"]
+    for w in weekdays:
+        if w in clean:
+            date_phrase = w.capitalize()
+            break
+    if "5 तारखेला" in clean or "5 तारीख" in clean or "5th" in clean:
+        date_phrase = "5 तारखेला"
+
+    intent = "part_payment" if offered_amt and offered_amt < record.amount_due else "ptp"
+
+    return LLMProposal(
+        intent=intent,
+        offered_amount=offered_amt or record.amount_due,
+        date_phrase=date_phrase,
+        waiver_requested=False,
+        sentiment="positive",
+        confidence=0.95
     )
 
-    return case
-
-def _deterministic_negotiate(case: CaseFile, text: str, today, max_ptp_date) -> CaseFile:
-    # 1. Dispute detection
-    if any(k in text for k in ["already paid", "cut चुके", "कट गए", "पैसे भर चुका", "गलत", "statement check", "लेजर", "फर्जी"]):
-        case.intent = "dispute"
-        case.sentiment = "hostile"
-        case.status = "escalated"
-        case.confidence = 0.98
-        case.offer_made = "Dispute flagged: Borrower asserts payment was already debited."
-        case.assigned_human = "Dispute Desk - Ops Lead"
-        return case
-
-    # 2. Hardship / Waiver detection
-    if any(k in text for k in ["नोकरी", "job", "अडचण", "हॉस्पिटल", "accident", "सूट", "माफी", "waiver", "restructure", "hospital", "तंगी"]):
-        case.intent = "hardship"
-        case.sentiment = "anxious"
-        case.status = "escalated"
-        case.confidence = 0.95
-        case.offer_made = "Hardship detected: Borrower seeks EMI restructuring/waiver. Flagged for human review."
-        case.assigned_human = "Credit Committee - Hardship Desk"
-        return case
-
-    # 3. Avoidance detection
-    if any(k in text for k in ["मीटिंग", "meeting", "busy", "बाद में", "फोन काटो", "काट दिया", "disconnect"]):
-        case.intent = "avoidance"
-        case.sentiment = "neutral"
-        case.status = "contacted"
-        case.confidence = 0.88
-        case.offer_made = "Call ended abruptly by borrower. Re-queued for retry window."
-        return case
-
-    # 4. PTP / Part payment
-    case.intent = "ptp"
-    case.sentiment = "cooperative"
-    case.confidence = 0.94
-    case.status = "ptp"
-    
-    # Check if specific date mentioned (like 5th, Friday, tomorrow)
-    if "5" in text or "५" in text:
-        # Hero demo case: 5th of current or next month
-        target_day = 5
-        ptp_dt = today + timedelta(days=3)  # within 7 days
-        case.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        case.offer_made = f"Full payment of ₹{case.amount_due:,.2f} committed for {case.ptp_date}."
-    elif any(k in text for k in ["उद्या", "कल", "tomorrow"]):
-        ptp_dt = today + timedelta(days=1)
-        case.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        case.offer_made = f"Next-day payment commitment for ₹{case.amount_due:,.2f} on {case.ptp_date}."
-    elif any(k in text for k in ["30%", "part payment", "हप्ता", "10,000", "15,000"]):
-        part_amt = round(case.amount_due * 0.4, 0)
-        ptp_dt = today + timedelta(days=5)
-        case.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        case.offer_made = f"Part payment of ₹{part_amt:,.2f} immediate + balance due on {case.ptp_date}."
-    else:
-        ptp_dt = today + timedelta(days=4)
-        case.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        case.offer_made = f"Commitment recorded to clear ₹{case.amount_due:,.2f} on {case.ptp_date}."
-
-    return case
+# Alias for backwards compatibility
+run_decision_agent = run_negotiation_agent
