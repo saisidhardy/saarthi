@@ -95,6 +95,18 @@ SARVAM_LANG_MAP = {
     "Gujarati": "gu-IN"
 }
 
+# High-Definition Neural Human Voice Model Mapping (Natural human speech per language)
+EDGE_VOICE_MAP = {
+    "Marathi": "mr-IN-AarohiNeural",
+    "Hindi": "hi-IN-SwaraNeural",
+    "Telugu": "te-IN-ShrutiNeural",
+    "Tamil": "ta-IN-PallaviNeural",
+    "Kannada": "kn-IN-SapnaNeural",
+    "Bengali": "bn-IN-TanishaaNeural",
+    "Gujarati": "gu-IN-DhwaniNeural",
+    "English": "en-IN-NeerjaNeural"
+}
+
 # 1. Workflows Endpoint
 @app.get("/api/workflows")
 def get_workflows():
@@ -514,18 +526,21 @@ def get_policies_catalog():
 @app.post("/api/events/scenario/{scenario_id}")
 def trigger_scenario(scenario_id: str):
     scenario_map = {
-        "s1": "1",   # Hero Sunita Patil
-        "s2": "2",   # Code-mixed part payment Rajesh Sharma
-        "s3": "4",   # Adversarial Vikram Malhotra (Policy Firewall blocked)
-        "s4": "3",   # Sensitive Event Hospital Suresh Patil + Hospicash claim
-        "s5": "5",   # Bad transcript Manoj Kumar (Compliance fail)
-        "s7": "21",  # T-24h Preventive Rescue Anjali Deshmukh (₹590 saved)
-        "s8": "22"   # 4x Kirana Cashflow Micro-Split Sunita Patil
+        "s1": "1",   # Hero Sunita Patil (Marathi)
+        "s2": "2",   # Code-mixed part payment Rajesh Sharma (Hindi)
+        "s3": "4",   # Adversarial Vikram Malhotra (English)
+        "s4": "3",   # Sensitive Event Hospital Suresh Patil + Hospicash claim (Marathi)
+        "s5": "5",   # Bad transcript Manoj Kumar (Compliance fail) (Hindi)
+        "s7": "21",  # T-24h Preventive Rescue Anjali Deshmukh (₹590 saved) (Marathi)
+        "s8": "22",  # 4x Kirana Cashflow Micro-Split Sunita Patil (Marathi)
+        "s9": "23",  # Telugu Hero PTP Kavitha Reddy (Telugu)
+        "s10": "24", # Tamil Part Payment & Mandate Senthil Kumar (Tamil)
+        "s11": "25"  # Kannada T-24h Rescue Manjunath Gowda (Kannada)
     }
     s_key = scenario_id.lower()
     acc_id = scenario_map.get(s_key)
     if not acc_id:
-        raise HTTPException(status_code=400, detail=f"Invalid scenario '{scenario_id}'. Must be s1, s2, s3, s4, s5, s7, or s8.")
+        raise HTTPException(status_code=400, detail=f"Invalid scenario '{scenario_id}'. Must be s1, s2, s3, s4, s5, s7, s8, s9, s10, or s11.")
 
     case = get_case(acc_id, workflow_id="collections")
     if not case:
@@ -605,48 +620,71 @@ async def speech_to_text(file: Optional[UploadFile] = File(None), language: Opti
         fallback_txt = "माझा पगार 5 तारखेला जमा होतो." if language == "Marathi" else "कल दोपहर तक कर दूंगा."
         return {"transcript": fallback_txt, "language_code": lang_code, "source": "fallback", "error": str(e)}
 
-# 11. Voice TTS (Sarvam Bulbul v3 with 4s circuit breaker)
+# 11. Voice TTS (Sarvam Bulbul v3 with fallback to Studio-Grade High-Definition Neural Human Voices)
 @app.post("/api/voice/tts")
-def text_to_speech(req: TTSRequest):
-    lang_code = SARVAM_LANG_MAP.get(req.language, "mr-IN")
+async def text_to_speech(req: TTSRequest):
+    lang = req.language or "Marathi"
+    lang_code = SARVAM_LANG_MAP.get(lang, "mr-IN")
     speaker = req.speaker or "priya"
 
-    # If SIMULATE mode, return browser synthesis directive
-    if settings.SIMULATE or not settings.SARVAM_API_KEY:
-        return {
-            "mode": "simulated",
-            "text": req.text,
-            "language": req.language,
-            "browser_speech": True,
-            "audio_base64": None
-        }
+    # 1. In Live Mode with Sarvam API Key: Use Sarvam Bulbul:v3
+    if settings.SARVAM_API_KEY and settings.SARVAM_API_KEY != "mock_sarvam_key" and not settings.SIMULATE:
+        try:
+            from sarvamai import SarvamAI
+            client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=4.0)
+            res = client.text_to_speech.convert(
+                text=req.text,
+                target_language_code=lang_code,
+                speaker=speaker,
+                model="bulbul:v3",
+                output_audio_codec="mp3"
+            )
+            if res.audios and len(res.audios) > 0:
+                return {
+                    "mode": "live",
+                    "text": req.text,
+                    "language": lang,
+                    "browser_speech": False,
+                    "audio_base64": res.audios[0],
+                    "mime_type": "audio/mp3",
+                    "source": "sarvam_bulbul",
+                    "voice_name": f"Sarvam Bulbul:v3 ({speaker})"
+                }
+        except Exception as e:
+            logger.warning(f"Sarvam Bulbul TTS failed ({e}), falling back to High-Definition Neural Voice")
 
-    # In LIVE mode, call Sarvam Bulbul v3
+    # 2. Studio High-Definition Neural Human Voice (Natural human speech per language)
+    voice_name = EDGE_VOICE_MAP.get(lang, "mr-IN-AarohiNeural")
     try:
-        from sarvamai import SarvamAI
-        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=4.0)
-        res = client.text_to_speech.convert(
-            text=req.text,
-            target_language_code=lang_code,
-            speaker=speaker,
-            model="bulbul:v3",
-            output_audio_codec="mp3"
-        )
-        if res.audios and len(res.audios) > 0:
+        import edge_tts
+        comm = edge_tts.Communicate(req.text, voice_name, rate="-4%")
+        audio_bytes = b""
+        async for chunk in comm.stream():
+            if chunk["type"] == "audio":
+                audio_bytes += chunk["data"]
+        if audio_bytes:
+            b64_audio = base64.b64encode(audio_bytes).decode("utf-8")
             return {
-                "mode": "live",
+                "mode": "neural_human",
                 "text": req.text,
-                "language": req.language,
+                "language": lang,
                 "browser_speech": False,
-                "audio_base64": res.audios[0],
+                "audio_base64": b64_audio,
                 "mime_type": "audio/mp3",
-                "source": "sarvam_bulbul"
+                "source": "neural_human_tts",
+                "voice_name": voice_name
             }
-        else:
-            return {"mode": "fallback", "text": req.text, "browser_speech": True}
     except Exception as e:
-        # Automatic fallback on timeout or error
-        return {"mode": "fallback", "text": req.text, "browser_speech": True, "error": str(e)}
+        logger.warning(f"Neural TTS failed ({e})")
+
+    # 3. Final fallback to browser speech synthesis
+    return {
+        "mode": "fallback",
+        "text": req.text,
+        "language": lang,
+        "browser_speech": True,
+        "voice_name": voice_name
+    }
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 

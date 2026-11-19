@@ -6,6 +6,7 @@ python-dotenv>=1.0.0
 pyyaml>=6.0.0
 python-multipart>=0.0.18
 sarvamai>=0.1.46
+edge-tts>=7.0.0
 requests>=2.31.0
 httpx>=0.27.0
 pytest>=8.0.0

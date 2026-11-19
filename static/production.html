@@ -57,10 +57,24 @@
       <div class="overflow-hidden">
         <div class="flex items-center gap-1.5">
           <span class="text-sm font-black tracking-tight text-white">Saarthi</span>
-          <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">CLOUD</span>
+          <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AGENCY</span>
         </div>
-        <p class="text-[10px] text-slate-400 truncate">Saarthi Capital Ltd. (NBFC)</p>
+        <p class="text-[10px] text-slate-400 truncate">Multi-Lender AI Recovery Cloud</p>
       </div>
+    </div>
+
+    <!-- Multi-Lender Agency Switcher -->
+    <div class="px-3.5 py-2.5 border-b border-slate-800 bg-slate-950/70">
+      <label class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+        <i class="fa-solid fa-network-wired text-indigo-400 mr-1"></i> Serving Lender Tenant:
+      </label>
+      <select id="lenderTenantSelect" onchange="switchLenderTenant(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-indigo-300 font-bold focus:outline-none focus:border-indigo-500 cursor-pointer">
+        <option value="saarthi">Saarthi Capital Ltd. (Retail NBFC)</option>
+        <option value="bajaj">Bajaj Finance (Digital Credit)</option>
+        <option value="dmi">DMI Finance (MSME Term Loans)</option>
+        <option value="muthoot">Muthoot Microfin (Rural & JLG)</option>
+        <option value="kreditbee">KreditBee (Fintech Credit)</option>
+      </select>
     </div>
 
     <!-- Navigation Menu Items -->
@@ -205,6 +219,21 @@
       <button onclick="jumpToPreset('22')" id="pill-s8" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
         <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
         <span>S8: Kirana 4x Friday Micro-Split</span>
+      </button>
+
+      <button onclick="jumpToPreset('23')" id="pill-s9" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+        <span>S9: Kavitha (Telugu · ₹32k Salary Mandate)</span>
+      </button>
+
+      <button onclick="jumpToPreset('24')" id="pill-s10" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+        <span>S10: Senthil (Tamil · ₹28k Merchant Split)</span>
+      </button>
+
+      <button onclick="jumpToPreset('25')" id="pill-s11" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
+        <span>S11: Manjunath (Kannada · ₹22k Agritech Harvest)</span>
       </button>
 
       <button onclick="jumpToPreset('4')" id="pill-s3" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
@@ -455,7 +484,7 @@
         <div class="p-3 border-t border-slate-800 bg-slate-900 space-y-2 shrink-0">
           <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
             <span><i class="fa-solid fa-bolt text-teal-400 mr-1"></i> 1-Click Authorized Settlement Rails</span>
-            <span class="font-mono text-emerald-400 text-xs">repayments.saarthi@yesbank</span>
+            <span id="consoleVpaTag" class="font-mono text-emerald-400 text-xs">repayments.saarthi@yesbank</span>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
@@ -548,7 +577,7 @@
                 <i class="fa-solid fa-building-columns"></i>
               </div>
               <div>
-                <h4 class="text-base font-extrabold text-white">Saarthi Capital</h4>
+                <h4 id="phoneCallerName" class="text-base font-extrabold text-white">Saarthi Capital</h4>
                 <p class="text-xs text-indigo-300 font-medium">Autonomous Recovery Teammate</p>
                 <span id="phoneCallLanguageChip" class="inline-block mt-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
                   मराठी (Mr-IN)
@@ -613,7 +642,7 @@
               </div>
               <div class="overflow-hidden">
                 <div class="flex items-center gap-1">
-                  <span class="text-xs font-bold text-white truncate">Saarthi Capital</span>
+                  <span id="waSenderName" class="text-xs font-bold text-white truncate">Saarthi Capital</span>
                   <i class="fa-solid fa-circle-check text-emerald-400 text-[11px]" title="Verified Business"></i>
                 </div>
                 <span class="text-[9.5px] text-emerald-400">Official Business Account</span>
@@ -704,11 +733,11 @@
               <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-slate-400">Paying Beneficiary:</span>
-                  <span class="font-bold text-white">Saarthi Capital Ltd.</span>
+                  <span id="upiSheetLenderName" class="font-bold text-white">Saarthi Capital Ltd.</span>
                 </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-slate-400">Collection VPA:</span>
-                  <span class="font-mono text-indigo-300 text-[11px]">repayments.saarthi@yesbank</span>
+                  <span id="upiSheetVpaTag" class="font-mono text-indigo-300 text-[11px]">repayments.saarthi@yesbank</span>
                 </div>
                 <div class="flex items-center justify-between text-xs border-t border-slate-800 pt-2">
                   <span class="text-slate-400">Loan Account:</span>
@@ -847,6 +876,88 @@
     let audioPlayer = null;
     let isBorrowerSimOpen = false;
     let activePhoneApp = 'call';
+
+    // MULTI-LENDER TENANT AGENCY REPOSITORY
+    const LENDER_TENANTS = {
+      saarthi: {
+        name: "Saarthi Capital Ltd.",
+        shortName: "Saarthi Capital",
+        desc: "Multi-Lender Agency Portfolio",
+        vpa: "repayments.saarthi@yesbank",
+        badge: "Retail NBFC",
+        code: "SRT-AGY-01",
+        bank: "YES Bank Escrow",
+        utrPrefix: "YESB"
+      },
+      bajaj: {
+        name: "Bajaj Finance Ltd.",
+        shortName: "Bajaj Finance",
+        desc: "Digital Consumer Durable & EMI Book",
+        vpa: "collections.bajaj@hdfcbank",
+        badge: "Tier-1 NBFC",
+        code: "BFL-AGY-108",
+        bank: "HDFC Bank Escrow",
+        utrPrefix: "HDFC"
+      },
+      dmi: {
+        name: "DMI Finance Pvt. Ltd.",
+        shortName: "DMI Finance",
+        desc: "FinTech Digital Credit Agency Book",
+        vpa: "dmi.resolve@axisbank",
+        badge: "Digital Lender",
+        code: "DMI-AGY-402",
+        bank: "Axis Bank Escrow",
+        utrPrefix: "UTIB"
+      },
+      muthoot: {
+        name: "Muthoot Microfin Ltd.",
+        shortName: "Muthoot Microfin",
+        desc: "Rural & MSME Lending Agency Book",
+        vpa: "muthoot.collections@icicibank",
+        badge: "MFI Agency",
+        code: "MUT-MFI-007",
+        bank: "ICICI Bank Escrow",
+        utrPrefix: "ICIC"
+      },
+      kreditbee: {
+        name: "KreditBee (KrazyBee Services)",
+        shortName: "KreditBee",
+        desc: "Salaried Personal Loans Agency Book",
+        vpa: "kreditbee.pay@kotak",
+        badge: "Fintech NBFC",
+        code: "KB-AGY-331",
+        bank: "Kotak Mahindra Bank",
+        utrPrefix: "KKBK"
+      }
+    };
+
+    let currentTenant = 'saarthi';
+
+    function switchLenderTenant(val) {
+      const tenant = LENDER_TENANTS[val] || LENDER_TENANTS.saarthi;
+      currentTenant = val;
+
+      const cVpa = document.getElementById('consoleVpaTag');
+      if (cVpa) cVpa.innerText = tenant.vpa;
+
+      const upiVpa = document.getElementById('upiSheetVpaTag');
+      if (upiVpa) upiVpa.innerText = tenant.vpa;
+
+      const upiLender = document.getElementById('upiSheetLenderName');
+      if (upiLender) upiLender.innerText = tenant.name;
+
+      const waSender = document.getElementById('waSenderName');
+      if (waSender) waSender.innerText = tenant.shortName;
+
+      const phoneCaller = document.getElementById('phoneCallerName');
+      if (phoneCaller) phoneCaller.innerText = `${tenant.shortName} (Verified)`;
+
+      showToast(
+        `Serving ${tenant.name}`,
+        `Switched agency routing. All recovered funds auto-deposit to ${tenant.vpa} (${tenant.bank}).`
+      );
+    }
+
 
     // REAL IST CLOCK
     function startClock() {
@@ -1092,7 +1203,10 @@
         "4": "s3",
         "5": "s5",
         "21": "s7",
-        "22": "s8"
+        "22": "s8",
+        "23": "s9",
+        "24": "s10",
+        "25": "s11"
       };
 
       // Update pill active styling
@@ -1150,7 +1264,15 @@
         'bg-slate-800 text-slate-400 border border-slate-700'
       }`;
 
-      document.getElementById('voiceLanguageBadge').innerText = `Sarvam Bulbul:v3 (${lang} Devanagari)`;
+            const voiceBadgeMap = {
+        'Marathi': 'Human Studio Neural (mr-IN-Aarohi · Devanagari)',
+        'Hindi': 'Human Studio Neural (hi-IN-Swara · Devanagari)',
+        'Telugu': 'Human Studio Neural (te-IN-Shruti · తెలుగు)',
+        'Tamil': 'Human Studio Neural (ta-IN-Pallavi · தமிழ்)',
+        'Kannada': 'Human Studio Neural (kn-IN-Sapna · ಕನ್ನಡ)',
+        'English': 'Human Studio Neural (en-IN-Neerja · Latin)'
+      };
+      document.getElementById('voiceLanguageBadge').innerText = voiceBadgeMap[lang] || `Human Studio Neural (${lang})`;
 
       const hcBtn = document.getElementById('btnHospicashAction');
       const hasHc = a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider);
@@ -1252,13 +1374,29 @@
       const isPaid = a.status === 'paid';
 
       // 1. In-Call View
-      document.getElementById('phoneCallLanguageChip').innerText = `${a.language || 'Indic'} (${a.language === 'Marathi' ? 'मराठी' : 'हिन्दी'})`;
+      const langLabels = {
+        'Marathi': 'मराठी (Mr-IN)',
+        'Hindi': 'हिन्दी (Hi-IN)',
+        'Telugu': 'తెలుగు (Te-IN)',
+        'Tamil': 'தமிழ் (Ta-IN)',
+        'Kannada': 'ಕನ್ನಡ (Kn-IN)',
+        'English': 'English (En-IN)'
+      };
+      const nativeLabel = langLabels[a.language] || a.language || 'Indic';
+      document.getElementById('phoneCallLanguageChip').innerText = `${a.language || 'Indic'} · ${nativeLabel}`;
       
       const lastTurn = (a.transcript && a.transcript.length > 0) ? a.transcript[a.transcript.length - 1] : null;
       if (lastTurn) {
         document.getElementById('phoneLiveCaption').innerText = `"${lastTurn.text}"`;
       } else {
-        document.getElementById('phoneLiveCaption').innerText = `"नमस्कार, मी सारथी कॅपिटलकडून कॉल करत आहे..."`;
+        const defaultGreetings = {
+          'Telugu': '"నమస్కారం, నేను రికవరీ ఏజెన్సీ నుండి మాట్లాడుతున్నాను..."',
+          'Tamil': '"வணக்கம், நான் கடன் மீட்பு நிறுவனத்திலிருந்து அழைக்கிறேன்..."',
+          'Kannada': '"ನಮಸ್ಕಾರ, ನಾನು ಸಾಲ ಮರುಪಾವತಿ ಏಜೆನ್ಸಿಯಿಂದ ಕರೆ ಮಾಡುತ್ತಿದ್ದೇನೆ..."',
+          'Marathi': '"नमस्कार, मी सारथी कॅपिटलकडून कॉल करत आहे..."',
+          'Hindi': '"नमस्ते, मैं रिकवरी एजेंसी से कॉल कर रहा हूँ..."'
+        };
+        document.getElementById('phoneLiveCaption').innerText = defaultGreetings[a.language] || `"नमस्कार, मी सारथी कॅपिटलकडून कॉल करत आहे..."`;
       }
 
       // 2. WhatsApp View
@@ -1281,6 +1419,27 @@
         waBody.innerText = `अंजली ताई, उद्या ₹१८,००० चा EMI आहे. खात्यात शिल्लक कमी असल्याने ₹५९० बाउन्स शुल्क वाचवण्यासाठी आज ₹६,००० भरा व उर्वरित ३ दिवस पुढे ढकला.`;
         waCardAmount.innerText = `₹6,000.00`;
         waPayBtn.innerText = `Pay ₹6,000 Token Now (Save ₹590)`;
+        waUpiCard.classList.remove('hidden');
+        waHcCard.classList.add('hidden');
+      } else if (a.language === 'Telugu' || (a.data && a.data.scenario === 's9_telugu_hero')) {
+        waHeader.innerText = "రుణ పరిష్కార UPI లింక్ (అధికారికం)";
+        waBody.innerText = `నమస్కారం ${a.customer_name} గారు, మీ అభ్యర్థన మేరకు ₹${amt.toLocaleString()} రుణ పరిష్కారం కోసం అధికారిక UPI చెల్లింపు లింక్ క్రింద ఇవ్వబడింది. ఈ రోజు చెల్లించి 100% క్రెడిట్ స్కోర్ రక్షించుకోండి.`;
+        waCardAmount.innerText = `₹${amt.toLocaleString()}`;
+        waPayBtn.innerText = `Pay ₹${amt.toLocaleString()} via UPI (చెల్లించండి)`;
+        waUpiCard.classList.remove('hidden');
+        waHcCard.classList.add('hidden');
+      } else if (a.language === 'Tamil' || (a.data && a.data.scenario === 's10_tamil_part_pay')) {
+        waHeader.innerText = "கடன் தவணைத் தீர்வு (அதிகாரப்பூர்வ)";
+        waBody.innerText = `வணக்கம் ${a.customer_name} அவர்களே, உங்களின் ₹${amt.toLocaleString()} நிலுவைத் தொகைக்கு ₹7,000 உடனடி டோக்கன் மற்றும் வாராந்திர தவணை திட்டம் அங்கீகரிக்கப்பட்டுள்ளது.`;
+        waCardAmount.innerText = `₹7,000.00`;
+        waPayBtn.innerText = `Pay ₹7,000 Token (செலுத்துங்கள்)`;
+        waUpiCard.classList.remove('hidden');
+        waHcCard.classList.add('hidden');
+      } else if (a.language === 'Kannada' || (a.data && a.data.scenario === 's11_kannada_rescue')) {
+        waHeader.innerText = "ಸಾಲ ಮರುಪಾವತಿ ಲಿಂಕ್ (ಅಧಿಕೃತ)";
+        waBody.innerText = `ನಮಸ್ಕಾರ ${a.customer_name} ಅವರೇ, ನಿಮ್ಮ ₹${amt.toLocaleString()} ಕೃಷಿ ಸಾಲದ ಪರಿಹಾರಕ್ಕಾಗಿ ₹5,000 ಮುಂಗಡ ಟೋಕನ್ ಲಿಂಕ್ ಇಲ್ಲಿದೆ. ಉಳಿದ ಮೊತ್ತವನ್ನು ಸುಗ್ಗಿ ನಂತರ ಪಾವತಿಸಬಹುದು.`;
+        waCardAmount.innerText = `₹5,000.00`;
+        waPayBtn.innerText = `Pay ₹5,000 Token (ಪಾವತಿಸಿ)`;
         waUpiCard.classList.remove('hidden');
         waHcCard.classList.add('hidden');
       } else if (a.instant_recovered_inr > 0 || (a.data && a.data.instant_recovered_inr > 0)) {
@@ -1404,7 +1563,7 @@
             statusEl.innerText = "Audio stream finished";
           };
           audioPlayer.play();
-          statusEl.innerText = `Playing live Sarvam Bulbul:v3 Indic stream (${selectedAccount.language})`;
+          statusEl.innerText = `Playing ${data.voice_name || 'Studio Neural Voice'} (${selectedAccount.language}) - Human Inflection`;
           return;
         }
       } catch (err) {
@@ -1416,6 +1575,9 @@
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(lastTurn.text);
         if (selectedAccount.language === 'Marathi') utter.lang = 'mr-IN';
+        else if (selectedAccount.language === 'Telugu') utter.lang = 'te-IN';
+        else if (selectedAccount.language === 'Tamil') utter.lang = 'ta-IN';
+        else if (selectedAccount.language === 'Kannada') utter.lang = 'kn-IN';
         else if (selectedAccount.language === 'Hindi') utter.lang = 'hi-IN';
         else utter.lang = 'en-IN';
         utter.onend = () => {

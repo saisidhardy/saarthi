@@ -15,8 +15,8 @@ def extract_amount_from_speech(text: str, total_due: float, loan_id: Optional[st
     """
     clean = text.lower()
     
-    # 1. Full payment indicators in Marathi, Hindi, English
-    if any(k in clean for k in ["पूर्ण", "पूरा", "पूरे", "all", "full", "complete", "संपूर्ण", "सर्व", "सगळे", "नक्की सर्व", "full payment"]):
+    # 1. Full payment indicators in Marathi, Hindi, English, Telugu, Tamil, Kannada
+    if any(k in clean for k in ["पूर्ण", "पूरा", "पूरे", "all", "full", "complete", "संपूर्ण", "सर्व", "सगळे", "नक्की सर्व", "full payment", "పూర్తి", "మొత్తం", "ముழுவதும்", "முழு", "ಸಂಪೂರ್ಣ", "ಪೂರ್ತಿ"]):
         return total_due
 
     # 2. Check for half / 50%
@@ -239,7 +239,7 @@ def _deterministic_propose(record: JourneyRecord, text: str) -> LLMProposal:
     
     # Extract date phrase
     date_phrase = "3 days"
-    weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "शुक्रवार", "सोमवार", "शनिवार", "रविवार"]
+    weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "शुक्रवार", "सोमवार", "शनिवार", "रविवार", "శుక్రవారం", "సోమవారం", "శనివారం", "வெள்ளிக்கிழமை", "திங்கட்கிழமை", "ಶುಕ್ರವಾರ", "ಸೋಮವಾರ"]
     for w in weekdays:
         if w in clean:
             date_phrase = w.capitalize()
