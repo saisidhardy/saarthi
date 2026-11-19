@@ -8,7 +8,8 @@ class Settings(BaseSettings):
     SARVAM_API_KEY: str = os.getenv("SARVAM_API_KEY", "")
     SIMULATE: bool = os.getenv("SIMULATE", "true").lower() in ("true", "1", "yes")
     DEMO_OVERRIDE_HOURS: bool = os.getenv("DEMO_OVERRIDE_HOURS", "true").lower() in ("true", "1", "yes")
-    DATABASE_PATH: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "saarthi.db")
+    DATA_DIR: str = os.getenv("DATA_DIR", "")
+    DATABASE_PATH: str = os.path.join(os.getenv("DATA_DIR") or os.path.dirname(os.path.dirname(__file__)), "saarthi.db")
     SAMPLE_BOOK_PATH: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sample_book.csv")
     
     # Cost parameters
