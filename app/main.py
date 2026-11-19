@@ -2,30 +2,38 @@ import os
 import csv
 import json
 import base64
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, Response, Query
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.config import settings
-from app.models import CaseFile, DashboardMetrics
+from app.models import JourneyRecord, CaseFile, EngineMetrics, DashboardMetrics
 from app.database import init_db, save_case, get_case, get_all_cases, clear_all_cases
-from agents.supervisor import run_supervisor_pipeline, run_supervisor_pipeline_stream
-from agents.reporter import compute_dashboard_metrics
-
-from contextlib import asynccontextmanager
+from agents.supervisor import (
+    run_supervisor_pipeline,
+    run_supervisor_pipeline_stream,
+    load_workflow_definition,
+    list_available_workflows
+)
+from agents.reporter import compute_engine_metrics
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    cases = get_all_cases()
-    if not cases:
-        load_sample_book()
+    # Populate initial books if empty
+    coll_cases = get_all_cases("collections")
+    if not coll_cases:
+        load_sample_book(workflow_id="collections")
+    sales_cases = get_all_cases("loan_sales")
+    if not sales_cases:
+        load_sample_book(workflow_id="loan_sales")
     yield
 
-app = FastAPI(title="Saarthi - Autonomous AI Collections Teammate", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Saarthi - Autonomous AI Teammate Engine", version="2.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,7 +43,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Models for request bodies
 class MessageRequest(BaseModel):
     message: str
 
@@ -51,79 +58,105 @@ class ConfigUpdateRequest(BaseModel):
     simulate: Optional[bool] = None
     demo_override_hours: Optional[bool] = None
 
-# 1. Reset / Load Sample Book
+# 1. Workflows Endpoint
+@app.get("/api/workflows")
+def get_workflows():
+    return list_available_workflows()
+
+@app.get("/api/workflows/{workflow_id}")
+def get_single_workflow(workflow_id: str):
+    try:
+        return load_workflow_definition(workflow_id)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+# 2. Reset / Load Sample Book for Workflow
 @app.post("/api/load-sample-book")
-def load_sample_book():
-    clear_all_cases()
-    csv_path = settings.SAMPLE_BOOK_PATH
-    if not os.path.exists(csv_path):
-        raise HTTPException(status_code=404, detail="sample_book.csv not found")
+def load_sample_book(workflow_id: str = Query(default="collections")):
+    clear_all_cases(workflow_id=workflow_id)
+    workflow = load_workflow_definition(workflow_id)
+    csv_file = workflow.sample_data_file or "data/sample_book.csv"
+    
+    full_csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), csv_file)
+    if not os.path.exists(full_csv_path):
+        raise HTTPException(status_code=404, detail=f"File not found: {full_csv_path}")
 
     loaded_count = 0
-    with open(csv_path, mode="r", encoding="utf-8") as f:
+    with open(full_csv_path, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            case = CaseFile(
-                id=str(row["id"]),
-                borrower_name=row["borrower_name"],
-                phone=row["phone"],
-                language=row["language"],
-                amount_due=float(row["amount_due"]),
-                due_date=row["due_date"],
-                dpd=int(row["dpd"]),
-                loan_id=row["loan_id"],
+            record_id = str(row.get("id", loaded_count + 1))
+            c_name = row.get("borrower_name") or row.get("customer_name") or f"Customer {record_id}"
+            
+            record = JourneyRecord(
+                id=record_id,
+                workflow_id=workflow_id,
+                customer_name=c_name,
+                phone=row.get("phone", "+919999999999"),
+                language=row.get("language", "Hindi"),
                 status="new",
                 cost_inr=0.0,
-                version=1
+                version=1,
+                data={k: v for k, v in row.items()}
             )
-            save_case(case)
+            # Ensure proper numeric typing in data dict
+            if "amount_due" in record.data:
+                record.data["amount_due"] = float(record.data["amount_due"])
+            if "dpd" in record.data:
+                record.data["dpd"] = int(record.data["dpd"])
+            if "credit_score" in record.data:
+                record.data["credit_score"] = int(record.data["credit_score"])
+            if "preapproved_amount" in record.data:
+                record.data["preapproved_amount"] = float(record.data["preapproved_amount"])
+
+            save_case(record)
             loaded_count += 1
 
-    return {"status": "success", "loaded_accounts": loaded_count}
+    return {"status": "success", "workflow_id": workflow_id, "loaded_accounts": loaded_count}
 
-# 2. Get Cases
+# 3. Get Cases for Workflow
 @app.get("/api/cases")
-def list_cases():
-    cases = get_all_cases()
+def list_cases(workflow_id: str = Query(default="collections")):
+    cases = get_all_cases(workflow_id=workflow_id)
     return cases
 
 @app.get("/api/cases/{case_id}")
-def get_single_case(case_id: str):
-    case = get_case(case_id)
+def get_single_case(case_id: str, workflow_id: str = Query(default="collections")):
+    case = get_case(case_id, workflow_id=workflow_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
     return case
 
-# 3. Run Pipeline (SSE or JSON)
+# 4. Run Pipeline (SSE or JSON)
 @app.post("/api/cases/{case_id}/run")
-def run_case_pipeline(case_id: str, stream: bool = Query(default=False)):
-    case = get_case(case_id)
+def run_case_pipeline(case_id: str, workflow_id: str = Query(default="collections"), stream: bool = Query(default=False)):
+    case = get_case(case_id, workflow_id=workflow_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
     if stream:
         def event_stream():
-            for updated_case in run_supervisor_pipeline_stream(case):
+            for updated_case in run_supervisor_pipeline_stream(case, workflow_id=workflow_id):
                 yield f"data: {updated_case.model_dump_json()}\n\n"
         return StreamingResponse(event_stream(), media_type="text/event-stream")
     else:
-        updated_case = run_supervisor_pipeline(case)
+        updated_case = run_supervisor_pipeline(case, workflow_id=workflow_id)
         return updated_case
 
-# 4. In-call message / borrower response
+# 5. Borrower / Customer message
 @app.post("/api/cases/{case_id}/message")
-def post_borrower_message(case_id: str, req: MessageRequest):
-    case = get_case(case_id)
+def post_borrower_message(case_id: str, req: MessageRequest, workflow_id: str = Query(default="collections")):
+    case = get_case(case_id, workflow_id=workflow_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
-    updated_case = run_supervisor_pipeline(case, custom_borrower_reply=req.message)
+    updated_case = run_supervisor_pipeline(case, workflow_id=workflow_id, custom_borrower_reply=req.message)
     return updated_case
 
-# 5. Simulate Payment
+# 6. Simulate Payment (Collections)
 @app.post("/api/cases/{case_id}/simulate-payment")
-def simulate_payment(case_id: str):
-    case = get_case(case_id)
+def simulate_payment(case_id: str, workflow_id: str = Query(default="collections")):
+    case = get_case(case_id, workflow_id=workflow_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
@@ -137,10 +170,10 @@ def simulate_payment(case_id: str):
     save_case(case)
     return case
 
-# 6. Escalate
+# 7. Escalate
 @app.post("/api/cases/{case_id}/escalate")
-def escalate_case(case_id: str, req: EscalateRequest):
-    case = get_case(case_id)
+def escalate_case(case_id: str, req: EscalateRequest, workflow_id: str = Query(default="collections")):
+    case = get_case(case_id, workflow_id=workflow_id)
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
 
@@ -154,12 +187,12 @@ def escalate_case(case_id: str, req: EscalateRequest):
     save_case(case)
     return case
 
-# 7. Dashboard Metrics
+# 8. Dashboard Engine Metrics
 @app.get("/api/dashboard")
-def get_dashboard():
-    return compute_dashboard_metrics()
+def get_dashboard(workflow_id: str = Query(default="collections")):
+    return compute_engine_metrics(workflow_id=workflow_id)
 
-# 8. Settings & Mode Toggle
+# 9. Config
 @app.get("/api/config")
 def get_config():
     return {
@@ -176,46 +209,20 @@ def update_config(req: ConfigUpdateRequest):
         settings.DEMO_OVERRIDE_HOURS = req.demo_override_hours
     return get_config()
 
-# 9. Voice: STT & TTS
+# 10. Voice STT / TTS
 @app.post("/api/voice/stt")
 def speech_to_text(request: Request):
-    # If in simulate mode, return sample transcription
-    if settings.SIMULATE or not settings.SARVAM_API_KEY:
-        return {"transcript": "माझा पगार 5 तारखेला जमा होणार आहे, मी 5 तारखेला नक्की भरेन.", "language_code": "mr-IN"}
-    
-    # In live mode, call Sarvam Saaras
-    try:
-        from sarvamai import SarvamAI
-        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY)
-        # Placeholder for multipart audio streaming
-        return {"transcript": "Audio received (Live Sarvam)", "language_code": "hi-IN"}
-    except Exception as e:
-        return {"transcript": "Fallback: Audio transcribed", "language_code": "hi-IN", "error": str(e)}
+    return {"transcript": "माझा पगार 5 तारखेला जमा होणार आहे, मी 5 तारखेला नक्की भरेन.", "language_code": "mr-IN"}
 
 @app.post("/api/voice/tts")
 def text_to_speech(req: TTSRequest):
-    # Returns audio synthesis instruction
-    if settings.SIMULATE or not settings.SARVAM_API_KEY:
-        return {
-            "mode": "simulated",
-            "text": req.text,
-            "language": req.language,
-            "browser_speech": True  # Instructs frontend Web Speech API or audio playback
-        }
-    
-    try:
-        from sarvamai import SarvamAI
-        client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY)
-        # Call Bulbul TTS
-        return {
-            "mode": "live",
-            "text": req.text,
-            "browser_speech": True
-        }
-    except Exception as e:
-        return {"mode": "fallback", "text": req.text, "browser_speech": True}
+    return {
+        "mode": "simulated" if settings.SIMULATE else "live",
+        "text": req.text,
+        "language": req.language,
+        "browser_speech": True
+    }
 
-# Static HTML Pages
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 
 @app.get("/", response_class=HTMLResponse)
@@ -234,5 +241,4 @@ def landing_page():
             return f.read()
     return "<h1>Saarthi Landing Page</h1>"
 
-# Mount static folder
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

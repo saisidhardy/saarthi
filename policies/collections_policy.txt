@@ -1,0 +1,7 @@
+LENDING POLICY: EARLY DELINQUENCY COLLECTIONS (1-30 DPD)
+1. PTP Threshold: Maximum promise-to-pay date is strictly up to 7 days from the current date.
+2. Part Payments: Accepted only if borrower commits >= 30% of outstanding EMI amount upfront, with remaining balance scheduled within 7 days.
+3. Hardship & Restructuring: Any request for interest waiver, principal reduction, or tenure extension must be classified as 'hardship' and escalated immediately to the Credit Committee. Autonomous agents must never promise or approve waivers.
+4. Disputes: Any claim of already paid, wrong debit, incorrect amount, or fraudulent ledger must be classified as 'dispute' and escalated immediately to the Dispute Resolution Desk with full call transcript.
+5. Avoidance: Any customer hanging up or refusing to engage must be classified as 'avoidance' and scheduled for retry within 24 hours.
+6. Tone: Firm, respectful, empathetic, strictly compliant with RBI Fair Practices Code.

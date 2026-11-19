@@ -1,86 +1,114 @@
-from typing import List, Dict, Any
-from app.models import CaseFile, DashboardMetrics
+from typing import List, Dict, Any, Optional
+from app.models import JourneyRecord, EngineMetrics, WorkflowStep
 from app.config import settings
 from app.database import get_all_cases
 
-def compute_dashboard_metrics(cases: List[CaseFile] = None) -> DashboardMetrics:
+def compute_engine_metrics(workflow_id: str = "collections", records: List[JourneyRecord] = None) -> EngineMetrics:
     """
-    Computes real-time portfolio metrics across the loan book.
-    Crucial Rule: Calls that fail compliance audit do NOT count toward valid PTP/recovery.
+    Computes workflow engine-level metrics across journey records.
+    Engine Metrics:
+    - Journeys started
+    - Journeys completed autonomously
+    - Human-touch rate %
+    - Cost per completed journey
+    - Workflow's own metric (recovery % for collections, qualified leads for sales)
     """
-    if cases is None:
-        cases = get_all_cases()
+    if records is None:
+        records = get_all_cases(workflow_id=workflow_id)
 
-    total_accounts = len(cases)
-    if total_accounts == 0:
-        return DashboardMetrics(
-            total_accounts=0,
-            contacted=0,
-            ptps=0,
-            paid=0,
-            escalated=0,
-            ptp_conversion_pct=0.0,
-            recovery_pct=0.0,
-            total_cost_inr=0.0,
-            our_cost_per_contact=0.0,
-            language_breakdown={}
+    total_records = len(records)
+    started_records = [r for r in records if r.status != "new"]
+    started_count = len(started_records)
+
+    # Valid records (failed audits do not count as completed autonomously)
+    valid_records = [r for r in records if r.audit_pass is not False]
+    
+    # Human-touch records
+    escalated_records = [r for r in records if r.status == "escalated" or r.assigned_human]
+    human_touch_count = len(escalated_records)
+    human_touch_rate = round((human_touch_count / max(started_count, 1)) * 100, 1) if started_count > 0 else 0.0
+
+    total_cost = sum(r.cost_inr for r in started_records)
+
+    if workflow_id == "loan_sales":
+        # Loan Sales metrics
+        completed_autonomously = sum(1 for r in valid_records if r.status in ("qualified", "completed") and r.status != "escalated")
+        cost_per_completed = round(total_cost / max(completed_autonomously, 1), 2) if completed_autonomously > 0 else 0.0
+        conversion_rate = round((completed_autonomously / max(started_count, 1)) * 100, 1) if started_count > 0 else 0.0
+
+        return EngineMetrics(
+            workflow_id="loan_sales",
+            workflow_name="Pre-Approved Personal Loan Sales",
+            journeys_started=started_count,
+            journeys_completed_autonomously=completed_autonomously,
+            human_touch_count=human_touch_count,
+            human_touch_rate_pct=human_touch_rate,
+            total_cost_inr=round(total_cost, 2),
+            cost_per_completed_journey=cost_per_completed,
+            workflow_metric_name="Qualified Leads Conversion",
+            workflow_metric_value=conversion_rate,
+            industry_call_centre_cost=settings.INDUSTRY_CALL_CENTRE_COST,
+            industry_field_visit_cost=settings.INDUSTRY_FIELD_VISIT_COST,
+            details={
+                "qualified": completed_autonomously,
+                "escalated": human_touch_count,
+                "total_leads": total_records
+            }
+        )
+    else:
+        # Collections metrics
+        ptp_count = sum(1 for r in valid_records if r.status == "ptp")
+        paid_count = sum(1 for r in valid_records if r.status == "paid")
+        completed_autonomously = ptp_count + paid_count
+        cost_per_completed = round(total_cost / max(completed_autonomously, 1), 2) if completed_autonomously > 0 else 0.0
+
+        total_book_val = sum(r.amount_due for r in records)
+        paid_val = sum(r.amount_due for r in valid_records if r.status == "paid")
+        recovery_pct = round((paid_val / max(total_book_val, 1)) * 100, 1)
+
+        # Average cost per contact
+        avg_cost_contact = round(total_cost / max(started_count, 1), 2) if started_count > 0 else 0.0
+
+        return EngineMetrics(
+            workflow_id="collections",
+            workflow_name="Early Delinquency Collections (EMI)",
+            journeys_started=started_count,
+            journeys_completed_autonomously=completed_autonomously,
+            human_touch_count=human_touch_count,
+            human_touch_rate_pct=human_touch_rate,
+            total_cost_inr=round(total_cost, 2),
+            cost_per_completed_journey=cost_per_completed,
+            workflow_metric_name="Recovery Rate",
+            workflow_metric_value=recovery_pct,
+            industry_call_centre_cost=settings.INDUSTRY_CALL_CENTRE_COST,
+            industry_field_visit_cost=settings.INDUSTRY_FIELD_VISIT_COST,
+            details={
+                "total_accounts": total_records,
+                "contacted": started_count,
+                "ptps": ptp_count,
+                "paid": paid_count,
+                "escalated": human_touch_count,
+                "recovery_pct": recovery_pct,
+                "our_cost_per_contact": avg_cost_contact
+            }
         )
 
-    contacted_cases = [c for c in cases if c.status != "new"]
-    contacted_count = len(contacted_cases)
+# Alias for backward compatibility
+compute_dashboard_metrics = compute_engine_metrics
 
-    # Valid cases: either not audited yet or audit passed (failed audit is excluded from valid recoveries)
-    valid_cases = [c for c in cases if c.audit_pass is not False]
-    
-    ptp_count = sum(1 for c in valid_cases if c.status == "ptp")
-    paid_count = sum(1 for c in valid_cases if c.status == "paid")
-    escalated_count = sum(1 for c in cases if c.status == "escalated")
-
-    # Conversion % = (PTPs + Paid) / Total Contacted Valid Calls
-    valid_contacted = sum(1 for c in contacted_cases if c.audit_pass is not False)
-    ptp_conv_pct = round(((ptp_count + paid_count) / max(valid_contacted, 1)) * 100, 1) if valid_contacted > 0 else 0.0
-
-    # Recovery % = Total Paid Amount / Total Book Amount
-    total_book_val = sum(c.amount_due for c in cases)
-    paid_val = sum(c.amount_due for c in valid_cases if c.status == "paid")
-    recovery_pct = round((paid_val / max(total_book_val, 1)) * 100, 1)
-
-    # Cost Tracking: Real computed cost per contact
-    total_cost = sum(c.cost_inr for c in contacted_cases)
-    avg_cost = round(total_cost / max(contacted_count, 1), 2) if contacted_count > 0 else 0.0
-
-    # Language breakdown
-    langs: Dict[str, int] = {}
-    for c in cases:
-        langs[c.language] = langs.get(c.language, 0) + 1
-
-    return DashboardMetrics(
-        total_accounts=total_accounts,
-        contacted=contacted_count,
-        ptps=ptp_count,
-        paid=paid_count,
-        escalated=escalated_count,
-        ptp_conversion_pct=ptp_conv_pct,
-        recovery_pct=recovery_pct,
-        total_cost_inr=round(total_cost, 2),
-        our_cost_per_contact=avg_cost,
-        industry_call_centre_cost=settings.INDUSTRY_CALL_CENTRE_COST,
-        industry_field_visit_cost=settings.INDUSTRY_FIELD_VISIT_COST,
-        language_breakdown=langs
-    )
-
-def run_reporter_agent(case: CaseFile) -> CaseFile:
+def run_reporter_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None, context: Optional[Dict[str, Any]] = None) -> JourneyRecord:
     """
-    Reporter Agent:
-    - Calculates the incremental effect of this case on portfolio metrics
-    - Appends final report trace item to the case file
+    Generic Reporter Agent:
+    - Calculates the incremental effect of this journey on engine metrics
+    - Appends final report trace item to the record
     """
-    metrics = compute_dashboard_metrics()
+    workflow_id = record.workflow_id or (context.get("workflow_id") if context else "collections")
+    metrics = compute_engine_metrics(workflow_id)
     
-    case.add_trace(
+    record.add_trace(
         agent="Reporter",
-        action="Portfolio Metrics & Cost Attribution Synchronized",
-        summary=f"Portfolio Updated: Contacted={metrics.contacted}/{metrics.total_accounts}, PTPs={metrics.ptps}, Paid={metrics.paid}, Escalated={metrics.escalated}. Our Cost/Contact: ₹{metrics.our_cost_per_contact:.2f} (vs Industry ₹52.00)."
+        action="Engine Metrics & Attribution Synchronized",
+        summary=f"Engine State Updated: Started={metrics.journeys_started}, Autonomous Completed={metrics.journeys_completed_autonomously}, Human-Touch Rate={metrics.human_touch_rate_pct}%. Cost/Completed: ₹{metrics.cost_per_completed_journey:.2f}."
     )
 
-    return case
+    return record

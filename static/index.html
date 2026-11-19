@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Saarthi | Autonomous AI Collections Teammate</title>
+  <title>Saarthi | Generic AI Teammate Workflow Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script>
@@ -13,7 +13,6 @@
         extend: {
           colors: {
             brand: {
-              50: '#eef2ff',
               500: '#6366f1',
               600: '#4f46e5',
               700: '#4338ca',
@@ -51,102 +50,103 @@
   <!-- TOP HEADER -->
   <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-4 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <!-- Logo & Tagline -->
+      <!-- Logo & Engine Subtitle -->
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <i class="fa-solid fa-headset text-white text-lg"></i>
+          <i class="fa-solid fa-microchip text-white text-lg"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="text-xl font-bold tracking-tight text-white">Saarthi <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">सारथी</span></h1>
-            <span id="simulateBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer" onclick="toggleSimulateMode()" title="Click to toggle SIMULATE / LIVE mode">
+            
+            <!-- Workflow Switcher Dropdown -->
+            <div class="flex items-center gap-1.5 ml-2">
+              <span class="text-[11px] text-slate-400 font-medium">Workflow:</span>
+              <select id="workflowSelect" onchange="onWorkflowChange()" class="bg-slate-800 border border-indigo-500/40 text-xs font-semibold text-white rounded-lg px-2.5 py-1 focus:outline-none focus:border-indigo-400 cursor-pointer">
+                <option value="collections">Collections (Early Delinquency EMI)</option>
+                <option value="loan_sales">Loan Sales (Pre-Approved Offers)</option>
+              </select>
+            </div>
+
+            <span id="simulateBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer ml-1" onclick="toggleSimulateMode()" title="Toggle SIMULATE / LIVE mode">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              SIMULATE MODE (FREE)
+              SIMULATE (FREE)
             </span>
           </div>
-          <p class="text-xs text-slate-400">Autonomous Collections Teammate for Bharat Lenders (Sarvam Indic Stack)</p>
+          <p class="text-xs text-slate-400">Generic Autonomous Multi-Agent Workflow Engine · 6 Reusable Agents · 1 Shared Journey Record</p>
         </div>
       </div>
 
       <!-- Actions & Controls -->
       <div class="flex items-center flex-wrap gap-2">
         <button id="heroDemoBtn" onclick="runHeroDemo()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold text-xs rounded-lg shadow-md hover:shadow-orange-500/20 flex items-center gap-2 transition transform active:scale-95">
-          <i class="fa-solid fa-play"></i> Run Hero Demo (Acc #1)
+          <i class="fa-solid fa-play"></i> Run Hero Demo (#1)
         </button>
-        <button onclick="resetSampleBook()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-rotate-right"></i> Reset 20 Accounts
+        <button onclick="resetCurrentWorkflowBook()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-rotate-right"></i> Reset Sample Data
         </button>
-        <button id="demoHoursBtn" onclick="toggleDemoHours()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 flex items-center gap-1.5 transition" title="Override 08:00-19:00 IST window for demo testing">
-          <i class="fa-regular fa-clock text-emerald-400"></i> Demo Hours: <span id="hoursStatus" class="text-emerald-400 font-semibold">11:30 AM IST</span>
+        <button id="demoHoursBtn" onclick="toggleDemoHours()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-regular fa-clock text-emerald-400"></i> Hours: <span id="hoursStatus" class="text-emerald-400 font-semibold">11:30 AM IST</span>
         </button>
         <a href="/landing" target="_blank" class="px-3 py-1.5 bg-indigo-900/40 hover:bg-indigo-900/60 text-indigo-300 text-xs rounded-lg border border-indigo-700/50 flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Pricing / Pitch
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Pricing
         </a>
       </div>
     </div>
   </header>
 
-  <!-- DASHBOARD STRIP (METRICS & UNIT ECONOMICS) -->
+  <!-- DASHBOARD STRIP: ENGINE-LEVEL & WORKFLOW-SPECIFIC METRICS -->
   <section class="bg-slate-900/60 border-b border-slate-800 px-4 py-3">
-    <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-      <!-- Contacted -->
+    <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <!-- 1. Journeys Started -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
         <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Contacted</span>
-          <i class="fa-solid fa-phone text-indigo-400 text-xs"></i>
+          <span>Journeys Started</span>
+          <i class="fa-solid fa-route text-indigo-400 text-xs"></i>
         </div>
-        <div id="statContacted" class="text-lg font-bold text-white mt-0.5">0 / 20</div>
-        <div class="text-[10px] text-slate-500">Automated outbound</div>
+        <div id="statJourneysStarted" class="text-lg font-bold text-white mt-0.5">0</div>
+        <div class="text-[10px] text-slate-500">Total automated runs</div>
       </div>
-      <!-- PTPs -->
+      <!-- 2. Autonomous Completed -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
         <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>PTPs Secured</span>
-          <i class="fa-solid fa-handshake text-amber-400 text-xs"></i>
-        </div>
-        <div id="statPTPs" class="text-lg font-bold text-amber-400 mt-0.5">0</div>
-        <div class="text-[10px] text-slate-500">Promise-to-Pay locked</div>
-      </div>
-      <!-- Paid -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-        <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Paid</span>
+          <span>Completed Autonomously</span>
           <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
         </div>
-        <div id="statPaid" class="text-lg font-bold text-emerald-400 mt-0.5">0</div>
-        <div class="text-[10px] text-slate-500">Instant UPI settlement</div>
+        <div id="statAutonomousCompleted" class="text-lg font-bold text-emerald-400 mt-0.5">0</div>
+        <div class="text-[10px] text-slate-500">Zero human intervention</div>
       </div>
-      <!-- Escalated -->
+      <!-- 3. Human Touch Rate -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
         <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Escalated</span>
+          <span>Human-Touch Rate</span>
           <i class="fa-solid fa-user-shield text-rose-400 text-xs"></i>
         </div>
-        <div id="statEscalated" class="text-lg font-bold text-rose-400 mt-0.5">0</div>
-        <div class="text-[10px] text-slate-500">Hardship / Dispute</div>
+        <div id="statHumanTouchRate" class="text-lg font-bold text-rose-400 mt-0.5">0.0%</div>
+        <div class="text-[10px] text-slate-500">Escalated exceptions</div>
       </div>
-      <!-- Recovery % -->
+      <!-- 4. Workflow Success Metric (Dynamic) -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
         <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Recovery %</span>
+          <span id="statMetricLabel">Outcome Metric</span>
           <i class="fa-solid fa-chart-line text-cyan-400 text-xs"></i>
         </div>
-        <div id="statRecovery" class="text-lg font-bold text-cyan-400 mt-0.5">0.0%</div>
-        <div class="text-[10px] text-slate-500">Of total overdue book</div>
+        <div id="statMetricValue" class="text-lg font-bold text-cyan-400 mt-0.5">0.0%</div>
+        <div id="statMetricSub" class="text-[10px] text-slate-500">Workflow goal</div>
       </div>
-      <!-- Our Cost/Contact -->
+      <!-- 5. Cost Per Completed Journey -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/20">
         <div class="text-[11px] text-indigo-300 flex items-center justify-between">
-          <span>Our Cost/Contact</span>
+          <span>Cost / Completed</span>
           <i class="fa-solid fa-bolt text-indigo-400 text-xs"></i>
         </div>
-        <div id="statOurCost" class="text-lg font-bold text-indigo-300 mt-0.5">₹0.00</div>
+        <div id="statCostCompleted" class="text-lg font-bold text-indigo-300 mt-0.5">₹0.00</div>
         <div class="text-[10px] text-slate-400">Sarvam Voice + LLM</div>
       </div>
-      <!-- Industry Benchmark -->
+      <!-- 6. Industry Benchmark -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 bg-slate-900/40">
         <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Industry Baseline</span>
+          <span>Industry Human Cost</span>
           <i class="fa-solid fa-building-columns text-slate-400 text-xs"></i>
         </div>
         <div class="text-sm font-semibold text-slate-300 mt-1">₹52 <span class="text-[10px] text-slate-500 font-normal">call</span> / ₹250 <span class="text-[10px] text-slate-500 font-normal">visit</span></div>
@@ -158,53 +158,53 @@
   <!-- MAIN 3-COLUMN WORKSPACE -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
     
-    <!-- COLUMN 1: ACCOUNTS BOOK (3 cols) -->
+    <!-- COLUMN 1: JOURNEY RECORDS LIST (3 cols) -->
     <div class="lg:col-span-3 flex flex-col bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[680px]">
       <div class="p-3 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-indigo-400 text-sm"></i>
-          <h2 class="text-sm font-bold text-white">Loan Accounts (20)</h2>
+          <i class="fa-solid fa-address-book text-indigo-400 text-sm"></i>
+          <h2 id="listTitle" class="text-sm font-bold text-white">Journey Records</h2>
         </div>
-        <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">1-30 DPD</span>
+        <span id="recordCountBadge" class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">0 loaded</span>
       </div>
-      <div id="accountsList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1.5">
-        <!-- Rendered by JS -->
+      <div id="recordsList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1.5">
+        <!-- Records rendered by JS -->
       </div>
     </div>
 
-    <!-- COLUMN 2: LIVE CALL & CASE FILE (5 cols) -->
+    <!-- COLUMN 2: LIVE CALL & INTERACTION (5 cols) -->
     <div class="lg:col-span-5 flex flex-col bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[680px]">
       
-      <!-- Selected Case Header -->
-      <div id="caseHeader" class="p-3.5 border-b border-slate-800 bg-slate-900/90 flex items-start justify-between">
+      <!-- Record Header -->
+      <div class="p-3.5 border-b border-slate-800 bg-slate-900/90 flex items-start justify-between">
         <div>
           <div class="flex items-center gap-2">
-            <h3 id="currentBorrowerName" class="text-base font-bold text-white">Select an Account</h3>
+            <h3 id="currentCustomerName" class="text-base font-bold text-white">Select a Record</h3>
             <span id="currentStatusBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">NEW</span>
           </div>
-          <div id="currentSubDetails" class="text-xs text-slate-400 mt-0.5">Overdue Amount & Details</div>
+          <div id="currentSubDetails" class="text-xs text-slate-400 mt-0.5">Select a customer to view journey state</div>
         </div>
         <div class="flex items-center gap-1.5">
           <button id="simulatePaymentBtn" onclick="simulatePaymentCurrent()" class="hidden px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold rounded-lg border border-emerald-500/40 transition flex items-center gap-1">
             <i class="fa-solid fa-money-bill-wave"></i> Simulate Pay
           </button>
-          <button id="runSingleBtn" onclick="runPipelineCurrent()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+          <button id="runPipelineBtn" onclick="runPipelineCurrent()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-bolt"></i> Run Pipeline
           </button>
         </div>
       </div>
 
       <!-- Call Audio / Status Panel -->
-      <div id="callControlStrip" class="px-3.5 py-2.5 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between text-xs">
+      <div class="px-3.5 py-2.5 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between text-xs">
         <div class="flex items-center gap-2">
           <div id="callIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
-          <span id="callStatusText" class="text-slate-400">Idle - Click Run to connect</span>
+          <span id="callStatusText" class="text-slate-400">Idle - Click Run Pipeline to execute</span>
         </div>
         <div class="flex items-center gap-2">
           <button id="micBtn" onclick="toggleMic()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1">
             <i class="fa-solid fa-microphone text-xs"></i> <span id="micLabel">Mic</span>
           </button>
-          <button id="speakAudioBtn" onclick="replayLastAgentAudio()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1" title="Speak agent message using browser TTS">
+          <button onclick="speakLastAgentMessage()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1" title="Speak message">
             <i class="fa-solid fa-volume-high text-xs"></i>
           </button>
         </div>
@@ -212,127 +212,59 @@
 
       <!-- Live Transcript -->
       <div class="flex-1 overflow-y-auto custom-scroll p-3.5 space-y-2.5 bg-slate-950/40" id="transcriptContainer">
-        <!-- Transcript balloons will appear here -->
         <div class="text-center text-slate-500 text-xs py-10">
           <i class="fa-solid fa-comments text-2xl mb-2 text-slate-600 block"></i>
-          No transcript yet. Click "Run Hero Demo" or select an account.
+          No transcript yet. Click "Run Hero Demo" or select a record.
         </div>
       </div>
 
-      <!-- Action Panel: UPI Link & WhatsApp Template (when active) -->
+      <!-- Action Panel: UPI Link or Sales Application Link -->
       <div id="actionDeliverables" class="hidden p-3 border-t border-slate-800 bg-slate-900/80">
         <div class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider flex items-center justify-between mb-1.5">
-          <span><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> WhatsApp Message Dispatched</span>
-          <span class="text-[10px] text-slate-400 font-mono">Status: SENT</span>
+          <span id="actionTitle"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Notification Dispatched</span>
+          <span class="text-[10px] text-slate-400 font-mono">Status: DISPATCHED</span>
         </div>
-        <div id="whatsappPreview" class="text-xs font-mono bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-slate-300 whitespace-pre-wrap max-h-24 overflow-y-auto custom-scroll">
-          <!-- WhatsApp template rendered here -->
+        <div id="actionPreviewText" class="text-xs font-mono bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-slate-300 whitespace-pre-wrap max-h-24 overflow-y-auto custom-scroll">
         </div>
         <div class="mt-2 flex items-center justify-between text-[11px]">
-          <a id="upiLinkAnchor" href="#" class="text-indigo-400 hover:underline truncate max-w-[280px]">
-            <i class="fa-solid fa-link mr-1"></i> <span id="upiLinkText">upi://pay?...</span>
+          <a id="actionLinkAnchor" href="#" target="_blank" class="text-indigo-400 hover:underline truncate max-w-[280px]">
+            <i class="fa-solid fa-link mr-1"></i> <span id="actionLinkText">link...</span>
           </a>
-          <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded">Demo lender - sample data</span>
+          <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded">Demo data</span>
         </div>
       </div>
 
-      <!-- Borrower Text Input Bar -->
+      <!-- Customer / Borrower Text Input Bar -->
       <div class="p-2.5 border-t border-slate-800 bg-slate-900 flex items-center gap-2">
-        <input type="text" id="borrowerInput" placeholder="Type borrower reply (Hindi / Marathi / English)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter') sendBorrowerText()">
-        <button onclick="sendBorrowerText()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">
+        <input type="text" id="customerInput" placeholder="Type reply (Hindi / Marathi / English)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter') sendCustomerText()">
+        <button onclick="sendCustomerText()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">
           <i class="fa-solid fa-paper-plane"></i>
         </button>
       </div>
     </div>
 
-    <!-- COLUMN 3: AGENT TRACE TIMELINE (4 cols) -->
+    <!-- COLUMN 3: GENERIC WORKFLOW AGENT TRACE (4 cols) -->
     <div class="lg:col-span-4 flex flex-col bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[680px]">
       <div class="p-3 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <i class="fa-solid fa-network-wired text-indigo-400 text-sm"></i>
-          <h2 class="text-sm font-bold text-white">Agent Handoff Trace</h2>
+          <i class="fa-solid fa-diagram-project text-indigo-400 text-sm"></i>
+          <h2 class="text-sm font-bold text-white">Workflow Agent Handoff</h2>
         </div>
-        <span class="text-[10px] font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded">6 Agents · 1 Case File</span>
+        <span id="workflowBadge" class="text-[10px] font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded">YAML Driven</span>
       </div>
 
-      <!-- Agent Cards Timeline -->
-      <div id="agentTraceCards" class="flex-1 overflow-y-auto custom-scroll p-3 space-y-2.5 bg-slate-950/30">
-        
-        <!-- 1. Intake Agent Card -->
-        <div id="card-Intake" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 1. Intake Agent
-            </span>
-            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
-          </div>
-          <p class="text-[11px] text-slate-400 summary-text">Reads loan book, assesses delinquency stage & tone hint.</p>
-        </div>
-
-        <!-- 2. Conversation Agent Card -->
-        <div id="card-Conversation" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 2. Conversation Agent
-            </span>
-            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
-          </div>
-          <p class="text-[11px] text-slate-400 summary-text">Plays mandatory RBI consent line & conducts Indic voice call.</p>
-        </div>
-
-        <!-- 3. Negotiation Agent Card -->
-        <div id="card-Negotiation" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 3. Negotiation Agent
-            </span>
-            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
-          </div>
-          <p class="text-[11px] text-slate-400 summary-text">Applies policy (PTP &le;7 days, part &ge;30%, escalate waivers).</p>
-        </div>
-
-        <!-- 4. Action Agent Card -->
-        <div id="card-Action" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 4. Action Agent
-            </span>
-            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
-          </div>
-          <p class="text-[11px] text-slate-400 summary-text">Generates idempotent UPI payment deep-link & WhatsApp copy.</p>
-        </div>
-
-        <!-- 5. Compliance Agent Card -->
-        <div id="card-Compliance" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 5. Compliance Agent
-            </span>
-            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
-          </div>
-          <p class="text-[11px] text-slate-400 summary-text">Audits 08:00-19:00 IST hours, consent, and anti-coercion rules.</p>
-        </div>
-
-        <!-- 6. Reporter Agent Card -->
-        <div id="card-Reporter" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 6. Reporter Agent
-            </span>
-            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
-          </div>
-          <p class="text-[11px] text-slate-400 summary-text">Computes recovery metrics & real unit cost vs ₹52 baseline.</p>
-        </div>
-
+      <!-- Dynamic Agent Steps Rendered From Workflow YAML -->
+      <div id="dynamicTraceContainer" class="flex-1 overflow-y-auto custom-scroll p-3 space-y-2.5 bg-slate-950/30">
+        <!-- Steps generated dynamically by JS -->
       </div>
 
-      <!-- Human Escalation Notice Banner (Dynamic) -->
+      <!-- Human Escalation Notice Banner -->
       <div id="escalationNotice" class="hidden p-3 bg-rose-950/70 border-t border-rose-800/80 text-rose-200 text-xs">
         <div class="font-bold flex items-center gap-1.5 mb-1">
-          <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> HANDED TO HUMAN OFFICER
+          <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> HANDED TO HUMAN SPECIALIST
         </div>
         <div id="escalationDetails" class="text-[11px] text-rose-300">
-          Routed to Senior Desk with full audio, transcript, and policy context.
+          Escalated to human supervisor with complete transcript & context.
         </div>
       </div>
 
@@ -342,20 +274,17 @@
 
   <!-- JAVASCRIPT APPLICATION LOGIC -->
   <script>
-    let allCases = [];
-    let selectedCase = null;
+    let currentWorkflowId = "collections";
+    let workflowDef = null;
+    let allRecords = [];
+    let selectedRecord = null;
     let isSimulate = true;
     let demoOverrideHours = true;
     let isHeroDemoRunning = false;
 
-    // Fetch initial configuration and accounts on load
     window.addEventListener('DOMContentLoaded', async () => {
       await fetchConfig();
-      await loadCases();
-      await updateDashboard();
-      if (allCases.length > 0) {
-        selectAccount(allCases[0].id);
-      }
+      await switchWorkflow("collections");
     });
 
     async function fetchConfig() {
@@ -373,15 +302,15 @@
     function updateConfigBadges() {
       const badge = document.getElementById('simulateBadge');
       if (isSimulate) {
-        badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer";
-        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> SIMULATE MODE (FREE)';
+        badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer ml-1";
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> SIMULATE (FREE)';
       } else {
-        badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5 cursor-pointer";
+        badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5 cursor-pointer ml-1";
         badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> LIVE SARVAM AI';
       }
 
       const hoursBtn = document.getElementById('hoursStatus');
-      hoursBtn.innerText = demoOverrideHours ? "11:30 AM IST (Simulated)" : "Live IST";
+      hoursBtn.innerText = demoOverrideHours ? "11:30 AM IST" : "Live IST";
     }
 
     async function toggleSimulateMode() {
@@ -404,137 +333,169 @@
       await fetchConfig();
     }
 
-    async function resetSampleBook() {
+    async function onWorkflowChange() {
+      const sel = document.getElementById('workflowSelect').value;
+      await switchWorkflow(sel);
+    }
+
+    async function switchWorkflow(workflowId) {
+      currentWorkflowId = workflowId;
+      document.getElementById('workflowSelect').value = workflowId;
+      
+      // 1. Fetch workflow YAML definition
+      const wfRes = await fetch(`/api/workflows/${workflowId}`);
+      workflowDef = await wfRes.json();
+      
+      document.getElementById('workflowBadge').innerText = `${workflowDef.steps.length} Steps · YAML`;
+      document.getElementById('listTitle').innerText = workflowId === "loan_sales" ? "Sales Leads" : "Loan Accounts";
+
+      // 2. Load records
+      await loadRecords();
+      await updateDashboard();
+
+      // 3. Render step cards skeleton in trace timeline
+      renderWorkflowStepCards();
+
+      // 4. Select first record
+      if (allRecords.length > 0) {
+        selectRecord(allRecords[0].id);
+      }
+    }
+
+    async function resetCurrentWorkflowBook() {
       try {
-        const res = await fetch('/api/load-sample-book', { method: 'POST' });
-        await loadCases();
+        await fetch(`/api/load-sample-book?workflow_id=${currentWorkflowId}`, { method: 'POST' });
+        await loadRecords();
         await updateDashboard();
-        if (allCases.length > 0) {
-          selectAccount(allCases[0].id);
+        if (allRecords.length > 0) {
+          selectRecord(allRecords[0].id);
         }
       } catch (err) {
-        alert("Failed to reset sample book: " + err);
+        alert("Failed to reset: " + err);
       }
     }
 
-    async function loadCases() {
+    async function loadRecords() {
       try {
-        const res = await fetch('/api/cases');
-        allCases = await res.json();
-        renderAccountsList();
-      } catch (err) {
-        console.error("Error loading cases:", err);
-      }
-    }
-
-    async function updateDashboard() {
-      try {
-        const res = await fetch('/api/dashboard');
-        const d = await res.json();
-        document.getElementById('statContacted').innerText = `${d.contacted} / ${d.total_accounts}`;
-        document.getElementById('statPTPs').innerText = d.ptps;
-        document.getElementById('statPaid').innerText = d.paid;
-        document.getElementById('statEscalated').innerText = d.escalated;
-        document.getElementById('statRecovery').innerText = `${d.recovery_pct}%`;
-        document.getElementById('statOurCost').innerText = `₹${d.our_cost_per_contact.toFixed(2)}`;
-      } catch (err) {
-        console.error("Error updating dashboard:", err);
-      }
-    }
-
-    function renderAccountsList() {
-      const list = document.getElementById('accountsList');
-      list.innerHTML = '';
-      allCases.forEach(c => {
-        const isSel = selectedCase && selectedCase.id === c.id;
-        const item = document.createElement('div');
-        item.className = `p-2.5 rounded-xl border cursor-pointer transition flex items-center justify-between text-xs ${
-          isSel ? 'border-indigo-500 bg-indigo-950/40 text-white' : 'border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300'
-        }`;
-        
-        let statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">NEW</span>`;
-        if (c.status === 'ptp') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30">PTP</span>`;
-        if (c.status === 'paid') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PAID</span>`;
-        if (c.status === 'escalated') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30">ESCALATED</span>`;
-        if (c.status === 'contacted') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">CALL</span>`;
-
-        item.innerHTML = `
-          <div>
-            <div class="font-bold flex items-center gap-1.5">
-              <span>#${c.id} ${c.borrower_name}</span>
-            </div>
-            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-2">
-              <span class="text-indigo-300">${c.language}</span>
-              <span>•</span>
-              <span>₹${c.amount_due.toLocaleString()}</span>
-              <span>•</span>
-              <span class="text-rose-400">${c.dpd} DPD</span>
-            </div>
-          </div>
-          <div>${statusBadge}</div>
-        `;
-        item.onclick = () => selectAccount(c.id);
-        list.appendChild(item);
-      });
-    }
-
-    async function selectAccount(caseId) {
-      try {
-        const res = await fetch(`/api/cases/${caseId}`);
-        selectedCase = await res.json();
-        renderAccountsList();
-        renderCaseDetails();
+        const res = await fetch(`/api/cases?workflow_id=${currentWorkflowId}`);
+        allRecords = await res.json();
+        document.getElementById('recordCountBadge').innerText = `${allRecords.length} loaded`;
+        renderRecordsList();
       } catch (err) {
         console.error(err);
       }
     }
 
-    function renderCaseDetails() {
-      if (!selectedCase) return;
-      const c = selectedCase;
+    async function updateDashboard() {
+      try {
+        const res = await fetch(`/api/dashboard?workflow_id=${currentWorkflowId}`);
+        const m = await res.json();
+        
+        document.getElementById('statJourneysStarted').innerText = m.journeys_started;
+        document.getElementById('statAutonomousCompleted').innerText = m.journeys_completed_autonomously;
+        document.getElementById('statHumanTouchRate').innerText = `${m.human_touch_rate_pct}% (${m.human_touch_count})`;
+        document.getElementById('statCostCompleted').innerText = `₹${m.cost_per_completed_journey.toFixed(2)}`;
+        
+        document.getElementById('statMetricLabel').innerText = m.workflow_metric_name;
+        document.getElementById('statMetricValue').innerText = `${m.workflow_metric_value}%`;
+        document.getElementById('statMetricSub').innerText = currentWorkflowId === "collections" ? "Of total overdue book" : "Of contacted leads";
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-      document.getElementById('currentBorrowerName').innerText = `#${c.id} ${c.borrower_name}`;
-      document.getElementById('currentSubDetails').innerText = `Overdue: ₹${c.amount_due.toLocaleString()} | DPD: ${c.dpd} | Lang: ${c.language} | Phone: ${c.phone}`;
+    function renderRecordsList() {
+      const list = document.getElementById('recordsList');
+      list.innerHTML = '';
+      allRecords.forEach(r => {
+        const isSel = selectedRecord && selectedRecord.id === r.id;
+        const item = document.createElement('div');
+        item.className = `p-2.5 rounded-xl border cursor-pointer transition flex items-center justify-between text-xs ${
+          isSel ? 'border-indigo-500 bg-indigo-950/40 text-white' : 'border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300'
+        }`;
+
+        let statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">NEW</span>`;
+        if (r.status === 'ptp') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30">PTP</span>`;
+        if (r.status === 'paid') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PAID</span>`;
+        if (r.status === 'qualified') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">QUALIFIED</span>`;
+        if (r.status === 'escalated') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30">ESCALATED</span>`;
+        if (r.status === 'contacted') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">CALL</span>`;
+
+        let subLine = "";
+        if (currentWorkflowId === "loan_sales") {
+          const preAmt = parseFloat(r.data.preapproved_amount || 0);
+          subLine = `<span class="text-indigo-300">${r.language}</span> • <span>₹${preAmt.toLocaleString()} pre-approved</span> • <span class="text-emerald-400">${r.data.credit_score || 750} CIBIL</span>`;
+        } else {
+          const amt = parseFloat(r.data.amount_due || 0);
+          subLine = `<span class="text-indigo-300">${r.language}</span> • <span>₹${amt.toLocaleString()}</span> • <span class="text-rose-400">${r.data.dpd || 0} DPD</span>`;
+        }
+
+        item.innerHTML = `
+          <div>
+            <div class="font-bold flex items-center gap-1.5">
+              <span>#${r.id} ${r.customer_name}</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-2">
+              ${subLine}
+            </div>
+          </div>
+          <div>${statusBadge}</div>
+        `;
+        item.onclick = () => selectRecord(r.id);
+        list.appendChild(item);
+      });
+    }
+
+    async function selectRecord(recordId) {
+      try {
+        const res = await fetch(`/api/cases/${recordId}?workflow_id=${currentWorkflowId}`);
+        selectedRecord = await res.json();
+        renderRecordsList();
+        renderRecordDetails();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderRecordDetails() {
+      if (!selectedRecord) return;
+      const r = selectedRecord;
+
+      document.getElementById('currentCustomerName').innerText = `#${r.id} ${r.customer_name}`;
       
+      if (currentWorkflowId === "loan_sales") {
+        const preAmt = parseFloat(r.data.preapproved_amount || 0);
+        document.getElementById('currentSubDetails').innerText = `Pre-Approved: ₹${preAmt.toLocaleString()} | Score: ${r.data.credit_score || 750} | Lang: ${r.language} | Phone: ${r.phone}`;
+      } else {
+        const amt = parseFloat(r.data.amount_due || 0);
+        document.getElementById('currentSubDetails').innerText = `Overdue: ₹${amt.toLocaleString()} | DPD: ${r.data.dpd || 0} | Lang: ${r.language} | Phone: ${r.phone}`;
+      }
+
       const badge = document.getElementById('currentStatusBadge');
-      badge.innerText = c.status.toUpperCase();
+      badge.innerText = r.status.toUpperCase();
       badge.className = `text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-        c.status === 'ptp' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
-        c.status === 'paid' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
-        c.status === 'escalated' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
+        r.status === 'ptp' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+        r.status === 'paid' || r.status === 'qualified' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+        r.status === 'escalated' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
         'bg-slate-800 text-slate-400'
       }`;
 
-      // Simulate payment button visibility
+      // Simulate payment button
       const simPayBtn = document.getElementById('simulatePaymentBtn');
-      if (c.status === 'ptp' && c.payment_status === 'sent') {
+      if (currentWorkflowId === "collections" && r.status === 'ptp' && r.data.payment_status === 'sent') {
         simPayBtn.classList.remove('hidden');
       } else {
         simPayBtn.classList.add('hidden');
       }
 
-      // Render Transcript
-      renderTranscript(c.transcript);
+      renderTranscript(r.transcript);
+      renderActionDeliverable(r);
+      updateWorkflowStepCards(r);
 
-      // Render Deliverables (WhatsApp & UPI)
-      const actionBox = document.getElementById('actionDeliverables');
-      if (c.payment_status === 'sent' || c.payment_status === 'paid') {
-        actionBox.classList.remove('hidden');
-        document.getElementById('upiLinkText').innerText = c.payment_link;
-        document.getElementById('upiLinkAnchor').href = c.payment_link;
-        document.getElementById('whatsappPreview').innerText = generateWhatsAppPreview(c);
-      } else {
-        actionBox.classList.add('hidden');
-      }
-
-      // Render Trace Timeline
-      renderTraceTimeline(c);
-
-      // Render Escalation Notice
       const escNotice = document.getElementById('escalationNotice');
-      if (c.status === 'escalated') {
+      if (r.status === 'escalated') {
         escNotice.classList.remove('hidden');
-        document.getElementById('escalationDetails').innerText = `Assigned Officer: ${c.assigned_human || 'Senior Operations Desk'}. Reason: ${c.offer_made || 'Customer dispute / loan restructuring request'}.`;
+        document.getElementById('escalationDetails').innerText = `Assigned Desk: ${r.assigned_human || 'Human Officer'}. Detail: ${r.data.offer_made || 'Customer exception escalated.'}`;
       } else {
         escNotice.classList.add('hidden');
       }
@@ -558,7 +519,7 @@
         const msgDiv = document.createElement('div');
         msgDiv.className = `flex flex-col ${isAgent ? 'items-start' : 'items-end'}`;
         msgDiv.innerHTML = `
-          <span class="text-[10px] text-slate-500 mb-0.5 px-1">${isAgent ? 'Saarthi AI Agent' : selectedCase.borrower_name} (${t.ts})</span>
+          <span class="text-[10px] text-slate-500 mb-0.5 px-1">${isAgent ? 'Saarthi AI Agent' : selectedRecord.customer_name} (${t.ts})</span>
           <div class="max-w-[85%] rounded-2xl px-3.5 py-2 text-xs ${
             isAgent 
               ? 'bg-indigo-950/80 border border-indigo-700/40 text-indigo-100 rounded-tl-sm' 
@@ -572,26 +533,69 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function generateWhatsAppPreview(caseItem) {
-      return `Dear ${caseItem.borrower_name},\nThank you for speaking with Saarthi Financial. PTP of ₹${caseItem.amount_due.toLocaleString()} confirmed for ${caseItem.ptp_date || 'immediate settlement'}.\nPay securely via UPI: ${caseItem.payment_link}\n(Demo lender - sample data)`;
+    function renderActionDeliverable(r) {
+      const actionBox = document.getElementById('actionDeliverables');
+      const actionTitle = document.getElementById('actionTitle');
+      const previewText = document.getElementById('actionPreviewText');
+      const linkAnchor = document.getElementById('actionLinkAnchor');
+      const linkText = document.getElementById('actionLinkText');
+
+      if (currentWorkflowId === "loan_sales" && r.data.application_link) {
+        actionBox.classList.remove('hidden');
+        actionTitle.innerHTML = `<i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> WhatsApp Sanction Link & Document Checklist Dispatched`;
+        previewText.innerText = r.data.whatsapp_message || `Pre-approved ₹${r.data.preapproved_amount} personal loan ready. Upload KYC documents via: ${r.data.application_link}`;
+        linkAnchor.href = r.data.application_link;
+        linkText.innerText = r.data.application_link;
+      } else if (currentWorkflowId === "collections" && (r.data.payment_status === 'sent' || r.data.payment_status === 'paid')) {
+        actionBox.classList.remove('hidden');
+        actionTitle.innerHTML = `<i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> WhatsApp UPI Link Dispatched`;
+        previewText.innerText = r.data.whatsapp_message || `Dear ${r.customer_name}, pay securely via UPI: ${r.data.payment_link}`;
+        linkAnchor.href = r.data.payment_link;
+        linkText.innerText = r.data.payment_link;
+      } else {
+        actionBox.classList.add('hidden');
+      }
     }
 
-    function renderTraceTimeline(caseItem) {
-      const agents = ['Intake', 'Conversation', 'Negotiation', 'Action', 'Compliance', 'Reporter'];
-      
-      agents.forEach(agentName => {
-        const card = document.getElementById(`card-${agentName}`);
+    function renderWorkflowStepCards() {
+      if (!workflowDef || !workflowDef.steps) return;
+      const container = document.getElementById('dynamicTraceContainer');
+      container.innerHTML = '';
+
+      workflowDef.steps.forEach((step, idx) => {
+        const card = document.createElement('div');
+        card.id = `stepCard-${step.agent}`;
+        card.className = "p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300";
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> ${idx + 1}. ${step.name} (${step.agent})
+            </span>
+            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 summary-text">Inputs: ${step.input_fields.join(', ') || 'shared memory'}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateWorkflowStepCards(record) {
+      if (!workflowDef || !workflowDef.steps) return;
+
+      workflowDef.steps.forEach(step => {
+        const card = document.getElementById(`stepCard-${step.agent}`);
+        if (!card) return;
         const pill = card.querySelector('.status-pill');
         const text = card.querySelector('.summary-text');
         const dot = card.querySelector('.agent-dot');
 
-        const traceEntry = caseItem.trace.find(t => t.agent === agentName);
+        const traceEntry = record.trace.find(t => t.agent === step.agent);
         if (traceEntry) {
           card.classList.remove('agent-active', 'border-slate-800', 'bg-slate-900/60');
           text.innerText = traceEntry.summary;
           
-          if (agentName === 'Compliance') {
-            if (caseItem.audit_pass === false) {
+          if (step.agent === 'Compliance') {
+            if (record.data.audit_pass === false) {
               card.className = "p-3 rounded-xl border border-rose-500/80 bg-rose-950/40 transition-all duration-300";
               pill.className = "text-[10px] font-bold text-rose-400 bg-rose-950 px-2 py-0.5 rounded border border-rose-600";
               pill.innerText = "FAILED";
@@ -618,63 +622,62 @@
     }
 
     async function runPipelineCurrent() {
-      if (!selectedCase) return;
-      await runPipelineForCase(selectedCase.id);
+      if (!selectedRecord) return;
+      await runPipelineForRecord(selectedRecord.id);
     }
 
-    async function runPipelineForCase(caseId) {
+    async function runPipelineForRecord(recordId) {
       const callDot = document.getElementById('callIndicatorDot');
       const callStatus = document.getElementById('callStatusText');
       callDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping";
-      callStatus.innerText = "Agent pipeline executing in sequence...";
+      callStatus.innerText = "Workflow engine executing steps...";
 
       try {
-        const res = await fetch(`/api/cases/${caseId}/run`, { method: 'POST' });
-        selectedCase = await res.json();
+        const res = await fetch(`/api/cases/${recordId}/run?workflow_id=${currentWorkflowId}`, { method: 'POST' });
+        selectedRecord = await res.json();
         
         callDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
-        callStatus.innerText = "Call completed & audited";
+        callStatus.innerText = "Workflow execution completed";
 
-        renderCaseDetails();
-        await loadCases();
+        renderRecordDetails();
+        await loadRecords();
         await updateDashboard();
 
-        // Speak the agent's message via browser speech synthesis
         speakLastAgentMessage();
       } catch (err) {
         callDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-        callStatus.innerText = "Pipeline error: " + err;
+        callStatus.innerText = "Engine error: " + err;
       }
     }
 
     async function simulatePaymentCurrent() {
-      if (!selectedCase) return;
+      if (!selectedRecord) return;
       try {
-        const res = await fetch(`/api/cases/${selectedCase.id}/simulate-payment`, { method: 'POST' });
-        selectedCase = await res.json();
-        renderCaseDetails();
-        await loadCases();
+        const res = await fetch(`/api/cases/${selectedRecord.id}/simulate-payment?workflow_id=${currentWorkflowId}`, { method: 'POST' });
+        selectedRecord = await res.json();
+        renderRecordDetails();
+        await loadRecords();
         await updateDashboard();
       } catch (err) {
         alert("Payment simulation failed: " + err);
       }
     }
 
-    async function sendBorrowerText() {
-      const input = document.getElementById('borrowerInput');
+    async function sendCustomerText() {
+      const input = document.getElementById('customerInput');
       const text = input.value.trim();
-      if (!text || !selectedCase) return;
+      if (!text || !selectedRecord) return;
       input.value = '';
 
       try {
-        const res = await fetch(`/api/cases/${selectedCase.id}/message`, {
+        const res = await fetch(`/api/cases/${selectedRecord.id}/message?workflow_id=${currentWorkflowId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text })
         });
-        selectedCase = await res.json();
-        renderCaseDetails();
-        await loadCases();
+        selectedRecord = await res.json();
+        renderRecordDetails();
+        await loadRecords();
         await updateDashboard();
         speakLastAgentMessage();
       } catch (err) {
@@ -682,7 +685,6 @@
       }
     }
 
-    // Hero Demo: plays the full Marathi Account #1 flow with visual pacing
     async function runHeroDemo() {
       if (isHeroDemoRunning) return;
       isHeroDemoRunning = true;
@@ -690,64 +692,36 @@
       heroBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Demo in Progress...';
       heroBtn.classList.add('opacity-75');
 
-      // 1. Select Account #1
-      await selectAccount('1');
+      await selectRecord('1');
       await new Promise(r => setTimeout(r, 600));
 
-      // 2. Light up Intake
-      highlightCard('Intake');
-      await new Promise(r => setTimeout(r, 800));
-
-      // 3. Light up Conversation & run pipeline
-      highlightCard('Conversation');
-      await runPipelineForCase('1');
+      await runPipelineForRecord('1');
       await new Promise(r => setTimeout(r, 1200));
 
-      // 4. Light up Action & simulate payment after 1.5s
-      highlightCard('Action');
-      await new Promise(r => setTimeout(r, 1000));
-      await simulatePaymentCurrent();
-      
-      // 5. Highlight Compliance & Reporter
-      highlightCard('Compliance');
-      await new Promise(r => setTimeout(r, 800));
-      highlightCard('Reporter');
+      if (currentWorkflowId === "collections") {
+        await simulatePaymentCurrent();
+      }
 
-      heroBtn.innerHTML = '<i class="fa-solid fa-play"></i> Run Hero Demo (Acc #1)';
+      heroBtn.innerHTML = '<i class="fa-solid fa-play"></i> Run Hero Demo (#1)';
       heroBtn.classList.remove('opacity-75');
       isHeroDemoRunning = false;
     }
 
-    function highlightCard(agentName) {
-      ['Intake', 'Conversation', 'Negotiation', 'Action', 'Compliance', 'Reporter'].forEach(a => {
-        const c = document.getElementById(`card-${a}`);
-        if (a === agentName) {
-          c.classList.add('agent-active');
-        } else {
-          c.classList.remove('agent-active');
-        }
-      });
-    }
-
     function speakLastAgentMessage() {
-      if (!selectedCase || !selectedCase.transcript) return;
-      const agentTurns = selectedCase.transcript.filter(t => t.speaker === 'agent');
+      if (!selectedRecord || !selectedRecord.transcript) return;
+      const agentTurns = selectedRecord.transcript.filter(t => t.speaker === 'agent');
       if (agentTurns.length === 0) return;
       const lastTurn = agentTurns[agentTurns.length - 1];
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(lastTurn.text);
-        if (selectedCase.language === 'Marathi') utter.lang = 'mr-IN';
-        else if (selectedCase.language === 'Hindi') utter.lang = 'hi-IN';
+        if (selectedRecord.language === 'Marathi') utter.lang = 'mr-IN';
+        else if (selectedRecord.language === 'Hindi') utter.lang = 'hi-IN';
         else utter.lang = 'en-IN';
         utter.rate = 1.05;
         window.speechSynthesis.speak(utter);
       }
-    }
-
-    function replayLastAgentAudio() {
-      speakLastAgentMessage();
     }
 
     let isRecording = false;
@@ -758,7 +732,7 @@
       const micLabel = document.getElementById('micLabel');
 
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Speech recognition is not supported in this browser. Please type borrower reply.");
+        alert("Speech recognition is not supported in this browser. Please type reply.");
         return;
       }
 
@@ -775,8 +749,8 @@
       recognition.continuous = false;
       recognition.interimResults = false;
       
-      if (selectedCase && selectedCase.language === 'Marathi') recognition.lang = 'mr-IN';
-      else if (selectedCase && selectedCase.language === 'Hindi') recognition.lang = 'hi-IN';
+      if (selectedRecord && selectedRecord.language === 'Marathi') recognition.lang = 'mr-IN';
+      else if (selectedRecord && selectedRecord.language === 'Hindi') recognition.lang = 'hi-IN';
       else recognition.lang = 'en-IN';
 
       recognition.onstart = () => {
@@ -787,12 +761,11 @@
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        document.getElementById('borrowerInput').value = transcript;
-        sendBorrowerText();
+        document.getElementById('customerInput').value = transcript;
+        sendCustomerText();
       };
 
-      recognition.onerror = (e) => {
-        console.error("Speech error", e);
+      recognition.onerror = () => {
         isRecording = false;
         micBtn.classList.remove('bg-rose-600', 'text-white');
         micLabel.innerText = "Mic";

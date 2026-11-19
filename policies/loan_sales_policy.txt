@@ -1,0 +1,14 @@
+LENDING POLICY: PRE-APPROVED PERSONAL LOAN SALES
+1. Target Segment: Prime retail and salaried customers with CIBIL >= 700.
+2. Pricing: Standard interest rate 10.50% - 12.00% p.a., tenure 12 to 60 months.
+3. Automated Sanction Ceiling: Up to ₹5,00,000 without manual underwriting.
+4. Mandatory Document Verification Checklist:
+   - Government ID (Aadhaar / Voter ID / Passport)
+   - Permanent Account Number (PAN Card)
+   - 3-Month Bank Statement showing salary credits
+5. Human Escalation:
+   - Any customer demanding custom interest rates (< 10.5%) must be escalated to Senior Relationship Manager.
+   - Any customer asking for Business or Secured Loan products must be routed to SME Lending Desk.
+6. Opt-Out & Regulatory Compliance:
+   - Calls permitted only between 09:00 - 19:00 IST.
+   - If customer states "Not interested" or "Do not call", agent must immediately apologize, terminate pitch, and add to National DNC suppression registry.

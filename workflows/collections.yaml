@@ -1,0 +1,67 @@
+id: collections
+name: "Early Delinquency Collections (EMI)"
+goal: "Recover bounced retail EMIs (1-30 DPD), negotiate valid PTPs, dispatch instant UPI payment links, audit RBI compliance, and escalate exceptions to human teams."
+success_metric: "recovery_pct"
+policy_file: "policies/collections_policy.txt"
+sample_data_file: "data/sample_book.csv"
+
+human_escalation_rules:
+  - condition: "record.data.get('intent') == 'dispute'"
+    target_desk: "Dispute Resolution Desk (Ops)"
+    reason: "Borrower asserts prior payment or ledger error"
+  - condition: "record.data.get('intent') == 'hardship'"
+    target_desk: "Credit Committee (Hardship Desk)"
+    reason: "Borrower seeks interest waiver or loan restructuring"
+  - condition: "record.data.get('audit_pass') is False"
+    target_desk: "Chief Compliance Officer"
+    reason: "Fair Practices Code violation detected in call transcript"
+
+steps:
+  - id: intake
+    name: "Account Profiling"
+    agent: "Intake"
+    retry_limit: 3
+    on_failure: "escalate"
+    input_fields: ["amount_due", "dpd", "language", "loan_id"]
+    output_fields: ["risk_note", "tone_hint", "best_call_window"]
+
+  - id: conversation
+    name: "Outbound Call & Consent"
+    agent: "Conversation"
+    retry_limit: 3
+    on_failure: "escalate"
+    input_fields: ["language", "customer_name", "phone", "amount_due"]
+    output_fields: ["consent_played", "transcript", "cost_inr"]
+
+  - id: decision
+    name: "Policy Decision & Negotiation"
+    agent: "Decision"
+    retry_limit: 3
+    on_failure: "escalate"
+    input_fields: ["transcript", "amount_due", "policy_file"]
+    output_fields: ["intent", "sentiment", "offer_made", "ptp_date", "confidence"]
+
+  - id: action
+    name: "UPI Link & WhatsApp Dispatch"
+    agent: "Action"
+    retry_limit: 3
+    on_failure: "escalate"
+    condition: "record.status != 'escalated'"
+    input_fields: ["amount_due", "ptp_date", "language", "loan_id"]
+    output_fields: ["payment_link", "payment_status"]
+
+  - id: compliance
+    name: "RBI Fair Practices Audit"
+    agent: "Compliance"
+    retry_limit: 3
+    on_failure: "escalate"
+    input_fields: ["transcript", "consent_played", "ptp_date"]
+    output_fields: ["audit_pass", "audit_reason"]
+
+  - id: reporter
+    name: "Portfolio Sync & Metrics"
+    agent: "Reporter"
+    retry_limit: 3
+    on_failure: "continue"
+    input_fields: []
+    output_fields: ["macro_metrics"]
