@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saarthi | Autonomous AI Collections Teammate</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .agent-active {
+      animation: pulse-subtle 1.8s infinite;
+      box-shadow: 0 0 18px rgba(99, 102, 241, 0.45);
+      border-color: #818cf8 !important;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- Logo & Tagline -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid fa-headset text-white text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold tracking-tight text-white">Saarthi <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">सारथी</span></h1>
+            <span id="simulateBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer" onclick="toggleSimulateMode()" title="Click to toggle SIMULATE / LIVE mode">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              SIMULATE MODE (FREE)
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Autonomous Collections Teammate for Bharat Lenders (Sarvam Indic Stack)</p>
+        </div>
+      </div>
+
+      <!-- Actions & Controls -->
+      <div class="flex items-center flex-wrap gap-2">
+        <button id="heroDemoBtn" onclick="runHeroDemo()" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-bold text-xs rounded-lg shadow-md hover:shadow-orange-500/20 flex items-center gap-2 transition transform active:scale-95">
+          <i class="fa-solid fa-play"></i> Run Hero Demo (Acc #1)
+        </button>
+        <button onclick="resetSampleBook()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-rotate-right"></i> Reset 20 Accounts
+        </button>
+        <button id="demoHoursBtn" onclick="toggleDemoHours()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 flex items-center gap-1.5 transition" title="Override 08:00-19:00 IST window for demo testing">
+          <i class="fa-regular fa-clock text-emerald-400"></i> Demo Hours: <span id="hoursStatus" class="text-emerald-400 font-semibold">11:30 AM IST</span>
+        </button>
+        <a href="/landing" target="_blank" class="px-3 py-1.5 bg-indigo-900/40 hover:bg-indigo-900/60 text-indigo-300 text-xs rounded-lg border border-indigo-700/50 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Pricing / Pitch
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- DASHBOARD STRIP (METRICS & UNIT ECONOMICS) -->
+  <section class="bg-slate-900/60 border-b border-slate-800 px-4 py-3">
+    <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+      <!-- Contacted -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+          <span>Contacted</span>
+          <i class="fa-solid fa-phone text-indigo-400 text-xs"></i>
+        </div>
+        <div id="statContacted" class="text-lg font-bold text-white mt-0.5">0 / 20</div>
+        <div class="text-[10px] text-slate-500">Automated outbound</div>
+      </div>
+      <!-- PTPs -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+          <span>PTPs Secured</span>
+          <i class="fa-solid fa-handshake text-amber-400 text-xs"></i>
+        </div>
+        <div id="statPTPs" class="text-lg font-bold text-amber-400 mt-0.5">0</div>
+        <div class="text-[10px] text-slate-500">Promise-to-Pay locked</div>
+      </div>
+      <!-- Paid -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+          <span>Paid</span>
+          <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
+        </div>
+        <div id="statPaid" class="text-lg font-bold text-emerald-400 mt-0.5">0</div>
+        <div class="text-[10px] text-slate-500">Instant UPI settlement</div>
+      </div>
+      <!-- Escalated -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+          <span>Escalated</span>
+          <i class="fa-solid fa-user-shield text-rose-400 text-xs"></i>
+        </div>
+        <div id="statEscalated" class="text-lg font-bold text-rose-400 mt-0.5">0</div>
+        <div class="text-[10px] text-slate-500">Hardship / Dispute</div>
+      </div>
+      <!-- Recovery % -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+          <span>Recovery %</span>
+          <i class="fa-solid fa-chart-line text-cyan-400 text-xs"></i>
+        </div>
+        <div id="statRecovery" class="text-lg font-bold text-cyan-400 mt-0.5">0.0%</div>
+        <div class="text-[10px] text-slate-500">Of total overdue book</div>
+      </div>
+      <!-- Our Cost/Contact -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/20">
+        <div class="text-[11px] text-indigo-300 flex items-center justify-between">
+          <span>Our Cost/Contact</span>
+          <i class="fa-solid fa-bolt text-indigo-400 text-xs"></i>
+        </div>
+        <div id="statOurCost" class="text-lg font-bold text-indigo-300 mt-0.5">₹0.00</div>
+        <div class="text-[10px] text-slate-400">Sarvam Voice + LLM</div>
+      </div>
+      <!-- Industry Benchmark -->
+      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 bg-slate-900/40">
+        <div class="text-[11px] text-slate-400 flex items-center justify-between">
+          <span>Industry Baseline</span>
+          <i class="fa-solid fa-building-columns text-slate-400 text-xs"></i>
+        </div>
+        <div class="text-sm font-semibold text-slate-300 mt-1">₹52 <span class="text-[10px] text-slate-500 font-normal">call</span> / ₹250 <span class="text-[10px] text-slate-500 font-normal">visit</span></div>
+        <div class="text-[9px] text-slate-500 mt-0.5">CRISIL / PayU published</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN 3-COLUMN WORKSPACE -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+    
+    <!-- COLUMN 1: ACCOUNTS BOOK (3 cols) -->
+    <div class="lg:col-span-3 flex flex-col bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[680px]">
+      <div class="p-3 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-indigo-400 text-sm"></i>
+          <h2 class="text-sm font-bold text-white">Loan Accounts (20)</h2>
+        </div>
+        <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">1-30 DPD</span>
+      </div>
+      <div id="accountsList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1.5">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- COLUMN 2: LIVE CALL & CASE FILE (5 cols) -->
+    <div class="lg:col-span-5 flex flex-col bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[680px]">
+      
+      <!-- Selected Case Header -->
+      <div id="caseHeader" class="p-3.5 border-b border-slate-800 bg-slate-900/90 flex items-start justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 id="currentBorrowerName" class="text-base font-bold text-white">Select an Account</h3>
+            <span id="currentStatusBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">NEW</span>
+          </div>
+          <div id="currentSubDetails" class="text-xs text-slate-400 mt-0.5">Overdue Amount & Details</div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button id="simulatePaymentBtn" onclick="simulatePaymentCurrent()" class="hidden px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold rounded-lg border border-emerald-500/40 transition flex items-center gap-1">
+            <i class="fa-solid fa-money-bill-wave"></i> Simulate Pay
+          </button>
+          <button id="runSingleBtn" onclick="runPipelineCurrent()" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt"></i> Run Pipeline
+          </button>
+        </div>
+      </div>
+
+      <!-- Call Audio / Status Panel -->
+      <div id="callControlStrip" class="px-3.5 py-2.5 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <div id="callIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
+          <span id="callStatusText" class="text-slate-400">Idle - Click Run to connect</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="micBtn" onclick="toggleMic()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1">
+            <i class="fa-solid fa-microphone text-xs"></i> <span id="micLabel">Mic</span>
+          </button>
+          <button id="speakAudioBtn" onclick="replayLastAgentAudio()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 flex items-center gap-1" title="Speak agent message using browser TTS">
+            <i class="fa-solid fa-volume-high text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Transcript -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-3.5 space-y-2.5 bg-slate-950/40" id="transcriptContainer">
+        <!-- Transcript balloons will appear here -->
+        <div class="text-center text-slate-500 text-xs py-10">
+          <i class="fa-solid fa-comments text-2xl mb-2 text-slate-600 block"></i>
+          No transcript yet. Click "Run Hero Demo" or select an account.
+        </div>
+      </div>
+
+      <!-- Action Panel: UPI Link & WhatsApp Template (when active) -->
+      <div id="actionDeliverables" class="hidden p-3 border-t border-slate-800 bg-slate-900/80">
+        <div class="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider flex items-center justify-between mb-1.5">
+          <span><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> WhatsApp Message Dispatched</span>
+          <span class="text-[10px] text-slate-400 font-mono">Status: SENT</span>
+        </div>
+        <div id="whatsappPreview" class="text-xs font-mono bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-slate-300 whitespace-pre-wrap max-h-24 overflow-y-auto custom-scroll">
+          <!-- WhatsApp template rendered here -->
+        </div>
+        <div class="mt-2 flex items-center justify-between text-[11px]">
+          <a id="upiLinkAnchor" href="#" class="text-indigo-400 hover:underline truncate max-w-[280px]">
+            <i class="fa-solid fa-link mr-1"></i> <span id="upiLinkText">upi://pay?...</span>
+          </a>
+          <span class="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded">Demo lender - sample data</span>
+        </div>
+      </div>
+
+      <!-- Borrower Text Input Bar -->
+      <div class="p-2.5 border-t border-slate-800 bg-slate-900 flex items-center gap-2">
+        <input type="text" id="borrowerInput" placeholder="Type borrower reply (Hindi / Marathi / English)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" onkeydown="if(event.key==='Enter') sendBorrowerText()">
+        <button onclick="sendBorrowerText()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- COLUMN 3: AGENT TRACE TIMELINE (4 cols) -->
+    <div class="lg:col-span-4 flex flex-col bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[680px]">
+      <div class="p-3 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-network-wired text-indigo-400 text-sm"></i>
+          <h2 class="text-sm font-bold text-white">Agent Handoff Trace</h2>
+        </div>
+        <span class="text-[10px] font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded">6 Agents · 1 Case File</span>
+      </div>
+
+      <!-- Agent Cards Timeline -->
+      <div id="agentTraceCards" class="flex-1 overflow-y-auto custom-scroll p-3 space-y-2.5 bg-slate-950/30">
+        
+        <!-- 1. Intake Agent Card -->
+        <div id="card-Intake" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 1. Intake Agent
+            </span>
+            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 summary-text">Reads loan book, assesses delinquency stage & tone hint.</p>
+        </div>
+
+        <!-- 2. Conversation Agent Card -->
+        <div id="card-Conversation" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 2. Conversation Agent
+            </span>
+            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 summary-text">Plays mandatory RBI consent line & conducts Indic voice call.</p>
+        </div>
+
+        <!-- 3. Negotiation Agent Card -->
+        <div id="card-Negotiation" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 3. Negotiation Agent
+            </span>
+            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 summary-text">Applies policy (PTP &le;7 days, part &ge;30%, escalate waivers).</p>
+        </div>
+
+        <!-- 4. Action Agent Card -->
+        <div id="card-Action" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 4. Action Agent
+            </span>
+            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 summary-text">Generates idempotent UPI payment deep-link & WhatsApp copy.</p>
+        </div>
+
+        <!-- 5. Compliance Agent Card -->
+        <div id="card-Compliance" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 5. Compliance Agent
+            </span>
+            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 summary-text">Audits 08:00-19:00 IST hours, consent, and anti-coercion rules.</p>
+        </div>
+
+        <!-- 6. Reporter Agent Card -->
+        <div id="card-Reporter" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-600 agent-dot"></span> 6. Reporter Agent
+            </span>
+            <span class="text-[10px] text-slate-500 status-pill">IDLE</span>
+          </div>
+          <p class="text-[11px] text-slate-400 summary-text">Computes recovery metrics & real unit cost vs ₹52 baseline.</p>
+        </div>
+
+      </div>
+
+      <!-- Human Escalation Notice Banner (Dynamic) -->
+      <div id="escalationNotice" class="hidden p-3 bg-rose-950/70 border-t border-rose-800/80 text-rose-200 text-xs">
+        <div class="font-bold flex items-center gap-1.5 mb-1">
+          <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> HANDED TO HUMAN OFFICER
+        </div>
+        <div id="escalationDetails" class="text-[11px] text-rose-300">
+          Routed to Senior Desk with full audio, transcript, and policy context.
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    let allCases = [];
+    let selectedCase = null;
+    let isSimulate = true;
+    let demoOverrideHours = true;
+    let isHeroDemoRunning = false;
+
+    // Fetch initial configuration and accounts on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      await fetchConfig();
+      await loadCases();
+      await updateDashboard();
+      if (allCases.length > 0) {
+        selectAccount(allCases[0].id);
+      }
+    });
+
+    async function fetchConfig() {
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        isSimulate = data.simulate;
+        demoOverrideHours = data.demo_override_hours;
+        updateConfigBadges();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function updateConfigBadges() {
+      const badge = document.getElementById('simulateBadge');
+      if (isSimulate) {
+        badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer";
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> SIMULATE MODE (FREE)';
+      } else {
+        badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5 cursor-pointer";
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> LIVE SARVAM AI';
+      }
+
+      const hoursBtn = document.getElementById('hoursStatus');
+      hoursBtn.innerText = demoOverrideHours ? "11:30 AM IST (Simulated)" : "Live IST";
+    }
+
+    async function toggleSimulateMode() {
+      const nextSim = !isSimulate;
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ simulate: nextSim })
+      });
+      await fetchConfig();
+    }
+
+    async function toggleDemoHours() {
+      const nextHours = !demoOverrideHours;
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ demo_override_hours: nextHours })
+      });
+      await fetchConfig();
+    }
+
+    async function resetSampleBook() {
+      try {
+        const res = await fetch('/api/load-sample-book', { method: 'POST' });
+        await loadCases();
+        await updateDashboard();
+        if (allCases.length > 0) {
+          selectAccount(allCases[0].id);
+        }
+      } catch (err) {
+        alert("Failed to reset sample book: " + err);
+      }
+    }
+
+    async function loadCases() {
+      try {
+        const res = await fetch('/api/cases');
+        allCases = await res.json();
+        renderAccountsList();
+      } catch (err) {
+        console.error("Error loading cases:", err);
+      }
+    }
+
+    async function updateDashboard() {
+      try {
+        const res = await fetch('/api/dashboard');
+        const d = await res.json();
+        document.getElementById('statContacted').innerText = `${d.contacted} / ${d.total_accounts}`;
+        document.getElementById('statPTPs').innerText = d.ptps;
+        document.getElementById('statPaid').innerText = d.paid;
+        document.getElementById('statEscalated').innerText = d.escalated;
+        document.getElementById('statRecovery').innerText = `${d.recovery_pct}%`;
+        document.getElementById('statOurCost').innerText = `₹${d.our_cost_per_contact.toFixed(2)}`;
+      } catch (err) {
+        console.error("Error updating dashboard:", err);
+      }
+    }
+
+    function renderAccountsList() {
+      const list = document.getElementById('accountsList');
+      list.innerHTML = '';
+      allCases.forEach(c => {
+        const isSel = selectedCase && selectedCase.id === c.id;
+        const item = document.createElement('div');
+        item.className = `p-2.5 rounded-xl border cursor-pointer transition flex items-center justify-between text-xs ${
+          isSel ? 'border-indigo-500 bg-indigo-950/40 text-white' : 'border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300'
+        }`;
+        
+        let statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400">NEW</span>`;
+        if (c.status === 'ptp') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30">PTP</span>`;
+        if (c.status === 'paid') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">PAID</span>`;
+        if (c.status === 'escalated') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30">ESCALATED</span>`;
+        if (c.status === 'contacted') statusBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">CALL</span>`;
+
+        item.innerHTML = `
+          <div>
+            <div class="font-bold flex items-center gap-1.5">
+              <span>#${c.id} ${c.borrower_name}</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-2">
+              <span class="text-indigo-300">${c.language}</span>
+              <span>•</span>
+              <span>₹${c.amount_due.toLocaleString()}</span>
+              <span>•</span>
+              <span class="text-rose-400">${c.dpd} DPD</span>
+            </div>
+          </div>
+          <div>${statusBadge}</div>
+        `;
+        item.onclick = () => selectAccount(c.id);
+        list.appendChild(item);
+      });
+    }
+
+    async function selectAccount(caseId) {
+      try {
+        const res = await fetch(`/api/cases/${caseId}`);
+        selectedCase = await res.json();
+        renderAccountsList();
+        renderCaseDetails();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderCaseDetails() {
+      if (!selectedCase) return;
+      const c = selectedCase;
+
+      document.getElementById('currentBorrowerName').innerText = `#${c.id} ${c.borrower_name}`;
+      document.getElementById('currentSubDetails').innerText = `Overdue: ₹${c.amount_due.toLocaleString()} | DPD: ${c.dpd} | Lang: ${c.language} | Phone: ${c.phone}`;
+      
+      const badge = document.getElementById('currentStatusBadge');
+      badge.innerText = c.status.toUpperCase();
+      badge.className = `text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+        c.status === 'ptp' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+        c.status === 'paid' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+        c.status === 'escalated' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
+        'bg-slate-800 text-slate-400'
+      }`;
+
+      // Simulate payment button visibility
+      const simPayBtn = document.getElementById('simulatePaymentBtn');
+      if (c.status === 'ptp' && c.payment_status === 'sent') {
+        simPayBtn.classList.remove('hidden');
+      } else {
+        simPayBtn.classList.add('hidden');
+      }
+
+      // Render Transcript
+      renderTranscript(c.transcript);
+
+      // Render Deliverables (WhatsApp & UPI)
+      const actionBox = document.getElementById('actionDeliverables');
+      if (c.payment_status === 'sent' || c.payment_status === 'paid') {
+        actionBox.classList.remove('hidden');
+        document.getElementById('upiLinkText').innerText = c.payment_link;
+        document.getElementById('upiLinkAnchor').href = c.payment_link;
+        document.getElementById('whatsappPreview').innerText = generateWhatsAppPreview(c);
+      } else {
+        actionBox.classList.add('hidden');
+      }
+
+      // Render Trace Timeline
+      renderTraceTimeline(c);
+
+      // Render Escalation Notice
+      const escNotice = document.getElementById('escalationNotice');
+      if (c.status === 'escalated') {
+        escNotice.classList.remove('hidden');
+        document.getElementById('escalationDetails').innerText = `Assigned Officer: ${c.assigned_human || 'Senior Operations Desk'}. Reason: ${c.offer_made || 'Customer dispute / loan restructuring request'}.`;
+      } else {
+        escNotice.classList.add('hidden');
+      }
+    }
+
+    function renderTranscript(transcript) {
+      const container = document.getElementById('transcriptContainer');
+      container.innerHTML = '';
+      if (!transcript || transcript.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-slate-500 text-xs py-10">
+            <i class="fa-solid fa-comments text-2xl mb-2 text-slate-600 block"></i>
+            No transcript yet. Click "Run Pipeline" to begin.
+          </div>
+        `;
+        return;
+      }
+
+      transcript.forEach(t => {
+        const isAgent = t.speaker === 'agent';
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `flex flex-col ${isAgent ? 'items-start' : 'items-end'}`;
+        msgDiv.innerHTML = `
+          <span class="text-[10px] text-slate-500 mb-0.5 px-1">${isAgent ? 'Saarthi AI Agent' : selectedCase.borrower_name} (${t.ts})</span>
+          <div class="max-w-[85%] rounded-2xl px-3.5 py-2 text-xs ${
+            isAgent 
+              ? 'bg-indigo-950/80 border border-indigo-700/40 text-indigo-100 rounded-tl-sm' 
+              : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tr-sm'
+          }">
+            ${t.text}
+          </div>
+        `;
+        container.appendChild(msgDiv);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function generateWhatsAppPreview(caseItem) {
+      return `Dear ${caseItem.borrower_name},\nThank you for speaking with Saarthi Financial. PTP of ₹${caseItem.amount_due.toLocaleString()} confirmed for ${caseItem.ptp_date || 'immediate settlement'}.\nPay securely via UPI: ${caseItem.payment_link}\n(Demo lender - sample data)`;
+    }
+
+    function renderTraceTimeline(caseItem) {
+      const agents = ['Intake', 'Conversation', 'Negotiation', 'Action', 'Compliance', 'Reporter'];
+      
+      agents.forEach(agentName => {
+        const card = document.getElementById(`card-${agentName}`);
+        const pill = card.querySelector('.status-pill');
+        const text = card.querySelector('.summary-text');
+        const dot = card.querySelector('.agent-dot');
+
+        const traceEntry = caseItem.trace.find(t => t.agent === agentName);
+        if (traceEntry) {
+          card.classList.remove('agent-active', 'border-slate-800', 'bg-slate-900/60');
+          text.innerText = traceEntry.summary;
+          
+          if (agentName === 'Compliance') {
+            if (caseItem.audit_pass === false) {
+              card.className = "p-3 rounded-xl border border-rose-500/80 bg-rose-950/40 transition-all duration-300";
+              pill.className = "text-[10px] font-bold text-rose-400 bg-rose-950 px-2 py-0.5 rounded border border-rose-600";
+              pill.innerText = "FAILED";
+              dot.className = "w-2 h-2 rounded-full bg-rose-500";
+            } else {
+              card.className = "p-3 rounded-xl border border-emerald-500/80 bg-emerald-950/40 transition-all duration-300";
+              pill.className = "text-[10px] font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-600";
+              pill.innerText = "PASSED";
+              dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+            }
+          } else {
+            card.className = "p-3 rounded-xl border border-indigo-500/40 bg-indigo-950/20 transition-all duration-300";
+            pill.className = "text-[10px] font-bold text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded";
+            pill.innerText = "DONE";
+            dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+          }
+        } else {
+          card.className = "p-3 rounded-xl border border-slate-800 bg-slate-900/60 transition-all duration-300";
+          pill.className = "text-[10px] text-slate-500 status-pill";
+          pill.innerText = "IDLE";
+          dot.className = "w-2 h-2 rounded-full bg-slate-600 agent-dot";
+        }
+      });
+    }
+
+    async function runPipelineCurrent() {
+      if (!selectedCase) return;
+      await runPipelineForCase(selectedCase.id);
+    }
+
+    async function runPipelineForCase(caseId) {
+      const callDot = document.getElementById('callIndicatorDot');
+      const callStatus = document.getElementById('callStatusText');
+      callDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping";
+      callStatus.innerText = "Agent pipeline executing in sequence...";
+
+      try {
+        const res = await fetch(`/api/cases/${caseId}/run`, { method: 'POST' });
+        selectedCase = await res.json();
+        
+        callDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        callStatus.innerText = "Call completed & audited";
+
+        renderCaseDetails();
+        await loadCases();
+        await updateDashboard();
+
+        // Speak the agent's message via browser speech synthesis
+        speakLastAgentMessage();
+      } catch (err) {
+        callDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+        callStatus.innerText = "Pipeline error: " + err;
+      }
+    }
+
+    async function simulatePaymentCurrent() {
+      if (!selectedCase) return;
+      try {
+        const res = await fetch(`/api/cases/${selectedCase.id}/simulate-payment`, { method: 'POST' });
+        selectedCase = await res.json();
+        renderCaseDetails();
+        await loadCases();
+        await updateDashboard();
+      } catch (err) {
+        alert("Payment simulation failed: " + err);
+      }
+    }
+
+    async function sendBorrowerText() {
+      const input = document.getElementById('borrowerInput');
+      const text = input.value.trim();
+      if (!text || !selectedCase) return;
+      input.value = '';
+
+      try {
+        const res = await fetch(`/api/cases/${selectedCase.id}/message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        selectedCase = await res.json();
+        renderCaseDetails();
+        await loadCases();
+        await updateDashboard();
+        speakLastAgentMessage();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Hero Demo: plays the full Marathi Account #1 flow with visual pacing
+    async function runHeroDemo() {
+      if (isHeroDemoRunning) return;
+      isHeroDemoRunning = true;
+      const heroBtn = document.getElementById('heroDemoBtn');
+      heroBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Demo in Progress...';
+      heroBtn.classList.add('opacity-75');
+
+      // 1. Select Account #1
+      await selectAccount('1');
+      await new Promise(r => setTimeout(r, 600));
+
+      // 2. Light up Intake
+      highlightCard('Intake');
+      await new Promise(r => setTimeout(r, 800));
+
+      // 3. Light up Conversation & run pipeline
+      highlightCard('Conversation');
+      await runPipelineForCase('1');
+      await new Promise(r => setTimeout(r, 1200));
+
+      // 4. Light up Action & simulate payment after 1.5s
+      highlightCard('Action');
+      await new Promise(r => setTimeout(r, 1000));
+      await simulatePaymentCurrent();
+      
+      // 5. Highlight Compliance & Reporter
+      highlightCard('Compliance');
+      await new Promise(r => setTimeout(r, 800));
+      highlightCard('Reporter');
+
+      heroBtn.innerHTML = '<i class="fa-solid fa-play"></i> Run Hero Demo (Acc #1)';
+      heroBtn.classList.remove('opacity-75');
+      isHeroDemoRunning = false;
+    }
+
+    function highlightCard(agentName) {
+      ['Intake', 'Conversation', 'Negotiation', 'Action', 'Compliance', 'Reporter'].forEach(a => {
+        const c = document.getElementById(`card-${a}`);
+        if (a === agentName) {
+          c.classList.add('agent-active');
+        } else {
+          c.classList.remove('agent-active');
+        }
+      });
+    }
+
+    function speakLastAgentMessage() {
+      if (!selectedCase || !selectedCase.transcript) return;
+      const agentTurns = selectedCase.transcript.filter(t => t.speaker === 'agent');
+      if (agentTurns.length === 0) return;
+      const lastTurn = agentTurns[agentTurns.length - 1];
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(lastTurn.text);
+        if (selectedCase.language === 'Marathi') utter.lang = 'mr-IN';
+        else if (selectedCase.language === 'Hindi') utter.lang = 'hi-IN';
+        else utter.lang = 'en-IN';
+        utter.rate = 1.05;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function replayLastAgentAudio() {
+      speakLastAgentMessage();
+    }
+
+    let isRecording = false;
+    let recognition = null;
+
+    function toggleMic() {
+      const micBtn = document.getElementById('micBtn');
+      const micLabel = document.getElementById('micLabel');
+
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Speech recognition is not supported in this browser. Please type borrower reply.");
+        return;
+      }
+
+      if (isRecording) {
+        if (recognition) recognition.stop();
+        isRecording = false;
+        micBtn.classList.remove('bg-rose-600', 'text-white');
+        micLabel.innerText = "Mic";
+        return;
+      }
+
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      
+      if (selectedCase && selectedCase.language === 'Marathi') recognition.lang = 'mr-IN';
+      else if (selectedCase && selectedCase.language === 'Hindi') recognition.lang = 'hi-IN';
+      else recognition.lang = 'en-IN';
+
+      recognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.add('bg-rose-600', 'text-white');
+        micLabel.innerText = "Listening...";
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('borrowerInput').value = transcript;
+        sendBorrowerText();
+      };
+
+      recognition.onerror = (e) => {
+        console.error("Speech error", e);
+        isRecording = false;
+        micBtn.classList.remove('bg-rose-600', 'text-white');
+        micLabel.innerText = "Mic";
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove('bg-rose-600', 'text-white');
+        micLabel.innerText = "Mic";
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
