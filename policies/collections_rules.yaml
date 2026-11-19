@@ -144,6 +144,38 @@ negotiation:
   rule_id_waiver_prohibited: "POLICY-WAIVER-NO01"
   waiver_allowed_autonomous: false
 
+liquidity_capture_rules:
+  rule_id: "POLICY-LIQ-CAPTURE01"
+  description: "Capture liquidity now: Never leave call with pure future promise. Split into immediate token UPI + locked recurring AutoPay mandate"
+  min_token_inr: 1000.0
+  require_instant_upi_token: true
+  auto_split_remainder_autopay: true
+  max_mandate_installments: 3
+  preferred_mandate_cadence: "WEEKLY_FRIDAY"
+
+preventive_rules:
+  rule_id: "POLICY-PREV-FEE01"
+  description: "T-24h preventive bounce intervention before eNACH/AutoPay debit"
+  bank_bounce_fee_inr: 590.0
+  allow_pre_due_date_shift_days: 3
+  cibil_impact_prevented: true
+  min_liquidity_buffer_inr: 6000.0
+
+micro_split_rules:
+  rule_id: "POLICY-MICRO-SPLIT01"
+  description: "Kirana cashflow-synced weekly Friday micro-split installment schedule"
+  allow_cashflow_micro_split: true
+  max_installments: 4
+  cadence: "WEEKLY_FRIDAY"
+  min_first_tranche_pct: 25.0
+
+insurance_rider_rules:
+  rule_id: "POLICY-HOSPICASH01"
+  description: "Automatic Hospicash / Credit-Shield claim packet preparation on medical calamity shock"
+  max_claim_relief_inr: 15000.0
+  cooling_pause_days: 7
+  designated_insurer: "HDFC ERGO Health Insurance / ICICI Lombard"
+
 compliance_guardrails:
   forbidden_phrases:
     - "पुलिस"

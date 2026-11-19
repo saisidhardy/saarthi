@@ -730,5 +730,101 @@
     "borrower_script_en": "Yes, last 4 digits are 1020. I will clear the complete EMI by Friday evening for sure.",
     "agent_script": "Understood, we have scheduled the PTP for Friday. The UPI payment link has been dispatched.",
     "agent_script_en": "Understood, we have scheduled the PTP for Friday. The UPI payment link has been dispatched."
+  },
+  "21": {
+    "account_id": "21",
+    "borrower_name": "Anjali Deshmukh",
+    "phone": "+919877112244",
+    "language": "Marathi",
+    "amount_due": 18000.0,
+    "due_date": "2026-11-20",
+    "dpd": -1,
+    "loan_id": "LN-MH-1021",
+    "scenario": "s7_preventive_rescue",
+    "expected_outcome": "rescued_pre_bounce",
+    "dialogue": [
+      {
+        "turn": 1,
+        "speaker": "agent",
+        "text": "नमस्कार अंजलीजी, मी सारथी कॅपिटलच्या वतीने बोलणारा एक एआय असिस्टंट आहे. हा कॉल गुणवत्तेसाठी रेकॉर्ड केला जातोय. व्यक्तीशी बोलण्यासाठी आपण कधीही 'इंसान' किंवा 'अधिकारी' बोलू शकता. सुरक्षेसाठी लोनचे शेवटचे ४ अंक सांगाल का?",
+        "translation": "Hello Anjaliji, I am an AI assistant calling on behalf of Saarthi Capital. This call is recorded. You can say 'human' anytime to speak with a person. Could you confirm the last 4 digits of your loan?"
+      },
+      {
+        "turn": 2,
+        "speaker": "borrower",
+        "text": "हो, 1021 आहे. सांगा काय अडचण आहे?",
+        "translation": "Yes, it is 1021. Tell me, what is the problem?"
+      },
+      {
+        "turn": 3,
+        "speaker": "agent",
+        "text": "धन्यवाद अंजलीजी, ओळखीची पुष्टी झाली आहे. उद्या आपल्या खात्यातून ₹18,000 चा ईएमआय ऑटो-डेबिट होणार आहे, परंतु खात्यात केवळ ₹6,200 शिल्लक दिसत आहेत. ₹590 बाउंस फी आणि सिबिल स्कोअर वाचवण्यासाठी आम्ही डेबिट तारीख 3 दिवस पुढे ढकलू शकतो किंवा ₹6,000 चा लिक्विडिटी बफर देऊ शकतो.",
+        "translation": "Thank you Anjaliji, identity confirmed. Tomorrow an EMI of ₹18,000 is scheduled for auto-debit, but account balance shows only ₹6,200. To prevent a ₹590 bounce fee and protect your CIBIL score, we can shift the debit date by 3 days or provide a ₹6,000 liquidity buffer."
+      },
+      {
+        "turn": 4,
+        "speaker": "borrower",
+        "text": "हो, 1021 आहे. नागपूरच्या बुटीकचे कलेक्शन परवा येणार आहे, कृपया 3 दिवस पुढे ढकला. 590 रुपये बाउंस फी वाचेल हे चांगलं झालं.",
+        "translation": "Yes, 1021. My Nagpur boutique collections will arrive day after tomorrow, please shift by 3 days. Glad that the ₹590 bounce fee is saved."
+      },
+      {
+        "turn": 5,
+        "speaker": "agent",
+        "text": "उत्तम अंजलीजी! पॉलिसीनुसार आम्ही ईएमआय डेबिट तारीख 3 दिवस पुढे ढकलली आहे आणि ₹590 बँक बाउंस फी वाचवली आहे. आपला सिबिल स्कोअर पूर्णपणे सुरक्षित राहील. धन्यवाद!",
+        "translation": "Great Anjaliji! As per policy, we have shifted the debit date by 3 days and saved your ₹590 bank bounce fee. Your CIBIL score remains fully protected. Thank you!"
+      }
+    ],
+    "borrower_script": "हो, 1021 आहे. नागपूरच्या बुटीकचे कलेक्शन परवा येणार आहे, कृपया 3 दिवस पुढे ढकला. 590 रुपये बाउंस फी वाचेल हे चांगलं झालं.",
+    "borrower_script_en": "Yes, it's 1021. My Nagpur boutique collections will arrive day after tomorrow, please shift by 3 days. Glad that the ₹590 bounce fee is saved.",
+    "agent_script": "अंजलीजी, ओळखीची पुष्टी झाली. आम्ही ऑटो-डेबिट 3 दिवस पुढे ढकलले आहे आणि ₹590 बाउंस फी वाचवली आहे. धन्यवाद.",
+    "agent_script_en": "Anjaliji, identity confirmed. We shifted the auto-debit by 3 days and saved the ₹590 bounce fee. Thank you."
+  },
+  "22": {
+    "account_id": "22",
+    "borrower_name": "Sunita Patil",
+    "phone": "+919820112233",
+    "language": "Marathi",
+    "amount_due": 40000.0,
+    "due_date": "2026-11-16",
+    "dpd": 3,
+    "loan_id": "LN-MH-1022",
+    "scenario": "s8_cashflow_split",
+    "expected_outcome": "ptp",
+    "dialogue": [
+      {
+        "turn": 1,
+        "speaker": "agent",
+        "text": "नमस्कार सुनिताजी, मी सारथी कॅपिटलच्या वतीने बोलणारा एक एआय असिस्टंट आहे. हा कॉल सुरक्षेसाठी रेकॉर्ड केला जातोय. व्यक्तीशी बोलण्यासाठी आपण कधीही 'इंसान' किंवा 'अधिकारी' बोलू शकता. सुरक्षेसाठी लोनचे शेवटचे ४ अंक सांगाल का?",
+        "translation": "Hello Sunitaji, I am an AI assistant calling on behalf of Saarthi Capital. This call is recorded for compliance. You can say 'human' anytime to speak with a person. Could you confirm the last 4 digits of your loan?"
+      },
+      {
+        "turn": 2,
+        "speaker": "borrower",
+        "text": "हो, 1022 आहे. बोला काय काम होतं?",
+        "translation": "Yes, it is 1022. Tell me, what was the matter?"
+      },
+      {
+        "turn": 3,
+        "speaker": "agent",
+        "text": "धन्यवाद सुनिताजी, ओळखीची पुष्टी झाली आहे. आपल्या लोन खात्यावर ₹40,000 चा ईएमआय 3 दिवसांपासून थकला आहे. आज भरणा करू शकाल का?",
+        "translation": "Thank you Sunitaji, identity confirmed. Overdue EMI of ₹40,000. Can you pay today?"
+      },
+      {
+        "turn": 4,
+        "speaker": "borrower",
+        "text": "हो, 1022 आहे. अहो ताई, 40,000 एकदम भरणे शक्य नाही. दर शुक्रवारी गिऱ्हाईकांचे पैसे येतात, 10-10 हजार करून 4 आठवड्यांत भरू का?",
+        "translation": "Yes, 1022. Madam, cannot pay 40k all at once. Kirana customer receipts come every Friday, can I pay 10k each Friday over 4 weeks?"
+      },
+      {
+        "turn": 5,
+        "speaker": "agent",
+        "text": "सुनिताजी, किराणा कॅशफ्लो पॉलिसीनुसार दर शुक्रवारचे ₹10,000 चे 4 आठवड्यांचे UPI AutoPay शेड्युल मंजूर केले आहे. पहिल्या हप्त्याची तात्काळ लिंक आणि पुढील हप्त्यांचे AutoPay मॅन्डेट व्हॉट्सॲपवर पाठवले आहे. धन्यवाद!",
+        "translation": "Sunitaji, approved 4-week Friday UPI AutoPay schedule of ₹10,000 per week. First link dispatched. Thank you!"
+      }
+    ],
+    "borrower_script": "हो, 1022 आहे. अहो ताई, 40,000 एकदम भरणे शक्य नाही. दर शुक्रवारी गिऱ्हाईकांचे पैसे येतात, 10-10 हजार करून 4 आठवड्यांत भरू का?",
+    "borrower_script_en": "Yes, it is 1022. Look madam, paying 40k all at once is not possible. Customer sales come every Friday, can I pay 10k every Friday across 4 weeks?",
+    "agent_script": "सुनिताजी, किराणा कॅशफ्लो पॉलिसीनुसार 4 आठवड्यांचे शुक्रवार UPI AutoPay शेड्युल मंजूर केले आहे. पहिली लिंक पाठवली आहे. धन्यवाद.",
+    "agent_script_en": "Sunitaji, approved 4-week Friday UPI AutoPay schedule per kirana cashflow policy. First link dispatched. Thank you."
   }
 }

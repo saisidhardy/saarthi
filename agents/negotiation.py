@@ -86,12 +86,12 @@ def run_negotiation_agent(record: JourneyRecord, step: Optional[WorkflowStep] = 
             {latest_dialogue}
 
             Extract:
-            1. intent: 'ptp' | 'part_payment' | 'hardship' | 'dispute' | 'avoidance' | 'adversarial'
+            1. intent: 'ptp' | 'part_payment' | 'hardship' | 'dispute' | 'avoidance' | 'adversarial' | 'cashflow_split' | 'pre_due_shift'
             2. sentiment: 'positive' | 'neutral' | 'anxious' | 'hostile' | 'adversarial'
             3. extracted_amount: integer or null (e.g. 2500, 10000, 20000)
-            4. extracted_date_phrase: exact relative date text (e.g. 'Friday', '5th', '20 days', 'tomorrow')
+            4. extracted_date_phrase: exact relative date text (e.g. 'Friday', '5th', '20 days', 'tomorrow', '3 days')
             5. waiver_requested: boolean (true if borrower demands waiver, fee cancellation, or says 'ignore your rules')
-            6. requested_days: integer or null (e.g. 20 if borrower asks 20 days)
+            6. requested_days: integer or null (e.g. 20 if borrower asks 20 days, 3 if asking 3 days shift)
 
             Output JSON only. Do not compute ISO dates.
             """
@@ -209,7 +209,32 @@ def _deterministic_propose(record: JourneyRecord, text: str) -> LLMProposal:
             confidence=0.90
         )
 
-    # 6. Part Payment (e.g. S2 code-mixed "Friday ko 2,500 bhar dunga, baaki next week" or "Friday la 2,500 bharu ka?")
+    # 6. T-24h Preventive Bounce Shift (Scenario S7)
+    if record.trigger_type == "PRE_DUE_T24H" or any(k in clean for k in ["पुढे ढकला", "shift", "postpone", "pre-due", "590 रुपये", "590", "बाउंस फी", "फी वाचेल", "बफर"]):
+        return LLMProposal(
+            intent="pre_due_shift",
+            offered_amount=record.amount_due,
+            date_phrase="3 days",
+            requested_days=3,
+            waiver_requested=False,
+            sentiment="positive",
+            confidence=0.98
+        )
+
+    # 7. Cashflow-Synced Kirana Micro-Split (Scenario S8)
+    if any(k in clean for k in ["4 आठवड्यांत", "चार आठवड्यांत", "दर शुक्रवारी", "हर शुक्रवार", "10-10 हजार", "हप्त्यात", "micro-split", "micro split", "4 हप्त्यात"]):
+        tranche_amt = round(record.amount_due / 4, 2)
+        return LLMProposal(
+            intent="cashflow_split",
+            offered_amount=tranche_amt,
+            date_phrase="Friday",
+            requested_days=4,
+            waiver_requested=False,
+            sentiment="positive",
+            confidence=0.98
+        )
+
+    # 8. Part Payment (e.g. S2 code-mixed "Friday ko 2,500 bhar dunga, baaki next week" or "Friday la 2,500 bharu ka?")
     offered_amt = extract_amount_from_speech(text, record.amount_due, loan_id=record.data.get("loan_id"))
     
     # Extract date phrase

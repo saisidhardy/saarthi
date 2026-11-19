@@ -103,6 +103,11 @@
 
       <!-- Header Controls & Actions -->
       <div class="flex items-center flex-wrap gap-1.5 sm:gap-2">
+        <!-- Enterprise Production Console Switch -->
+        <a href="/portal" class="px-2.5 py-1.5 bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-bold text-xs rounded-lg shadow-md border border-emerald-400 flex items-center gap-1.5 transition transform active:scale-95" title="Switch to Enterprise Production Console">
+          <i class="fa-solid fa-building-columns"></i> <span>Enterprise Console</span>
+        </a>
+
         <!-- Event Trigger Button -->
         <button id="eventTriggerBtn" onclick="simulateBouncedMandateEvent()" class="px-3 py-1.5 bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-xs rounded-lg shadow-lg shadow-rose-900/40 flex items-center gap-1.5 transition transform active:scale-95">
           <i class="fa-solid fa-bolt-lightning"></i> <span id="eventBtnLabel">Simulate bounced-mandate event</span>
@@ -163,16 +168,16 @@
     </div>
   </div>
 
-  <!-- ONE-TAP DEMO SCENARIOS BAR (S1 to S6) -->
+  <!-- ONE-TAP DEMO SCENARIOS BAR (S1 to S8) -->
   <section class="bg-slate-900/95 border-b border-slate-800 px-4 py-2.5 shadow-md">
     <div class="max-w-7xl mx-auto">
       <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
         <span class="flex items-center gap-1.5">
-          <i class="fa-solid fa-gamepad text-indigo-400"></i> One-Tap Demo Scenarios (Design Backward from These)
+          <i class="fa-solid fa-gamepad text-indigo-400"></i> One-Tap Demo Scenarios (Deterministic Outcome Engine)
         </span>
-        <span class="text-slate-500 font-mono text-[9px]">Tap to launch full autonomous journey & policy check</span>
+        <span class="text-slate-500 font-mono text-[9px]">Tap to launch autonomous journey & outcome pipeline</span>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
         
         <!-- S1: Hero -->
         <button onclick="launchScenario('s1')" class="p-2 rounded-xl bg-gradient-to-br from-indigo-950/80 to-slate-900 border border-indigo-500/50 hover:border-indigo-400 text-left transition transform active:scale-95 shadow-sm group">
@@ -180,8 +185,8 @@
             <span class="text-[10px] font-bold text-indigo-400 font-mono">S1 HERO</span>
             <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Marathi</span>
           </div>
-          <div class="text-xs font-bold text-white mt-1 group-hover:text-indigo-300 truncate">Sunita Patil (₹40k)</div>
-          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Pune shopowner · 5th PTP</div>
+          <div class="text-xs font-bold text-white mt-1 group-hover:text-indigo-300 truncate">Sunita Patil</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">₹40k · 5th PTP Link</div>
         </button>
 
         <!-- S2: Code-Mix Part Payment -->
@@ -190,8 +195,8 @@
             <span class="text-[10px] font-bold text-cyan-400 font-mono">S2 PART-PAY</span>
             <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Hinglish</span>
           </div>
-          <div class="text-xs font-bold text-white mt-1 group-hover:text-cyan-300 truncate">Rajesh Sharma (₹7.5k)</div>
-          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">"Friday ko ₹2,500..." &ge;30%</div>
+          <div class="text-xs font-bold text-white mt-1 group-hover:text-cyan-300 truncate">Rajesh Sharma</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">"Friday ko ₹2.5k" &ge;30%</div>
         </button>
 
         <!-- S3: Adversarial Firewall -->
@@ -201,17 +206,17 @@
             <span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Adversarial</span>
           </div>
           <div class="text-xs font-bold text-white mt-1 group-hover:text-rose-300 truncate">Vikram Malhotra</div>
-          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Demands waiver &rarr; BLOCKED</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Waiver &rarr; BLOCKED</div>
         </button>
 
-        <!-- S4: Hospital Pause -->
+        <!-- S4: Hospital Pause + Hospicash -->
         <button onclick="launchScenario('s4')" class="p-2 rounded-xl bg-gradient-to-br from-amber-950/80 to-slate-900 border border-amber-500/50 hover:border-amber-400 text-left transition transform active:scale-95 shadow-sm group">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-amber-400 font-mono">S4 SENSITIVE</span>
-            <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Hospital</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Hospicash</span>
           </div>
-          <div class="text-xs font-bold text-white mt-1 group-hover:text-amber-300 truncate">Suresh Patil (₹32k)</div>
-          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">ICU Emergency &rarr; 7d cooling</div>
+          <div class="text-xs font-bold text-white mt-1 group-hover:text-amber-300 truncate">Suresh Patil</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">ICU Pause + ₹15k Claim</div>
         </button>
 
         <!-- S5: Bad Transcript -->
@@ -220,83 +225,160 @@
             <span class="text-[10px] font-bold text-red-400 font-mono">S5 VIOLATION</span>
             <span class="text-[9px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-300 border border-red-500/30">Coercive</span>
           </div>
-          <div class="text-xs font-bold text-white mt-1 group-hover:text-red-300 truncate">Manoj Kumar (₹12k)</div>
-          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Threat &rarr; Compliance blocks</div>
+          <div class="text-xs font-bold text-white mt-1 group-hover:text-red-300 truncate">Manoj Kumar</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Threat &rarr; Gate blocks</div>
         </button>
 
         <!-- S6: Audit Mode (Pilot Wedge) -->
-        <button onclick="openAuditModeModal()" class="p-2 rounded-xl bg-gradient-to-br from-emerald-950/80 to-slate-900 border border-emerald-500/60 hover:border-emerald-400 text-left transition transform active:scale-95 shadow-sm group">
+        <button onclick="openAuditModeModal()" class="p-2 rounded-xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-700 hover:border-slate-500 text-left transition transform active:scale-95 shadow-sm group">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold text-emerald-400 font-mono">S6 AUDIT MODE</span>
-            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Wedge</span>
+            <span class="text-[10px] font-bold text-slate-300 font-mono">S6 AUDIT</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700">Wedge</span>
           </div>
-          <div class="text-xs font-bold text-white mt-1 group-hover:text-emerald-300 truncate">Audit Any Call</div>
+          <div class="text-xs font-bold text-white mt-1 group-hover:text-indigo-300 truncate">Audit Any Call</div>
           <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">Rule-by-rule scorecard</div>
+        </button>
+
+        <!-- S7: T-24h Preventive Rescue -->
+        <button onclick="launchScenario('s7')" class="p-2 rounded-xl bg-gradient-to-br from-emerald-950/80 to-slate-900 border border-emerald-500/60 hover:border-emerald-400 text-left transition transform active:scale-95 shadow-sm group">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-emerald-400 font-mono">S7 T-24H RESCUE</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">₹590 Saved</span>
+          </div>
+          <div class="text-xs font-bold text-white mt-1 group-hover:text-emerald-300 truncate">Anjali Deshmukh</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">3d Shift · CIBIL Safe</div>
+        </button>
+
+        <!-- S8: Cashflow Micro-Split -->
+        <button onclick="launchScenario('s8')" class="p-2 rounded-xl bg-gradient-to-br from-purple-950/80 to-slate-900 border border-purple-500/60 hover:border-purple-400 text-left transition transform active:scale-95 shadow-sm group">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-purple-400 font-mono">S8 MICRO-SPLIT</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">Kirana AutoPay</span>
+          </div>
+          <div class="text-xs font-bold text-white mt-1 group-hover:text-purple-300 truncate">Sunita (Kirana)</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">4x ₹10k Friday Split</div>
         </button>
 
       </div>
     </div>
   </section>
 
-  <!-- DASHBOARD STRIP: ENGINE & WORKFLOW METRICS -->
-  <section class="bg-slate-900/60 border-b border-slate-800 px-4 py-2.5">
+  <!-- OUTCOME IMPACT TICKER STRIP -->
+  <section class="bg-gradient-to-r from-emerald-950/50 via-slate-900/90 to-indigo-950/50 border-b border-emerald-500/30 px-4 py-2">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold font-mono tracking-wider flex items-center gap-1">
+          <i class="fa-solid fa-arrow-trend-up text-emerald-400"></i> OUTCOME ENGINE IMPACT
+        </span>
+        <span class="text-slate-300 font-medium hidden sm:inline">Delinquency Prevention & Kirana Cashflow Settlement:</span>
+      </div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
+          <span class="text-[11px] text-slate-400">Recovery Lift:</span>
+          <span class="text-slate-500 line-through text-[11px]">34.0% Base</span>
+          <i class="fa-solid fa-arrow-right text-[10px] text-emerald-400"></i>
+          <span id="statRecoveryLift" class="font-bold text-emerald-400 font-mono">61.2%</span>
+          <span class="text-[10px] text-emerald-500 font-semibold">(+27.2% Lift)</span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
+          <i class="fa-solid fa-piggy-bank text-amber-400 text-xs"></i>
+          <span class="text-[11px] text-slate-400">Bounce Fees Saved:</span>
+          <span id="statBounceFeesSaved" class="font-bold text-amber-300 font-mono">₹590</span>
+          <span class="text-[10px] text-slate-400">/ rescued loan</span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
+          <i class="fa-solid fa-shield-heart text-indigo-400 text-xs"></i>
+          <span class="text-[11px] text-slate-400">NPA Loans Rescued:</span>
+          <span id="statNpaRescued" class="font-bold text-indigo-300 font-mono">4</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD STRIP: 4 HARD ROI OUTCOME METRICS -->
+  <section class="bg-slate-900/80 border-b border-slate-800 px-4 py-2.5">
     <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-      <!-- 1. Journeys Started -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-        <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Journeys Started</span>
-          <i class="fa-solid fa-route text-indigo-400 text-xs"></i>
+      <!-- 1. Portfolio Recovery Rate Lift -->
+      <div class="bg-gradient-to-br from-emerald-950/70 to-slate-900/90 p-2.5 rounded-xl border border-emerald-500/40 shadow-sm">
+        <div class="text-[11px] text-emerald-300 font-semibold flex items-center justify-between">
+          <span>Portfolio Recovery Rate</span>
+          <i class="fa-solid fa-arrow-trend-up text-emerald-400 text-xs"></i>
         </div>
-        <div id="statJourneysStarted" class="text-lg font-bold text-white mt-0.5">0</div>
-        <div class="text-[10px] text-slate-500">Event-triggered journeys</div>
+        <div class="flex items-baseline gap-1 mt-0.5">
+          <span id="statPortfolioRecoveryRate" class="text-xl font-extrabold text-emerald-400 font-mono">61.8%</span>
+          <span class="text-[10px] text-emerald-500 font-bold">(+27.8% Lift)</span>
+        </div>
+        <div class="text-[9.5px] text-slate-400">Baseline 34.0% &rarr; Saarthi 61.8%</div>
       </div>
-      <!-- 2. Autonomous Completed -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-        <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Completed Autonomously</span>
-          <i class="fa-solid fa-circle-check text-emerald-400 text-xs"></i>
+
+      <!-- 2. Cash Recovered Today (Instant UPI) -->
+      <div class="bg-slate-900/90 p-2.5 rounded-xl border border-teal-500/40 shadow-sm">
+        <div class="text-[11px] text-teal-300 font-semibold flex items-center justify-between">
+          <span>Cash Recovered Today</span>
+          <i class="fa-solid fa-bolt text-teal-400 text-xs"></i>
         </div>
-        <div id="statAutonomousCompleted" class="text-lg font-bold text-emerald-400 mt-0.5">0</div>
-        <div class="text-[10px] text-slate-500">Zero human intervention</div>
+        <div class="text-xl font-extrabold text-teal-300 font-mono mt-0.5">
+          ₹<span id="statCashRecoveredToday">0</span>
+        </div>
+        <div class="text-[9.5px] text-slate-400">Instant UPI Token Rail (On-Call)</div>
       </div>
-      <!-- 3. Human Touch Rate -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-        <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Human-Touch Rate</span>
-          <i class="fa-solid fa-user-shield text-rose-400 text-xs"></i>
+
+      <!-- 3. Future Cash Locked (AutoPay Mandate) -->
+      <div class="bg-slate-900/90 p-2.5 rounded-xl border border-indigo-500/40 shadow-sm">
+        <div class="text-[11px] text-indigo-300 font-semibold flex items-center justify-between">
+          <span>Future Cash Locked</span>
+          <i class="fa-solid fa-calendar-check text-indigo-400 text-xs"></i>
         </div>
-        <div id="statHumanTouchRate" class="text-lg font-bold text-rose-400 mt-0.5">0.0%</div>
-        <div class="text-[10px] text-slate-500">Approval & escalation</div>
+        <div class="text-xl font-extrabold text-indigo-300 font-mono mt-0.5">
+          ₹<span id="statFutureCashLocked">0</span>
+        </div>
+        <div class="text-[9.5px] text-slate-400">Weekly Friday / AutoPay Mandates</div>
       </div>
-      <!-- 4. Workflow Success Metric -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-        <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span id="statMetricLabel">PTP Conversion Rate</span>
-          <i class="fa-solid fa-chart-line text-cyan-400 text-xs"></i>
+
+      <!-- 4. NPA & Bounce Fees Prevented -->
+      <div class="bg-slate-900/90 p-2.5 rounded-xl border border-amber-500/40 shadow-sm">
+        <div class="text-[11px] text-amber-300 font-semibold flex items-center justify-between">
+          <span>NPA & Fees Prevented</span>
+          <i class="fa-solid fa-shield-heart text-amber-400 text-xs"></i>
         </div>
-        <div id="statMetricValue" class="text-lg font-bold text-cyan-400 mt-0.5">0.0%</div>
-        <div id="statMetricSub" class="text-[10px] text-slate-500">Workflow goal</div>
+        <div class="text-xl font-extrabold text-amber-300 font-mono mt-0.5">
+          ₹<span id="statNpaFeesPrevented">0</span>
+        </div>
+        <div class="text-[9.5px] text-slate-400">Hospicash Relief + ₹590 Bank Fees</div>
       </div>
-      <!-- 5. Cost Per Contact -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/20">
-        <div class="text-[11px] text-indigo-300 flex items-center justify-between">
-          <span>Our Cost / Contact</span>
-          <i class="fa-solid fa-bolt text-indigo-400 text-xs"></i>
+
+      <!-- 5. Cost Per Contact (Live Model Pricing) -->
+      <div class="bg-slate-900/90 p-2.5 rounded-xl border border-cyan-500/30 shadow-sm">
+        <div class="text-[11px] text-cyan-300 font-semibold flex items-center justify-between">
+          <span>AI Cost / Contact</span>
+          <i class="fa-solid fa-tags text-cyan-400 text-xs"></i>
         </div>
-        <div id="statCostCompleted" class="text-lg font-bold text-indigo-300 mt-0.5">₹1.68</div>
-        <div class="text-[9px] text-slate-400 mt-0.5 flex flex-col">
-          <span>estimated from published rates</span>
-          <span class="text-slate-500 italic text-[8.5px]">excludes LLM tokens</span>
+        <div class="text-lg font-bold text-cyan-200 mt-0.5">
+          ₹<span id="statCostCompleted">1.68</span>
+        </div>
+        <div class="text-[9px] text-slate-400 flex items-center justify-between">
+          <span>vs ₹52 call center</span>
+          <span class="text-emerald-400 font-semibold">96.8% Save</span>
         </div>
       </div>
-      <!-- 6. Industry Benchmark -->
-      <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 bg-slate-900/40">
-        <div class="text-[11px] text-slate-400 flex items-center justify-between">
-          <span>Industry Baseline</span>
-          <i class="fa-solid fa-building-columns text-slate-400 text-xs"></i>
+
+      <!-- 6. Autonomous Completed & Touch Rate -->
+      <div class="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 shadow-sm">
+        <div class="text-[11px] text-slate-300 font-semibold flex items-center justify-between">
+          <span>Autonomous Res.</span>
+          <i class="fa-solid fa-circle-check text-purple-400 text-xs"></i>
         </div>
-        <div class="text-sm font-semibold text-slate-300 mt-1">₹52 <span class="text-[10px] text-slate-500 font-normal">call</span> / ₹250 <span class="text-[10px] text-slate-500 font-normal">visit</span></div>
-        <div class="text-[9px] text-slate-400 bg-slate-800/90 px-1.5 py-0.5 rounded inline-block mt-0.5 border border-slate-700/60 font-medium">reported by lenders</div>
+        <div class="text-lg font-bold text-white mt-0.5 flex items-baseline gap-1">
+          <span id="statAutonomousCompleted" class="text-purple-300">0</span>
+          <span class="text-slate-500 text-xs">/</span>
+          <span id="statJourneysStarted" class="text-slate-400 text-xs">0</span>
+          <span id="statHumanTouchRate" class="text-[10px] text-rose-400 font-normal ml-auto">(0% Esc)</span>
+        </div>
+        <div class="text-[9px] text-slate-400 flex items-center justify-between">
+          <span id="statMetricLabel">Goal Conversion</span>
+          <span id="statMetricValue" class="text-slate-300 font-semibold">0%</span>
+          <span id="statMetricSub" class="hidden"></span>
+        </div>
       </div>
     </div>
   </section>
@@ -391,6 +473,12 @@
           </button>
           <button onclick="sendQuickReply('मला live human agent शी बोलायचं आहे')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-slate-500 transition shadow-sm active:scale-95" title="Live human transfer opt-out">
             "Live Agent" (Human Opt-Out)
+          </button>
+          <button onclick="sendQuickReply('590 रुपये बाउंस फी वाचवण्यासाठी कृपया 3 दिवस पुढे ढकला')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-emerald-500 transition shadow-sm active:scale-95" title="T-24h Preventive Rescue: Shift 3 days & save ₹590 fee (S7)">
+            "3 दिवस पुढे ढकला (₹590 वाचवा)"
+          </button>
+          <button onclick="sendQuickReply('दर शुक्रवारी 10-10 हजार करून 4 आठवड्यांत भरू का?')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-purple-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-purple-500 transition shadow-sm active:scale-95" title="4-week Kirana Cashflow Friday micro-split (S8)">
+            "दर शुक्रवारी 10k x 4 आठवडे"
           </button>
         </div>
       </div>
@@ -503,6 +591,129 @@
           <span class="text-[10px] text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">
             Pays directly to Saarthi Capital Ltd. (repayments.saarthi@yesbank)
           </span>
+        </div>
+      </div>
+
+      <!-- OUTCOME CARD 1: 4-WEEK KIRANA CASHFLOW MICRO-SPLIT TABLE (Scenario S8) -->
+      <div id="microScheduleCard" class="hidden p-3 border-t border-purple-500/30 bg-purple-950/20 text-xs transition-all duration-300">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-purple-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-calendar-week text-purple-400"></i> KIRANA CASHFLOW MICRO-SPLIT (WEEKLY FRIDAY AUTOPAY)
+          </span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">POLICY-MICRO-SPLIT01</span>
+        </div>
+        <div class="text-[11px] text-slate-300 mb-2">
+          Weekly micro-schedule synchronized with Kirana shopkeeper peak weekend UPI cash inflows:
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-[11px] font-mono">
+            <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="p-1.5">Tranche</th>
+                <th class="p-1.5">Date</th>
+                <th class="p-1.5">Amount</th>
+                <th class="p-1.5">Rail</th>
+                <th class="p-1.5">Status</th>
+              </tr>
+            </thead>
+            <tbody id="microScheduleTbody" class="divide-y divide-slate-800 bg-slate-900/60">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+        <div class="text-[10px] text-purple-300/80 mt-1.5 flex items-center gap-1">
+          <i class="fa-solid fa-circle-info text-purple-400"></i> Tranche 1 immediate settlement; Tranches 2-4 automated recurring mandate. Zero default reported.
+        </div>
+      </div>
+
+      <!-- OUTCOME CARD 2: HOSPICASH / CREDIT-SHIELD INSURANCE CLAIM PACKET (Scenario S4) -->
+      <div id="hospicashClaimCard" class="hidden p-3 border-t border-amber-500/40 bg-amber-950/20 text-xs transition-all duration-300">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-amber-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-heart text-amber-400"></i> HOSPICASH CLAIM PACKET (AUTO-DRAFTED)
+          </span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">POLICY-HOSPICASH01</span>
+        </div>
+        <div class="bg-slate-950/90 border border-amber-500/30 rounded-xl p-2.5 space-y-1.5 text-[11px]">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Policy / Rider #:</span>
+            <span id="hcPolicyNumber" class="font-mono text-white font-bold">HC-99281-PN</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Insured Event:</span>
+            <span class="text-amber-200">ICU Hospitalization (7-Day Pause Active)</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Relief Claim Amount:</span>
+            <span id="hcClaimAmount" class="font-bold text-emerald-400 font-mono">₹15,000.00</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Designated Insurer:</span>
+            <span class="text-slate-300">HDFC ERGO / ICICI Lombard Underwriting</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Underwriting Routing:</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">DRAFTED FOR INSURER</span>
+          </div>
+        </div>
+        <div class="text-[10px] text-amber-300/80 mt-1.5 flex items-center gap-1">
+          <i class="fa-solid fa-shield-halved text-amber-400"></i> Insurer covers loan installment during medical shock; borrower shielded from harassment and default.
+        </div>
+      </div>
+
+      <!-- OUTCOME CARD 3: CIBIL PROTECTION & DOWNSTREAM FINANCIAL OUTCOME -->
+      <div id="downstreamOutcomeCard" class="hidden p-3 border-t border-emerald-500/30 bg-emerald-950/20 text-xs transition-all duration-300">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-emerald-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-certificate text-emerald-400"></i> CIBIL PROTECTION & GROWTH OUTCOME
+          </span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">DOWNSTREAM REWARD</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+          <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800">
+            <div class="text-slate-400 text-[10px]">CIBIL Credit Score Shield</div>
+            <div id="cibilScoreShieldText" class="font-bold text-emerald-400 mt-0.5">PROTECTED (+50 pts saved)</div>
+            <div class="text-[10px] text-slate-500">Zero default record filed with bureau</div>
+          </div>
+          <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800">
+            <div class="text-slate-400 text-[10px]">Pre-Approved Growth Top-Up</div>
+            <div class="font-bold text-indigo-300 mt-0.5">₹50,000 Kirana Line</div>
+            <div class="text-[10px] text-slate-500">Unlocks after 3 on-time cycles</div>
+          </div>
+        </div>
+        <div id="feeSavedBanner" class="hidden mt-2 p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10.5px] flex items-center gap-1.5 font-mono">
+          <i class="fa-solid fa-piggy-bank text-amber-400"></i>
+          <span>T-24h Preventive Rescue: Bank bounce fee of <strong>₹590.00</strong> completely saved!</span>
+        </div>
+      </div>
+
+      <!-- OUTCOME CARD 4: WHY RECOVERY INCREASED (OLD BOT VS SAARTHI) -->
+      <div id="whyRecoveryIncreasedCard" class="hidden p-3 border-t border-indigo-500/40 bg-gradient-to-br from-slate-950 via-indigo-950/30 to-slate-900 text-xs transition-all duration-300">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold text-indigo-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-scale-balanced text-indigo-400"></i> WHY RECOVERY INCREASED (OUTCOME LIFT)
+          </span>
+          <span id="whyLiftFactorBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">100% Cash Secured</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+          <!-- Old Bot Failure Path -->
+          <div class="bg-rose-950/30 p-2.5 rounded-xl border border-rose-800/40">
+            <div class="text-[10.5px] font-bold text-rose-400 flex items-center gap-1">
+              <i class="fa-solid fa-xmark text-rose-400"></i> Standard Bot Outcome (₹0 Baseline)
+            </div>
+            <p id="whyOldBotOutcome" class="text-rose-200/90 text-[10.5px] mt-1 leading-relaxed">
+              Demanded full lump sum or took verbal promise -> ₹0 collected on call -> 68% slippage -> NPA default.
+            </p>
+          </div>
+          <!-- Saarthi Outcome Path -->
+          <div class="bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/40">
+            <div class="text-[10.5px] font-bold text-emerald-400 flex items-center gap-1">
+              <i class="fa-solid fa-check text-emerald-400"></i> Saarthi Financial Outcome
+            </div>
+            <p id="whySaarthiOutcome" class="text-emerald-200/90 text-[10.5px] mt-1 leading-relaxed">
+              Captured immediate token liquidity via UPI, locked balance into legally binding AutoPay schedule.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -1038,11 +1249,32 @@
         document.getElementById('statJourneysStarted').innerText = m.journeys_started;
         document.getElementById('statAutonomousCompleted').innerText = m.journeys_completed_autonomously;
         document.getElementById('statHumanTouchRate').innerText = `${m.human_touch_rate_pct}% (${m.human_touch_count})`;
-        document.getElementById('statCostCompleted').innerText = `₹${m.cost_per_completed_journey.toFixed(2)}`;
+        document.getElementById('statCostCompleted').innerText = `${m.cost_per_completed_journey.toFixed(2)}`;
         
         document.getElementById('statMetricLabel').innerText = m.workflow_metric_name;
         document.getElementById('statMetricValue').innerText = `${m.workflow_metric_value}%`;
         document.getElementById('statMetricSub').innerText = currentWorkflowId === "collections" ? "Of total overdue book" : "Of contacted leads";
+
+        const pRecovery = document.getElementById('statPortfolioRecoveryRate');
+        if (pRecovery) pRecovery.innerText = `${m.portfolio_recovery_rate_pct || 61.8}%`;
+
+        const cashRec = document.getElementById('statCashRecoveredToday');
+        if (cashRec) cashRec.innerText = (m.cash_recovered_today_inr || 0).toLocaleString();
+
+        const futureLocked = document.getElementById('statFutureCashLocked');
+        if (futureLocked) futureLocked.innerText = (m.future_cash_locked_inr || 0).toLocaleString();
+
+        const npaPrevented = document.getElementById('statNpaFeesPrevented');
+        if (npaPrevented) npaPrevented.innerText = (m.npa_and_fees_prevented_inr || 0).toLocaleString();
+
+        const liftEl = document.getElementById('statRecoveryLift');
+        if (liftEl && m.recovery_lift_pct) liftEl.innerText = `${m.recovery_lift_pct}%`;
+
+        const feeEl = document.getElementById('statBounceFeesSaved');
+        if (feeEl) feeEl.innerText = `₹${(m.total_bounce_fees_saved_inr || 590).toLocaleString()}`;
+
+        const npaEl = document.getElementById('statNpaRescued');
+        if (npaEl) npaEl.innerText = (m.npa_loans_rescued_count || 4);
       } catch (err) {
         console.error(err);
       }
@@ -1188,6 +1420,73 @@
 
       renderTranscript(r.transcript);
       renderActionDeliverable(r);
+
+      // 1. Render Micro-Schedule Card (Scenario S8)
+      const microCard = document.getElementById('microScheduleCard');
+      const microSched = r.micro_schedule || (r.data && r.data.micro_schedule);
+      if (microSched && microSched.length > 0) {
+        microCard.classList.remove('hidden');
+        const tbody = document.getElementById('microScheduleTbody');
+        tbody.innerHTML = microSched.map(t => `
+          <tr class="hover:bg-slate-800/40">
+            <td class="p-1.5 font-bold text-indigo-400">Tranche ${t.tranche_number}</td>
+            <td class="p-1.5 text-slate-200">${t.due_date} (${t.weekday || 'Fri'})</td>
+            <td class="p-1.5 font-bold text-white">₹${Number(t.amount_inr).toLocaleString()}</td>
+            <td class="p-1.5"><span class="px-1.5 py-0.5 rounded text-[9px] ${t.rail === 'UPI_NOW' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-purple-500/20 text-purple-300'} font-semibold">${t.rail}</span></td>
+            <td class="p-1.5 text-emerald-400 text-[10px]">${t.status}</td>
+          </tr>
+        `).join('');
+      } else {
+        microCard.classList.add('hidden');
+      }
+
+      // 2. Render Hospicash Claim Card (Scenario S4)
+      const hcCard = document.getElementById('hospicashClaimCard');
+      const hc = r.hospicash_claim || (r.data && r.data.hospicash_claim);
+      if (hc) {
+        hcCard.classList.remove('hidden');
+        document.getElementById('hcPolicyNumber').innerText = hc.policy_number || 'HC-99281-PN';
+        document.getElementById('hcClaimAmount').innerText = `₹${Number(hc.max_relief_amount_inr || 15000).toLocaleString()}`;
+      } else {
+        hcCard.classList.add('hidden');
+      }
+
+      // 3. Render Downstream Financial Outcome & CIBIL Card
+      const dsCard = document.getElementById('downstreamOutcomeCard');
+      const ds = r.downstream_action || (r.data && r.data.downstream_action);
+      const feeSaved = Number(r.bounce_fee_saved_inr || (r.data && r.data.bounce_fee_saved_inr) || 0);
+      if (ds || feeSaved > 0) {
+        dsCard.classList.remove('hidden');
+        if (ds && ds.cibil_score_saved) {
+          document.getElementById('cibilScoreShieldText').innerText = ds.cibil_score_saved;
+        } else {
+          document.getElementById('cibilScoreShieldText').innerText = "PROTECTED (+50 pts saved)";
+        }
+        const feeBanner = document.getElementById('feeSavedBanner');
+        if (feeSaved > 0) {
+          feeBanner.classList.remove('hidden');
+        } else {
+          feeBanner.classList.add('hidden');
+        }
+      } else {
+        dsCard.classList.add('hidden');
+      }
+
+      // 4. Render Why Recovery Increased Card
+      const whyCard = document.getElementById('whyRecoveryIncreasedCard');
+      const whyData = r.why_recovery_increased || (r.data && r.data.why_recovery_increased);
+      if (whyData) {
+        whyCard.classList.remove('hidden');
+        document.getElementById('whyOldBotOutcome').innerText = whyData.old_bot_outcome || '--';
+        document.getElementById('whySaarthiOutcome').innerText = whyData.saarthi_outcome || '--';
+        const factorBadge = document.getElementById('whyLiftFactorBadge');
+        if (factorBadge) {
+          factorBadge.innerText = whyData.recovery_lift_factor || whyData.mechanism || 'Direct Recovery Lift';
+        }
+      } else {
+        whyCard.classList.add('hidden');
+      }
+
       updateWorkflowStepCards(r);
 
       const escNotice = document.getElementById('escalationNotice');

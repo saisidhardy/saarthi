@@ -160,6 +160,66 @@ def run_action_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None,
     if decision_data and decision_data.get("effective_amount"):
         effective_amt = float(decision_data["effective_amount"])
 
+    # 1. Micro-Split Action Rail
+    if record.micro_schedule and len(record.micro_schedule) > 0:
+        first_tranche = record.micro_schedule[0]
+        record.payment_link = first_tranche.get("payment_link")
+        record.payment_status = "sent"
+        
+        schedule_text = "\n".join([
+            f"• हप्ता {t['tranche_number']} ({t['due_date']}, {t['weekday']}): ₹{t['amount_inr']:,.0f} [{t['rail']}]"
+            for t in record.micro_schedule
+        ])
+        
+        wa_msg = f"""प्रिय {record.customer_name}जी,
+सारथी कॅपिटल: किराणा कॅशफ्लो धोरणानुसार आपल्या ₹{record.amount_due:,.0f} थकीत कर्जाचे ४ आठवड्यांचे UPI AutoPay शेड्युल मंजूर करण्यात आले आहे:
+
+{schedule_text}
+
+पहिला हप्ता (तात्काळ UPI लिंक):
+{record.payment_link}
+
+पुढील हप्त्यांसाठी (Tranches 2-4) AutoPay मॅन्डेट लिंक:
+upi://mandate?pa={lender_vpa}&pn=Saarthi+AutoPay&am={first_tranche['amount_inr']:.2f}&recurrence=WEEKLY&cu=INR
+
+तक्रार निवारण अधिकारी: {pno.get('name', 'श्री आलोक वर्मा')} ({pno.get('phone', '022-68994400')}).
+(थेट {lender_name} खात्यात जमा होतो - Demo)"""
+        record.data["whatsapp_message"] = wa_msg
+
+        record.add_trace(
+            agent="Action",
+            action="Kirana 4x Micro-Split AutoPay Schedule Dispatched",
+            summary=f"Dispatched 4-week Friday schedule ({schedule_text.splitlines()[0]}...). Tranche 1 UPI link & Tranches 2-4 AutoPay mandate issued.",
+            badge="Event Trigger"
+        )
+        return record
+
+    # 2. T-24h Preventive Bounce Rescue Action Rail
+    if record.trigger_type == "PRE_DUE_T24H" or record.bounce_fee_saved_inr > 0:
+        record.payment_status = "rescheduled"
+        if not record.payment_link:
+            record.payment_link = f"upi://pay?pa={lender_vpa}&pn=Saarthi+Buffer&am=6000.00&tr={idem_key}&cu=INR"
+        
+        wa_msg = f"""प्रिय {record.customer_name}जी,
+सारथी कॅपिटल: आपल्या विनंतीनुसार ईएमआय ऑटो-डेबिट तारीख ३ दिवस पुढे ढकलण्यात आली आहे ({record.ptp_date}).
+
+• बँक बाउंस फी बचत: ₹590.00 (वाचवली)
+• सिबिल स्कोअर: १००% सुरक्षित
+• पर्यायी लिक्विडिटी बफर टॉप-अप (₹6,000): {record.payment_link}
+
+तक्रार निवारण अधिकारी: {pno.get('name', 'श्री आलोक वर्मा')} ({pno.get('phone', '022-68994400')}).
+(थेट {lender_name} खात्यात - Demo)"""
+        record.data["whatsapp_message"] = wa_msg
+
+        record.add_trace(
+            agent="Action",
+            action="T-24h Preventive Debit Shift & Fee Protection Dispatched",
+            summary=f"Proactive AutoPay date shifted to {record.ptp_date}. Saved ₹590 bounce fee and protected CIBIL score.",
+            badge="Event Trigger"
+        )
+        return record
+
+    # Standard Collections Action
     # UPI deep link directly to regulated lender's escrow account
     if not record.payment_link:
         record.payment_link = f"upi://pay?pa={lender_vpa}&pn=Saarthi+Capital+Repayments&am={effective_amt:.2f}&tr={idem_key}&cu=INR"

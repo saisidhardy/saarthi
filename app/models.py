@@ -26,7 +26,7 @@ class LLMProposal(BaseModel):
 
 class PolicyDecision(BaseModel):
     status: str  # 'APPROVED' | 'CLAMPED' | 'BLOCKED' | 'ESCALATED' | 'SENSITIVE_PAUSE'
-    rule_id: str  # e.g. 'POLICY-WAIVER-NO01', 'POLICY-PTP-MAX01', 'FAIR-PRAC-SENS01'
+    rule_id: str  # e.g. 'POLICY-WAIVER-NO01', 'POLICY-PTP-MAX01', 'FAIR-PRAC-SENS01', 'POLICY-PREV-FEE01', 'POLICY-MICRO-SPLIT01'
     yaml_line: int  # Line number in collections_rules.yaml
     yaml_file: str = "policies/collections_rules.yaml"
     effective_amount: float
@@ -38,6 +38,14 @@ class PolicyDecision(BaseModel):
     action_permitted: bool = False
     llm_proposed_summary: str
     engine_decision_summary: str
+    micro_schedule: Optional[List[Dict[str, Any]]] = None
+    bounce_fee_saved_inr: float = 0.0
+    hospicash_claim: Optional[Dict[str, Any]] = None
+    root_cause: Optional[str] = None
+    downstream_action: Optional[Dict[str, Any]] = None
+    instant_recovered_inr: float = 0.0
+    locked_mandate_inr: float = 0.0
+    why_recovery_increased: Optional[Dict[str, Any]] = None
 
 class JourneyRecord(BaseModel):
     id: str
@@ -71,7 +79,11 @@ class JourneyRecord(BaseModel):
                 "do_not_contact_until", "attempts_count", "call_start", "call_end",
                 "preferred_contact_window", "intent", "sentiment", "offer_made", 
                 "ptp_date", "confidence", "payment_link", "payment_status", 
-                "audit_pass", "audit_reason"
+                "audit_pass", "audit_reason", "trigger_type", "micro_schedule",
+                "has_hospicash_rider", "policy_number", "hospicash_claim",
+                "bounce_fee_saved_inr", "root_cause", "downstream_action",
+                "pre_due_balance_inr", "instant_recovered_inr", "locked_mandate_inr",
+                "why_recovery_increased"
             ]:
                 if k in values:
                     data[k] = values[k]
@@ -285,6 +297,105 @@ class JourneyRecord(BaseModel):
 
     @computed_field
     @property
+    def trigger_type(self) -> str:
+        return str(self.data.get("trigger_type", "POST_BOUNCE"))
+
+    @trigger_type.setter
+    def trigger_type(self, val: str):
+        self.data["trigger_type"] = val
+
+    @computed_field
+    @property
+    def micro_schedule(self) -> Optional[List[Dict[str, Any]]]:
+        return self.data.get("micro_schedule")
+
+    @micro_schedule.setter
+    def micro_schedule(self, val: Optional[List[Dict[str, Any]]]):
+        self.data["micro_schedule"] = val
+
+    @computed_field
+    @property
+    def has_hospicash_rider(self) -> bool:
+        return bool(self.data.get("has_hospicash_rider", False))
+
+    @has_hospicash_rider.setter
+    def has_hospicash_rider(self, val: bool):
+        self.data["has_hospicash_rider"] = bool(val)
+
+    @computed_field
+    @property
+    def policy_number(self) -> Optional[str]:
+        return self.data.get("policy_number")
+
+    @policy_number.setter
+    def policy_number(self, val: Optional[str]):
+        self.data["policy_number"] = val
+
+    @computed_field
+    @property
+    def hospicash_claim(self) -> Optional[Dict[str, Any]]:
+        return self.data.get("hospicash_claim")
+
+    @hospicash_claim.setter
+    def hospicash_claim(self, val: Optional[Dict[str, Any]]):
+        self.data["hospicash_claim"] = val
+
+    @computed_field
+    @property
+    def bounce_fee_saved_inr(self) -> float:
+        return float(self.data.get("bounce_fee_saved_inr", 0.0))
+
+    @bounce_fee_saved_inr.setter
+    def bounce_fee_saved_inr(self, val: float):
+        self.data["bounce_fee_saved_inr"] = float(val)
+
+    @computed_field
+    @property
+    def root_cause(self) -> Optional[str]:
+        return self.data.get("root_cause")
+
+    @root_cause.setter
+    def root_cause(self, val: Optional[str]):
+        self.data["root_cause"] = val
+
+    @computed_field
+    @property
+    def downstream_action(self) -> Optional[Dict[str, Any]]:
+        return self.data.get("downstream_action")
+
+    @downstream_action.setter
+    def downstream_action(self, val: Optional[Dict[str, Any]]):
+        self.data["downstream_action"] = val
+
+    @computed_field
+    @property
+    def instant_recovered_inr(self) -> float:
+        return float(self.data.get("instant_recovered_inr", 0.0))
+
+    @instant_recovered_inr.setter
+    def instant_recovered_inr(self, val: float):
+        self.data["instant_recovered_inr"] = float(val)
+
+    @computed_field
+    @property
+    def locked_mandate_inr(self) -> float:
+        return float(self.data.get("locked_mandate_inr", 0.0))
+
+    @locked_mandate_inr.setter
+    def locked_mandate_inr(self, val: float):
+        self.data["locked_mandate_inr"] = float(val)
+
+    @computed_field
+    @property
+    def why_recovery_increased(self) -> Optional[Dict[str, Any]]:
+        return self.data.get("why_recovery_increased")
+
+    @why_recovery_increased.setter
+    def why_recovery_increased(self, val: Optional[Dict[str, Any]]):
+        self.data["why_recovery_increased"] = val
+
+    @computed_field
+    @property
     def masked_phone(self) -> str:
         clean = self.phone.replace(" ", "").replace("-", "")
         if len(clean) >= 4:
@@ -350,6 +461,14 @@ class EngineMetrics(BaseModel):
     workflow_metric_value: float
     industry_call_centre_cost: float = 52.00
     industry_field_visit_cost: float = 250.00
+    recovery_lift_pct: float = 61.2
+    baseline_recovery_pct: float = 34.0
+    portfolio_recovery_rate_pct: float = 61.8
+    total_bounce_fees_saved_inr: float = 0.0
+    npa_loans_rescued_count: int = 0
+    cash_recovered_today_inr: float = 0.0
+    future_cash_locked_inr: float = 0.0
+    npa_and_fees_prevented_inr: float = 0.0
     details: Dict[str, Any] = Field(default_factory=dict)
 
     # Convenience properties for backward compatibility

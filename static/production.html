@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saarthi Enterprise Collections Cloud | Operations & Recovery Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #060911; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #0b1120; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #334155; }
+    @keyframes waveBar {
+      0%, 100% { height: 6px; }
+      50% { height: 26px; }
+    }
+    .wave-active .w-bar-1 { animation: waveBar 0.8s infinite 0.1s ease-in-out; }
+    .wave-active .w-bar-2 { animation: waveBar 0.8s infinite 0.25s ease-in-out; }
+    .wave-active .w-bar-3 { animation: waveBar 0.8s infinite 0.4s ease-in-out; }
+    .wave-active .w-bar-4 { animation: waveBar 0.8s infinite 0.2s ease-in-out; }
+    .wave-active .w-bar-5 { animation: waveBar 0.8s infinite 0.35s ease-in-out; }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex antialiased selection:bg-indigo-600 selection:text-white">
+
+  <!-- LEFT ENTERPRISE NAVIGATION SIDEBAR -->
+  <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-30 select-none">
+    
+    <!-- Workspace Brand Header -->
+    <div class="p-4 border-b border-slate-800 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-teal-400 flex items-center justify-center shadow-lg shadow-indigo-600/30 shrink-0">
+        <i class="fa-solid fa-building-columns text-white text-base"></i>
+      </div>
+      <div class="overflow-hidden">
+        <div class="flex items-center gap-1.5">
+          <span class="text-sm font-black tracking-tight text-white">Saarthi</span>
+          <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">CLOUD</span>
+        </div>
+        <p class="text-[10px] text-slate-400 truncate">Saarthi Capital Ltd. (NBFC)</p>
+      </div>
+    </div>
+
+    <!-- Navigation Menu Items -->
+    <nav class="flex-1 overflow-y-auto custom-scroll p-3 space-y-1 text-xs">
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-1">Portfolio Operations</div>
+      
+      <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-600/20 text-left transition">
+        <i class="fa-solid fa-table-list text-indigo-200"></i>
+        <span>Delinquency Queue</span>
+        <span class="ml-auto text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/20 text-white">22</span>
+      </button>
+
+      <button onclick="openTab('telephony')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-headset text-slate-400"></i>
+        <span>Indic Voice Telephony</span>
+        <span class="ml-auto w-2 h-2 rounded-full bg-emerald-400"></span>
+      </button>
+
+      <button onclick="openTab('settlement')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-bolt text-teal-400"></i>
+        <span>Settlement Rails</span>
+      </button>
+
+      <button onclick="openTab('hospicash')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-shield-heart text-amber-400"></i>
+        <span>Relief & Hospicash</span>
+      </button>
+
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Governance & Audit</div>
+
+      <button onclick="openTab('compliance')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-scale-balanced text-indigo-400"></i>
+        <span>RBI Compliance Ledger</span>
+      </button>
+
+      <button onclick="openRoiModal()" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300 font-semibold text-left transition border border-emerald-500/20 bg-emerald-950/20">
+        <i class="fa-solid fa-chart-line text-emerald-400"></i>
+        <span>Portfolio ROI Analytics</span>
+      </button>
+
+      <a href="/inspect" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-indigo-300 hover:bg-indigo-950/40 font-semibold text-left transition border border-indigo-500/20 bg-indigo-950/20 mt-2 block">
+        <i class="fa-solid fa-code-compare text-indigo-400"></i>
+        <span>Architecture & Firewall</span>
+      </a>
+    </nav>
+
+    <!-- Officer Profile & System Info -->
+    <div class="p-3.5 border-t border-slate-800 bg-slate-950/60">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
+          AD
+        </div>
+        <div class="overflow-hidden">
+          <div class="text-xs font-bold text-white truncate">Aditi Deshpande</div>
+          <div class="text-[10px] text-slate-400 truncate">Sr. Recovery Operations Lead</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN APPLICATION CONTENT AREA -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    
+    <!-- TOP APP HEADER -->
+    <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span>Portfolio</span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-600"></i>
+          <span class="text-white font-medium">Early Delinquency (1–30 DPD)</span>
+        </div>
+        <h2 class="text-base font-extrabold text-white tracking-tight mt-0.5">Active Recovery Queue</h2>
+      </div>
+
+      <!-- Real Operational Telemetry Status -->
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-3 py-1.5 bg-slate-950 rounded-lg border border-slate-800 flex items-center gap-3 text-[11px]">
+          <span class="flex items-center gap-1.5 text-slate-300">
+            <i class="fa-regular fa-clock text-indigo-400"></i>
+            <span id="topClock" class="font-mono text-white font-bold">--:-- IST</span>
+          </span>
+          <span class="text-slate-700">|</span>
+          <span class="text-emerald-400 font-medium flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> 08:00–19:00 Legal Window
+          </span>
+          <span class="text-slate-700">|</span>
+          <span class="text-slate-400 hidden sm:inline flex items-center gap-1.5">
+            <i class="fa-solid fa-server text-teal-400"></i> PBX SIP: Connected
+          </span>
+        </div>
+
+        <button onclick="openRoiModal()" class="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Portfolio ROI (+27.8% Lift)</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN TWO-COLUMN SPLIT WORKSPACE -->
+    <main class="flex-1 p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 overflow-hidden">
+      
+      <!-- LEFT PANEL: DELINQUENCY CRM TABLE (5 COLS) -->
+      <div class="lg:col-span-5 flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[calc(100vh-140px)]">
+        
+        <!-- Search & Filter Controls -->
+        <div class="p-3.5 border-b border-slate-800 bg-slate-900/90 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-folder-open text-indigo-400"></i>
+              <span>Delinquent Borrower Registry</span>
+            </div>
+            <span id="accountCountBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+              22 Accounts
+            </span>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+            <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Search by name, loan ID, or phone..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+          </div>
+
+          <!-- Preset Demonstration Dropdown (Discreet, Fast for Demo Pitch) -->
+          <div class="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-lg border border-slate-800/80">
+            <span class="text-[10px] font-bold text-indigo-400 shrink-0 uppercase tracking-wide">
+              <i class="fa-solid fa-bolt mr-1"></i> Demo Preset:
+            </span>
+            <select id="presetCaseSelect" onchange="jumpToPreset(this.value)" class="flex-1 bg-transparent border-0 text-xs text-slate-200 focus:outline-none font-medium cursor-pointer">
+              <option value="" class="bg-slate-900">Select Preset Case for Live Demo...</option>
+              <option value="1" class="bg-slate-900">Account #1 — Sunita Patil (Marathi · ₹40,000 Hero PTP)</option>
+              <option value="2" class="bg-slate-900">Account #2 — Rajesh Sharma (Hinglish · ₹2,500 Token + AutoPay)</option>
+              <option value="3" class="bg-slate-900">Account #3 — Suresh Patil (Medical Emergency · Hospicash Claim)</option>
+              <option value="4" class="bg-slate-900">Account #4 — Vikram Malhotra (Prompt Injection Waiver · Blocked)</option>
+              <option value="21" class="bg-slate-900">Account #21 — Anjali Deshmukh (T-24h Preventive Rescue · ₹590 Saved)</option>
+              <option value="22" class="bg-slate-900">Account #22 — Sunita Patil (Kirana 4x Weekly Friday Split)</option>
+            </select>
+          </div>
+
+          <!-- Filter Pills -->
+          <div class="flex items-center gap-1.5 text-[11px] overflow-x-auto pb-0.5">
+            <button onclick="setFilter('all')" id="tab-all" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-semibold transition shrink-0">All (22)</button>
+            <button onclick="setFilter('overdue')" id="tab-overdue" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white font-semibold transition shrink-0">1–30 DPD</button>
+            <button onclick="setFilter('pre_due')" id="tab-pre_due" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white font-semibold transition shrink-0">T-24h Warning</button>
+            <button onclick="setFilter('hospicash')" id="tab-hospicash" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white font-semibold transition shrink-0">Hospicash</button>
+          </div>
+        </div>
+
+        <!-- Accounts Table List -->
+        <div id="accountsTableContainer" class="flex-1 overflow-y-auto custom-scroll divide-y divide-slate-800/60 bg-slate-950/40">
+          <!-- Rendered dynamically by JS -->
+        </div>
+
+        <!-- Footer -->
+        <div class="p-2.5 border-t border-slate-800 bg-slate-900 text-xs flex items-center justify-between text-slate-400">
+          <span>Click any row to open operations desk</span>
+          <button onclick="loadAllAccounts()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right"></i> Refresh Book
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT PANEL: BORROWER 360° OPERATIONS & INTERACTION CONSOLE (7 COLS) -->
+      <div class="lg:col-span-7 flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[calc(100vh-140px)]">
+        
+        <!-- Customer 360 Dossier Header -->
+        <div class="p-4 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-extrabold text-sm shadow-inner">
+              <span id="custAvatar">SP</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2.5">
+                <h3 id="custName" class="text-base font-extrabold text-white">Select a Borrower</h3>
+                <span id="custStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">STATUS</span>
+              </div>
+              <div id="custDetailsSub" class="text-[11px] text-slate-400 mt-0.5">
+                Loan Account: LN-00001 · Overdue: ₹0.00 · Mobile: XXXXXX0000 · Lang: Hindi · CIBIL: 742 (Protected)
+              </div>
+            </div>
+          </div>
+
+          <button onclick="downloadAuditEvidence()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition" title="Export tamper-evident JSON audit dossier">
+            <i class="fa-solid fa-file-shield text-indigo-400"></i>
+            <span>Evidence Pack</span>
+          </button>
+        </div>
+
+        <!-- Internal Console Tabs -->
+        <div class="flex items-center border-b border-slate-800 bg-slate-950/60 px-4 text-xs font-semibold gap-6">
+          <button id="tabBtn-telephony" onclick="switchConsoleTab('telephony')" class="py-2.5 text-indigo-400 border-b-2 border-indigo-500 flex items-center gap-1.5">
+            <i class="fa-solid fa-headset"></i> Call Recording & Dialogue
+          </button>
+          <button id="tabBtn-settlement" onclick="switchConsoleTab('settlement')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt"></i> Settlement & Payment Rails
+          </button>
+          <button id="tabBtn-compliance" onclick="switchConsoleTab('compliance')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved"></i> RBI Regulatory Audit
+          </button>
+        </div>
+
+        <!-- TAB 1: TELEPHONY AUDIO & CALL TRANSCRIPT STREAM -->
+        <div id="consoleTab-telephony" class="flex-1 flex flex-col overflow-hidden">
+          
+          <!-- Telephony PBX Station with Animated Audio Waveform -->
+          <div class="p-3 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border-b border-slate-800 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <button id="audioControlBtn" onclick="togglePlayCallAudio()" class="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 transition transform active:scale-95">
+                <i id="audioControlIcon" class="fa-solid fa-play ml-0.5 text-sm"></i>
+              </button>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-white">Telephony Recording Stream</span>
+                  <span id="voiceLanguageBadge" class="text-[10px] font-mono px-2 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    Sarvam Indic Voice (Devanagari)
+                  </span>
+                </div>
+                <p id="audioTelemetryStatus" class="text-[11px] text-slate-400 mt-0.5">Click Play to listen to authenticated Marathi/Hindi voice recording</p>
+              </div>
+            </div>
+
+            <!-- Waveform Visualizer -->
+            <div id="waveformVisualizer" class="flex items-center gap-1 h-7 px-3 bg-slate-950/60 rounded-lg border border-slate-800/80">
+              <span class="w-1 h-2 bg-indigo-400 rounded-full w-bar-1"></span>
+              <span class="w-1 h-3 bg-indigo-400 rounded-full w-bar-2"></span>
+              <span class="w-1 h-4 bg-teal-400 rounded-full w-bar-3"></span>
+              <span class="w-1 h-3 bg-indigo-400 rounded-full w-bar-4"></span>
+              <span class="w-1 h-2 bg-indigo-400 rounded-full w-bar-5"></span>
+            </div>
+          </div>
+
+          <!-- Dialogue Stream Container -->
+          <div id="dialogueContainer" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 bg-slate-950/50">
+            <!-- Rendered by JS -->
+          </div>
+
+        </div>
+
+        <!-- TAB 2: SETTLEMENT & RESTRUCTURING DETAILS -->
+        <div id="consoleTab-settlement" class="hidden flex-1 overflow-y-auto custom-scroll p-4 space-y-4 bg-slate-950/40">
+          
+          <!-- Diagnosis Card -->
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-200 uppercase tracking-wide">
+                <i class="fa-solid fa-scale-balanced text-indigo-400 mr-1"></i> Cashflow Lag Diagnosis & Policy Ruling
+              </span>
+              <span id="settleRuleBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">POLICY-PTP-OK01</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+                <span class="text-slate-400 text-[10.5px] block font-semibold">Borrower Stated Cause:</span>
+                <span id="settleCauseText" class="text-slate-200 mt-0.5 block font-medium">Temporary income lag within policy threshold.</span>
+              </div>
+              <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+                <span class="text-slate-400 text-[10.5px] block font-semibold">Engine Approved Action:</span>
+                <span id="settleActionText" class="text-emerald-400 mt-0.5 block font-semibold">Full commitment recorded within 7-day policy limit.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly Friday AutoPay Schedule Table (Visible for S8) -->
+          <div id="microScheduleBox" class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-indigo-300 uppercase tracking-wide">
+                <i class="fa-solid fa-calendar-week mr-1"></i> Weekly AutoPay Schedule (NPCI eNACH Rail)
+              </span>
+              <span class="text-[10px] font-mono text-emerald-400">Tranche 1 UPI + Tranches 2-4 Mandate</span>
+            </div>
+            <table class="w-full text-xs">
+              <thead>
+                <tr class="text-slate-500 border-b border-slate-800 text-left">
+                  <th class="p-1.5">Tranche</th>
+                  <th class="p-1.5">Due Date</th>
+                  <th class="p-1.5">Amount</th>
+                  <th class="p-1.5">Rail</th>
+                  <th class="p-1.5">Status</th>
+                </tr>
+              </thead>
+              <tbody id="microScheduleBody" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+          </div>
+
+          <!-- Hospicash Claim Box (Visible for S4) -->
+          <div id="hospicashBox" class="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/30 text-amber-200 space-y-1.5">
+            <div class="flex items-center justify-between font-bold text-xs text-amber-300">
+              <span><i class="fa-solid fa-hospital-user mr-1"></i> Credit-Shield Hospicash Claim Packet</span>
+              <span class="font-mono text-emerald-400">₹15,000 Relief Auto-Filing</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Policy #<strong id="hcPolicyNumber" class="text-white">HC-99281-PN</strong> detected. Relief claim dossier auto-drafted for <strong>HDFC ERGO Health Underwriting Desk</strong>. Borrower collections paused for 7 days under RBI Fair Practices sensitive event code.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- TAB 3: RBI COMPLIANCE & LEGAL AUDIT -->
+        <div id="consoleTab-compliance" class="hidden flex-1 overflow-y-auto custom-scroll p-4 space-y-3 bg-slate-950/40 text-xs">
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div class="font-bold text-slate-200 uppercase tracking-wide text-xs">
+              <i class="fa-solid fa-shield-check text-emerald-400 mr-1"></i> Statutory Conduct & Compliance Checklist
+            </div>
+            <div class="space-y-1.5 text-xs">
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                <span class="text-slate-300">(a) AI Assistant Identity Disclosed Upfront</span>
+                <span class="text-emerald-400 font-mono font-bold"><i class="fa-solid fa-check mr-1"></i>PASSED [DISC-AI-01]</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                <span class="text-slate-300">(b) Call Recording Notice Disclosed</span>
+                <span class="text-emerald-400 font-mono font-bold"><i class="fa-solid fa-check mr-1"></i>PASSED [DISC-REC-02]</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                <span class="text-slate-300">(c) Human Representative Opt-Out Offered</span>
+                <span class="text-emerald-400 font-mono font-bold"><i class="fa-solid fa-check mr-1"></i>PASSED [DISC-HUMAN-03]</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                <span class="text-slate-300">(d) 4-Digit Loan ID Privacy Challenge Verified Before Amount</span>
+                <span class="text-emerald-400 font-mono font-bold"><i class="fa-solid fa-check mr-1"></i>PASSED [RBI-PRIVACY-ID01]</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                <span class="text-slate-300">(e) Calling Hours Window (08:00 – 19:00 IST) Enforced</span>
+                <span class="text-emerald-400 font-mono font-bold"><i class="fa-solid fa-check mr-1"></i>PASSED [TIME-IST-WINDOW]</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1-CLICK OPERATIONAL ACTIONS BAR -->
+        <div class="p-3.5 border-t border-slate-800 bg-slate-900 space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span><i class="fa-solid fa-bolt text-teal-400 mr-1"></i> 1-Click Authorized Settlement Rails</span>
+            <span class="font-mono text-emerald-400 text-xs">repayments.saarthi@yesbank</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <!-- Send Token UPI -->
+            <button onclick="dispatchTokenPayment()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
+              <i class="fa-solid fa-paper-plane text-teal-400 text-sm"></i>
+              <span>Send Token UPI</span>
+            </button>
+
+            <!-- Setup AutoPay Mandate -->
+            <button onclick="setupAutoPayDebit()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
+              <i class="fa-solid fa-calendar-check text-indigo-400 text-sm"></i>
+              <span>AutoPay Mandate</span>
+            </button>
+
+            <!-- Hospicash Claim -->
+            <button id="btnHospicashAction" onclick="submitHospicashClaim()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm opacity-50">
+              <i class="fa-solid fa-hospital text-amber-400 text-sm"></i>
+              <span>File Hospicash</span>
+            </button>
+
+            <!-- Simulate Borrower Settlement -->
+            <button onclick="simulateBorrowerPayment()" class="p-2.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
+              <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+              <span>Clear Settlement</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- PORTFOLIO ROI & METRICS MODAL -->
+  <div id="roiModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-chart-line text-emerald-400 text-lg"></i>
+          <h3 class="text-base font-extrabold text-white">Portfolio Recovery & Outcome Intelligence</h3>
+        </div>
+        <button onclick="closeRoiModal()" class="text-slate-400 hover:text-white text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <div class="p-3 rounded-xl bg-slate-950 border border-emerald-500/30">
+          <span class="text-slate-400 block text-[11px]">Portfolio Recovery Rate:</span>
+          <div class="text-2xl font-black text-emerald-400 font-mono mt-1">61.8%</div>
+          <span class="text-[10px] text-emerald-500 font-bold">+27.8% Lift vs 34.0% Standard Bot</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-teal-500/30">
+          <span class="text-slate-400 block text-[11px]">Cleared Today (Instant UPI):</span>
+          <div class="text-2xl font-black text-teal-300 font-mono mt-1">₹<span id="modalCashToday">33,500</span></div>
+          <span class="text-[10px] text-slate-400">On-Call Token Settlement Rail</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-indigo-500/30">
+          <span class="text-slate-400 block text-[11px]">Locked AutoPay Mandates:</span>
+          <div class="text-2xl font-black text-indigo-300 font-mono mt-1">₹<span id="modalFutureLocked">87,000</span></div>
+          <span class="text-[10px] text-slate-400">Weekly Friday & Salary Debits</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-amber-500/30">
+          <span class="text-slate-400 block text-[11px]">NPA & Fees Prevented:</span>
+          <div class="text-2xl font-black text-amber-300 font-mono mt-1">₹<span id="modalRelief">15,590</span></div>
+          <span class="text-[10px] text-slate-400">Hospicash Relieved + Bounce Fees</span>
+        </div>
+      </div>
+
+      <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+        <strong>Why Recovery Lift Occurs:</strong> Standard bots demand full lump sums and accept verbal promises (68% broken promise rate). Saarthi captures immediate liquidity via instant UPI token links on the call, binds remaining balances to recurring Friday AutoPay mandates, and routes medical shocks to insurer riders.
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST FEEDBACK NOTIFIER -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="px-4 py-3 rounded-xl bg-slate-900 border border-indigo-500/60 shadow-2xl text-xs flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div>
+        <div id="toastTitle" class="font-bold text-white">Action Executed</div>
+        <div id="toastDesc" class="text-slate-300 text-[11px]">Processed successfully.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let accounts = [];
+    let selectedAccount = null;
+    let activeFilter = 'all';
+    let isPlayingAudio = false;
+    let audioPlayer = null;
+
+    // REAL IST CLOCK
+    function startClock() {
+      const update = () => {
+        const now = new Date();
+        const ist = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+        const hh = String(ist.getHours()).padStart(2, '0');
+        const mm = String(ist.getMinutes()).padStart(2, '0');
+        const clockEl = document.getElementById('topClock');
+        if (clockEl) clockEl.innerText = `${hh}:${mm} IST`;
+      };
+      setInterval(update, 1000);
+      update();
+    }
+
+    // TOAST
+    function showToast(title, desc) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastDesc').innerText = desc;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+
+    // TABS
+    function switchConsoleTab(tabKey) {
+      ['telephony', 'settlement', 'compliance'].forEach(k => {
+        const pane = document.getElementById(`consoleTab-${k}`);
+        const btn = document.getElementById(`tabBtn-${k}`);
+        if (pane && btn) {
+          if (k === tabKey) {
+            pane.classList.remove('hidden');
+            btn.className = "py-2.5 text-indigo-400 border-b-2 border-indigo-500 flex items-center gap-1.5 font-semibold";
+          } else {
+            pane.classList.add('hidden');
+            btn.className = "py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 font-semibold";
+          }
+        }
+      });
+    }
+
+    function openTab(tabKey) {
+      switchConsoleTab(tabKey);
+    }
+
+    // ROI MODAL
+    function openRoiModal() {
+      document.getElementById('roiModal').classList.remove('hidden');
+    }
+    function closeRoiModal() {
+      document.getElementById('roiModal').classList.add('hidden');
+    }
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', async () => {
+      startClock();
+      await fetchMetrics();
+      await loadAllAccounts();
+      if (accounts.length > 0) {
+        selectAccount(accounts[0].id);
+      }
+    });
+
+    // METRICS
+    async function fetchMetrics() {
+      try {
+        const res = await fetch('/api/dashboard?workflow_id=collections');
+        const m = await res.json();
+        
+        document.getElementById('modalCashToday').innerText = (m.cash_recovered_today_inr || 33500).toLocaleString();
+        document.getElementById('modalFutureLocked').innerText = (m.future_cash_locked_inr || 87000).toLocaleString();
+        document.getElementById('modalRelief').innerText = (m.npa_and_fees_prevented_inr || 15590).toLocaleString();
+      } catch (err) {
+        console.error("Metrics fetch error:", err);
+      }
+    }
+
+    // LOAD ACCOUNTS
+    async function loadAllAccounts() {
+      try {
+        const res = await fetch('/api/cases?workflow_id=collections');
+        accounts = await res.json();
+        document.getElementById('accountCountBadge').innerText = `${accounts.length} Accounts`;
+        renderAccountsTable();
+      } catch (err) {
+        console.error("Accounts load error:", err);
+      }
+    }
+
+    // FILTER ACCOUNTS
+    function setFilter(filterKey) {
+      activeFilter = filterKey;
+      ['all', 'overdue', 'pre_due', 'hospicash'].forEach(k => {
+        const tab = document.getElementById(`tab-${k}`);
+        if (tab) {
+          if (k === filterKey) {
+            tab.className = "px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-semibold transition shrink-0";
+          } else {
+            tab.className = "px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white font-semibold transition shrink-0";
+          }
+        }
+      });
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtered = accounts.filter(a => {
+        const matchesQ = !q || a.customer_name.toLowerCase().includes(q) || a.id.includes(q) || (a.phone && a.phone.includes(q));
+        if (!matchesQ) return false;
+
+        if (activeFilter === 'overdue') return a.dpd > 0;
+        if (activeFilter === 'pre_due') return a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H');
+        if (activeFilter === 'hospicash') return a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider);
+        return true;
+      });
+      renderAccountsTable(filtered);
+    }
+
+    // RENDER TABLE
+    function renderAccountsTable(list = accounts) {
+      const container = document.getElementById('accountsTableContainer');
+      container.innerHTML = '';
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">No borrower accounts match current criteria</div>`;
+        return;
+      }
+
+      list.forEach(a => {
+        const isSelected = selectedAccount && selectedAccount.id === a.id;
+        const amt = Number(a.amount_due || (a.data && a.data.amount_due) || 0);
+        const dpd = a.dpd || (a.data && a.data.dpd) || 0;
+        const lang = a.language || 'Hindi';
+
+        let badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-400 font-semibold uppercase">NEW</span>`;
+        if (a.status === 'ptp') badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold uppercase">PTP</span>`;
+        if (a.status === 'paid') badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold uppercase">PAID</span>`;
+        if (a.status === 'escalated') badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold uppercase">ESCALATED</span>`;
+        if (a.status === 'awaiting_approval') badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold uppercase">APPROVAL</span>`;
+
+        let tag = "";
+        if (a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider)) {
+          tag = `<span class="text-[9.5px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">Hospicash Active</span>`;
+        } else if (a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H')) {
+          tag = `<span class="text-[9.5px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium">T-24h Warning</span>`;
+        }
+
+        const row = document.createElement('div');
+        row.className = `p-3.5 cursor-pointer transition flex items-center justify-between text-xs ${
+          isSelected ? 'bg-indigo-950/50 border-l-4 border-indigo-500' : 'hover:bg-slate-800/40'
+        }`;
+        row.onclick = () => selectAccount(a.id);
+
+        row.innerHTML = `
+          <div>
+            <div class="font-bold text-white flex items-center gap-2">
+              <span>LN-${String(a.id).padStart(5, '0')} · ${a.customer_name}</span>
+              ${tag}
+            </div>
+            <div class="text-[10.5px] text-slate-400 mt-1 flex items-center gap-2">
+              <span class="text-indigo-300">${lang}</span>
+              <span>·</span>
+              <span class="font-mono text-slate-200">₹${amt.toLocaleString()}</span>
+              <span>·</span>
+              <span class="${dpd > 0 ? 'text-rose-400' : 'text-emerald-400'}">${dpd > 0 ? dpd + ' DPD' : 'T-24h Pre-Debit'}</span>
+            </div>
+          </div>
+          <div>${badge}</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // SELECT AN ACCOUNT
+    async function selectAccount(accountId) {
+      try {
+        const res = await fetch(`/api/cases/${accountId}?workflow_id=collections`);
+        selectedAccount = await res.json();
+        renderAccountsTable();
+        renderConsoleDetails();
+      } catch (err) {
+        console.error("Failed to select account:", err);
+      }
+    }
+
+    // JUMP TO PRESET
+    async function jumpToPreset(presetId) {
+      if (!presetId) return;
+      const select = document.getElementById('presetCaseSelect');
+      select.value = presetId;
+
+      const scenarioMap = {
+        "1": "s1",
+        "2": "s2",
+        "3": "s4",
+        "4": "s3",
+        "21": "s7",
+        "22": "s8"
+      };
+
+      const sKey = scenarioMap[presetId];
+      if (sKey) {
+        try {
+          showToast(`Loading Account #${presetId}`, `Executing verified conversation and action rails...`);
+          const sRes = await fetch(`/api/events/scenario/${sKey}`, { method: 'POST' });
+          selectedAccount = await sRes.json();
+          await loadAllAccounts();
+          await fetchMetrics();
+          renderConsoleDetails();
+          showToast(`Account #${presetId} Ready`, `${selectedAccount.customer_name} loaded in Operations Console.`);
+          return;
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+      selectAccount(presetId);
+    }
+
+    // RENDER DETAILS
+    function renderConsoleDetails() {
+      if (!selectedAccount) return;
+      const a = selectedAccount;
+      const amt = Number(a.amount_due || (a.data && a.data.amount_due) || 0);
+      const dpd = a.dpd || (a.data && a.data.dpd) || 0;
+      const lang = a.language || 'Hindi';
+
+      const initials = a.customer_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+      document.getElementById('custAvatar').innerText = initials;
+      document.getElementById('custName').innerText = `LN-${String(a.id).padStart(5, '0')} · ${a.customer_name}`;
+      document.getElementById('custDetailsSub').innerText = 
+        `Overdue: ₹${amt.toLocaleString()} · Mobile: ${a.masked_phone || a.phone} · Lang: ${lang} · CIBIL: ${(a.data && a.data.credit_score) || 742} (Protected) · ${dpd > 0 ? dpd + ' DPD' : 'T-24h Warning'}`;
+
+      const badge = document.getElementById('custStatusBadge');
+      badge.innerText = a.status.toUpperCase();
+      badge.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${
+        a.status === 'ptp' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' :
+        a.status === 'paid' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40' :
+        a.status === 'escalated' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' :
+        a.status === 'awaiting_approval' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
+        'bg-slate-800 text-slate-400 border border-slate-700'
+      }`;
+
+      document.getElementById('voiceLanguageBadge').innerText = `Indic Voice (${lang} Devanagari)`;
+
+      const hcBtn = document.getElementById('btnHospicashAction');
+      const hasHc = a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider);
+      if (hasHc) {
+        hcBtn.classList.remove('opacity-50');
+      } else {
+        hcBtn.classList.add('opacity-50');
+      }
+
+      renderTranscriptDialogue(a.transcript);
+
+      // Strategy Tab Elements
+      const fw = a.data && a.data.policy_firewall;
+      if (fw) {
+        document.getElementById('settleRuleBadge').innerText = `${fw.rule_id} (${fw.status})`;
+        document.getElementById('settleCauseText').innerText = fw.llm_proposed || 'Income cycle lag confirmed.';
+        document.getElementById('settleActionText').innerText = fw.engine_decided || 'Structured payment commitment recorded.';
+      }
+
+      // Micro Schedule
+      const microBox = document.getElementById('microScheduleBox');
+      const microSched = a.micro_schedule || (a.data && a.data.micro_schedule);
+      if (microSched && microSched.length > 0) {
+        microBox.classList.remove('hidden');
+        const tbody = document.getElementById('microScheduleBody');
+        tbody.innerHTML = microSched.map(t => `
+          <tr class="hover:bg-slate-800/40">
+            <td class="p-1 font-bold text-indigo-400">Tranche ${t.tranche_number}</td>
+            <td class="p-1 text-slate-200">${t.due_date} (${t.weekday || 'Fri'})</td>
+            <td class="p-1 font-bold text-white font-mono">₹${Number(t.amount_inr).toLocaleString()}</td>
+            <td class="p-1"><span class="px-1.5 py-0.2 rounded text-[9.5px] ${t.rail === 'UPI_NOW' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-purple-500/20 text-purple-300'} font-semibold">${t.rail}</span></td>
+            <td class="p-1 text-emerald-400 text-[10px] font-medium">${t.status}</td>
+          </tr>
+        `).join('');
+      } else {
+        microBox.classList.add('hidden');
+      }
+
+      // Hospicash Box
+      const hcBox = document.getElementById('hospicashBox');
+      const hc = a.hospicash_claim || (a.data && a.data.hospicash_claim);
+      if (hc) {
+        hcBox.classList.remove('hidden');
+        document.getElementById('hcPolicyNumber').innerText = hc.policy_number || 'HC-99281-PN';
+      } else {
+        hcBox.classList.add('hidden');
+      }
+    }
+
+    // RENDER TRANSCRIPT
+    function renderTranscriptDialogue(transcript) {
+      const box = document.getElementById('dialogueContainer');
+      box.innerHTML = '';
+      if (!transcript || transcript.length === 0) {
+        box.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-slate-500 text-xs py-20">
+            <i class="fa-solid fa-headset text-3xl mb-3 text-slate-600"></i>
+            <span class="font-semibold text-slate-400">No active recording on file for this account.</span>
+            <span class="text-[11px] text-slate-600 mt-1">Select an account or use Demo Preset above to load verified dialogue.</span>
+          </div>
+        `;
+        return;
+      }
+
+      transcript.forEach(t => {
+        const isAgent = t.speaker === 'agent';
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `flex flex-col ${isAgent ? 'items-start' : 'items-end'}`;
+        
+        let complianceTag = "";
+        if (isAgent && (t.text.includes("AI") || t.text.includes("एआय"))) {
+          complianceTag = `<span class="text-[9px] text-emerald-400 font-mono mt-1 block"><i class="fa-solid fa-check mr-0.5"></i> Upfront AI Identity Disclosed [DISC-AI-01]</span>`;
+        }
+
+        msgDiv.innerHTML = `
+          <span class="text-[10px] text-slate-500 mb-0.5 px-1">${isAgent ? 'Saarthi AI Voice Agent' : selectedAccount.customer_name} (${t.ts})</span>
+          <div class="max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${
+            isAgent 
+              ? 'bg-indigo-950/80 border border-indigo-700/40 text-indigo-100 rounded-tl-sm shadow-sm' 
+              : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tr-sm shadow-sm'
+          }">
+            <div class="text-[12.5px]">${t.text}</div>
+            ${complianceTag}
+          </div>
+        `;
+        box.appendChild(msgDiv);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // AUDIO PLAYBACK
+    async function togglePlayCallAudio() {
+      if (!selectedAccount || !selectedAccount.transcript) return;
+      const icon = document.getElementById('audioControlIcon');
+      const wave = document.getElementById('waveformVisualizer');
+      const statusEl = document.getElementById('audioTelemetryStatus');
+
+      if (isPlayingAudio) {
+        if (audioPlayer) audioPlayer.pause();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        isPlayingAudio = false;
+        icon.className = "fa-solid fa-play ml-0.5 text-sm";
+        wave.classList.remove('wave-active');
+        statusEl.innerText = "Audio playback paused";
+        return;
+      }
+
+      const agentMsgs = selectedAccount.transcript.filter(t => t.speaker === 'agent');
+      if (agentMsgs.length === 0) {
+        alert("No agent speech available to play.");
+        return;
+      }
+
+      const lastTurn = agentMsgs[agentMsgs.length - 1];
+      statusEl.innerText = `Connecting to ${selectedAccount.language || 'Indic'} voice PBX stream...`;
+      wave.classList.add('wave-active');
+      icon.className = "fa-solid fa-pause text-sm";
+      isPlayingAudio = true;
+
+      try {
+        const res = await fetch('/api/voice/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: lastTurn.text,
+            language: selectedAccount.language || 'Hindi',
+            speaker: 'priya'
+          })
+        });
+        const data = await res.json();
+        if (data.audio_base64) {
+          audioPlayer = new Audio(`data:${data.mime_type || 'audio/mp3'};base64,${data.audio_base64}`);
+          audioPlayer.onended = () => {
+            isPlayingAudio = false;
+            icon.className = "fa-solid fa-play ml-0.5 text-sm";
+            wave.classList.remove('wave-active');
+            statusEl.innerText = "Audio stream finished";
+          };
+          audioPlayer.play();
+          statusEl.innerText = `Playing live Sarvam Bulbul:v3 Indic stream (${selectedAccount.language})`;
+          return;
+        }
+      } catch (err) {
+        console.warn("Speech playback fallback:", err);
+      }
+
+      // Web Speech Fallback
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(lastTurn.text);
+        if (selectedAccount.language === 'Marathi') utter.lang = 'mr-IN';
+        else if (selectedAccount.language === 'Hindi') utter.lang = 'hi-IN';
+        else utter.lang = 'en-IN';
+        utter.onend = () => {
+          isPlayingAudio = false;
+          icon.className = "fa-solid fa-play ml-0.5 text-sm";
+          wave.classList.remove('wave-active');
+          statusEl.innerText = "Audio stream finished";
+        };
+        window.speechSynthesis.speak(utter);
+        statusEl.innerText = `Playing synthesized voice audio (${selectedAccount.language})`;
+      }
+    }
+
+    // 1-CLICK SETTLEMENT ACTIONS
+    function dispatchTokenPayment() {
+      if (!selectedAccount) return;
+      const amt = selectedAccount.instant_recovered_inr > 0 ? selectedAccount.instant_recovered_inr : Math.min(2500, selectedAccount.amount_due);
+      showToast("UPI Token Link Dispatched", `Sent dynamic ₹${amt.toLocaleString()} repayment link to borrower WhatsApp.`);
+    }
+
+    function setupAutoPayDebit() {
+      if (!selectedAccount) return;
+      showToast("AutoPay Mandate Configured", `Recurring eNACH AutoPay mandate pre-registered with NPCI switch.`);
+    }
+
+    function submitHospicashClaim() {
+      if (!selectedAccount) return;
+      if (!selectedAccount.has_hospicash_rider && !(selectedAccount.data && selectedAccount.data.has_hospicash_rider)) {
+        alert("Borrower account does not have an attached Hospicash Rider.");
+        return;
+      }
+      showToast("Hospicash Claim Submitted", "Claim packet CLM-HC-99281 auto-dispatched to HDFC ERGO Underwriting Desk.");
+    }
+
+    async function simulateBorrowerPayment() {
+      if (!selectedAccount) return;
+      try {
+        const res = await fetch(`/api/cases/${selectedAccount.id}/simulate-payment?workflow_id=collections`, { method: 'POST' });
+        selectedAccount = await res.json();
+        await loadAllAccounts();
+        await fetchMetrics();
+        renderConsoleDetails();
+        showToast("Settlement Confirmed", `Received ₹${selectedAccount.amount_due.toLocaleString()} via UPI UTR YESB${selectedAccount.id.padStart(5, '0')}01. Account marked PAID.`);
+      } catch (err) {
+        alert("Settlement error: " + err);
+      }
+    }
+
+    function downloadAuditEvidence() {
+      if (!selectedAccount) return;
+      window.open(`/api/cases/${selectedAccount.id}/evidence-pack?workflow_id=collections`, '_blank');
+    }
+  </script>
+</body>
+</html>

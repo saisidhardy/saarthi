@@ -67,6 +67,13 @@ class EMIBouncedEvent(BaseModel):
     bounce_reason: Optional[str] = "E006 - Insufficient Funds"
     workflow_id: Optional[str] = "collections"
 
+class PreDueRiskEvent(BaseModel):
+    account_id: Optional[str] = "21"
+    balance_inr: Optional[float] = 6200.0
+    emi_amount: Optional[float] = 18000.0
+    due_date: Optional[str] = None
+    workflow_id: Optional[str] = "collections"
+
 class TTSRequest(BaseModel):
     text: str
     language: Optional[str] = "Hindi"
@@ -184,6 +191,27 @@ def handle_emi_bounced_event(event: EMIBouncedEvent):
         agent="Supervisor",
         action="NACH Mandate Bounce Event Ingested",
         summary=f"Event triggered via NPCI Auto-Debit clearing. Reason: {event.bounce_reason}."
+    )
+    save_case(case)
+    updated = run_supervisor_pipeline(case, workflow_id=w_id)
+    return updated
+
+# 4b-2. Pre-Due Risk: POST /api/events/pre-due-risk (T-24h Preventive Rescue)
+@app.post("/api/events/pre-due-risk")
+def handle_pre_due_risk_event(event: PreDueRiskEvent):
+    w_id = event.workflow_id or "collections"
+    case = get_case(event.account_id, workflow_id=w_id)
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Account #{event.account_id} not found in {w_id}")
+    
+    case.trigger_type = "PRE_DUE_T24H"
+    case.data["trigger_type"] = "PRE_DUE_T24H"
+    case.data["pre_due_balance_inr"] = event.balance_inr
+    case.add_trace(
+        agent="Supervisor",
+        action="Pre-Due Low-Balance Risk Ingested (T-24h)",
+        summary=f"T-24h Risk Signal: Account balance (₹{event.balance_inr:,.2f}) insufficient for scheduled EMI (₹{case.amount_due:,.2f}). Proactive rescue initiated to save ₹590 bounce fee and protect CIBIL.",
+        badge="Event Trigger"
     )
     save_case(case)
     updated = run_supervisor_pipeline(case, workflow_id=w_id)
@@ -350,6 +378,8 @@ def simulate_payment(case_id: str, workflow_id: str = Query(default="collections
 
     case.payment_status = "paid"
     case.status = "paid"
+    case.instant_recovered_inr = case.amount_due
+    case.locked_mandate_inr = 0.0
     case.add_trace(
         agent="Action",
         action="UPI Instant Settlement Confirmation",
@@ -480,23 +510,33 @@ def get_policies_catalog():
         "policy_statement": "Enforces lender-approved recovery policies and supports RBI conduct rules."
     }
 
-# 12. Quick Scenario Triggers (S1 - S5)
+# 12. Quick Scenario Triggers (S1 - S8)
 @app.post("/api/events/scenario/{scenario_id}")
 def trigger_scenario(scenario_id: str):
     scenario_map = {
-        "s1": "1",  # Hero Sunita Patil
-        "s2": "2",  # Code-mixed part payment Rajesh Sharma
-        "s3": "4",  # Adversarial Vikram Malhotra (Policy Firewall blocked)
-        "s4": "3",  # Sensitive Event Hospital Suresh Patil
-        "s5": "5"   # Bad transcript Manoj Kumar (Compliance fail)
+        "s1": "1",   # Hero Sunita Patil
+        "s2": "2",   # Code-mixed part payment Rajesh Sharma
+        "s3": "4",   # Adversarial Vikram Malhotra (Policy Firewall blocked)
+        "s4": "3",   # Sensitive Event Hospital Suresh Patil + Hospicash claim
+        "s5": "5",   # Bad transcript Manoj Kumar (Compliance fail)
+        "s7": "21",  # T-24h Preventive Rescue Anjali Deshmukh (₹590 saved)
+        "s8": "22"   # 4x Kirana Cashflow Micro-Split Sunita Patil
     }
-    acc_id = scenario_map.get(scenario_id.lower())
+    s_key = scenario_id.lower()
+    acc_id = scenario_map.get(s_key)
     if not acc_id:
-        raise HTTPException(status_code=400, detail=f"Invalid scenario '{scenario_id}'. Must be s1, s2, s3, s4, or s5.")
+        raise HTTPException(status_code=400, detail=f"Invalid scenario '{scenario_id}'. Must be s1, s2, s3, s4, s5, s7, or s8.")
 
     case = get_case(acc_id, workflow_id="collections")
     if not case:
         raise HTTPException(status_code=404, detail=f"Account #{acc_id} not found in collections book")
+
+    if s_key == "s7":
+        case.trigger_type = "PRE_DUE_T24H"
+        case.data["trigger_type"] = "PRE_DUE_T24H"
+        case.data["pre_due_balance_inr"] = 6200.0
+    elif s_key == "s8":
+        case.data["scenario"] = "s8_cashflow_split"
 
     case.add_trace(
         agent="Supervisor",
@@ -611,19 +651,23 @@ def text_to_speech(req: TTSRequest):
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 
 @app.get("/", response_class=HTMLResponse)
-def index_page():
+@app.get("/portal", response_class=HTMLResponse)
+@app.get("/production", response_class=HTMLResponse)
+def production_portal():
+    prod_file = os.path.join(STATIC_DIR, "production.html")
+    if os.path.exists(prod_file):
+        with open(prod_file, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>Saarthi Enterprise Collections Cloud</h1>"
+
+@app.get("/inspect", response_class=HTMLResponse)
+@app.get("/firewall", response_class=HTMLResponse)
+@app.get("/audit-engine", response_class=HTMLResponse)
+def inspection_page():
     index_file = os.path.join(STATIC_DIR, "index.html")
     if os.path.exists(index_file):
         with open(index_file, "r", encoding="utf-8") as f:
             return f.read()
-    return "<h1>Saarthi Backend Running</h1>"
-
-@app.get("/landing", response_class=HTMLResponse)
-def landing_page():
-    landing_file = os.path.join(STATIC_DIR, "landing.html")
-    if os.path.exists(landing_file):
-        with open(landing_file, "r", encoding="utf-8") as f:
-            return f.read()
-    return "<h1>Saarthi Landing Page</h1>"
+    return "<h1>Saarthi Policy Firewall & Inspection View</h1>"
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

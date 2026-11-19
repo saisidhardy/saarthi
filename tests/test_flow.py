@@ -23,7 +23,7 @@ def setup_db():
 
 def test_load_sample_book():
     cases = get_all_cases("collections")
-    assert len(cases) == 20
+    assert len(cases) >= 20
     acc1 = get_case("1", "collections")
     assert acc1 is not None
     assert acc1.customer_name == "Sunita Patil"
@@ -118,6 +118,64 @@ def test_s4_sensitive_event_pause():
     assert firewall["status"] == "SENSITIVE_PAUSE"
     assert firewall["rule_id"] == "FAIR-PRAC-SENS01"
     assert firewall["yaml_line"] == 57
+
+    # Feature 3: Hospicash Rider Claim Packet Check
+    hc = updated.hospicash_claim or updated.data.get("hospicash_claim")
+    assert hc is not None
+    assert hc["policy_number"] == "HC-99281-PN"
+    assert hc["max_relief_amount_inr"] == 15000.0
+    assert hc["claim_status"] == "DRAFTED_FOR_INSURER"
+    assert updated.root_cause == "MEDICAL_CALAMITY_SHOCK"
+
+def test_s7_preventive_bounce_rescue():
+    """
+    S7 T-24h Preventive Bounce Rescue (Anjali Deshmukh, ₹18,000, Marathi):
+    Ingests PRE_DUE_LOW_BALANCE signal -> Shifts debit date by 3 days ->
+    Saves ₹590 bank bounce fee -> Protects CIBIL score.
+    """
+    case = get_case("21", "collections")
+    assert case is not None
+    case.trigger_type = "PRE_DUE_T24H"
+    updated = run_supervisor_pipeline(case, workflow_id="collections")
+
+    assert updated.status == "ptp"
+    firewall = updated.data.get("policy_firewall")
+    assert firewall is not None
+    assert firewall["status"] == "APPROVED"
+    assert firewall["rule_id"] == "POLICY-PREV-FEE01"
+    assert updated.bounce_fee_saved_inr == 590.0 or updated.data.get("bounce_fee_saved_inr") == 590.0
+
+    # Downstream action check
+    ds = updated.downstream_action or updated.data.get("downstream_action")
+    assert ds is not None
+    assert ds["preapproved_topup_eligible"] is True
+    assert ds["bounce_fee_saved_inr"] == 590.0
+
+def test_s8_kirana_cashflow_micro_split():
+    """
+    S8 Cashflow-Synced Micro-Split (Sunita Patil, ₹40,000, Marathi):
+    Kirana shopowner splits into 4 x ₹10,000 weekly Friday tranches.
+    Tranche 1 immediate UPI link + Tranches 2-4 recurring AutoPay mandate.
+    """
+    case = get_case("22", "collections")
+    assert case is not None
+    updated = run_supervisor_pipeline(case, workflow_id="collections")
+
+    assert updated.status == "ptp"
+    firewall = updated.data.get("policy_firewall")
+    assert firewall is not None
+    assert firewall["status"] == "APPROVED"
+    assert firewall["rule_id"] == "POLICY-MICRO-SPLIT01"
+
+    micro = updated.micro_schedule or updated.data.get("micro_schedule")
+    assert micro is not None
+    assert len(micro) == 4
+    assert micro[0]["amount_inr"] == 10000.0
+    assert micro[0]["rail"] == "UPI_NOW"
+    assert micro[1]["rail"] == "UPI_AUTOPAY"
+    assert micro[2]["rail"] == "UPI_AUTOPAY"
+    assert micro[3]["rail"] == "UPI_AUTOPAY"
+    assert "repayments.saarthi@yesbank" in micro[0]["payment_link"]
 
 def test_s3_adversarial_policy_firewall_block():
     """

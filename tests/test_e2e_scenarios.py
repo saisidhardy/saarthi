@@ -45,7 +45,31 @@ def test_full_system_e2e():
     assert s4["data"]["policy_firewall"]["status"] == "SENSITIVE_PAUSE"
     assert s4["data"]["policy_firewall"]["rule_id"] == "FAIR-PRAC-SENS01"
     assert s4["do_not_contact_until"] is not None
-    print("[PASS] S4 Sensitive Pause:", s4["customer_name"], s4["do_not_contact_until"], s4["assigned_human"])
+    hc = s4.get("hospicash_claim") or s4["data"].get("hospicash_claim")
+    assert hc is not None
+    assert hc["policy_number"] == "HC-99281-PN"
+    assert hc["max_relief_amount_inr"] == 15000.0
+    print("[PASS] S4 Sensitive Pause + Hospicash Claim:", s4["customer_name"], hc["policy_number"], "₹15,000 relief")
+
+    # 4b. S7 T-24h Preventive Rescue (Anjali Deshmukh)
+    req = urllib.request.Request(f"{BASE}/api/events/scenario/s7", method="POST")
+    s7 = json.loads(urllib.request.urlopen(req).read())
+    assert s7["status"] == "ptp"
+    assert s7["data"]["policy_firewall"]["rule_id"] == "POLICY-PREV-FEE01"
+    assert s7.get("bounce_fee_saved_inr") == 590.0 or s7["data"].get("bounce_fee_saved_inr") == 590.0
+    print("[PASS] S7 T-24h Rescue:", s7["customer_name"], "Saved ₹590 bounce fee, CIBIL safe")
+
+    # 4c. S8 Kirana Cashflow 4x Micro-Split (Sunita Patil)
+    req = urllib.request.Request(f"{BASE}/api/events/scenario/s8", method="POST")
+    s8 = json.loads(urllib.request.urlopen(req).read())
+    assert s8["status"] == "ptp"
+    assert s8["data"]["policy_firewall"]["rule_id"] == "POLICY-MICRO-SPLIT01"
+    micro = s8.get("micro_schedule") or s8["data"].get("micro_schedule")
+    assert len(micro) == 4
+    assert micro[0]["amount_inr"] == 10000.0
+    assert micro[0]["rail"] == "UPI_NOW"
+    assert micro[1]["rail"] == "UPI_AUTOPAY"
+    print("[PASS] S8 Micro-Split:", s8["customer_name"], "4 Friday Tranches of ₹10,000 AutoPay")
 
     # 5. S5 Bad Transcript Threat (Manoj Kumar)
     req = urllib.request.Request(f"{BASE}/api/events/scenario/s5", method="POST")
