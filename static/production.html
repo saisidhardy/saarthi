@@ -14,6 +14,7 @@
     .custom-scroll::-webkit-scrollbar-track { background: #0b1120; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     .custom-scroll::-webkit-scrollbar-thumb:hover { background: #334155; }
+    
     @keyframes waveBar {
       0%, 100% { height: 6px; }
       50% { height: 26px; }
@@ -23,9 +24,27 @@
     .wave-active .w-bar-3 { animation: waveBar 0.8s infinite 0.4s ease-in-out; }
     .wave-active .w-bar-4 { animation: waveBar 0.8s infinite 0.2s ease-in-out; }
     .wave-active .w-bar-5 { animation: waveBar 0.8s infinite 0.35s ease-in-out; }
+
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.2; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring { animation: pulseRing 2s infinite ease-in-out; }
+
+    /* Phone frame simulation */
+    .phone-bezel {
+      border: 8px solid #1e293b;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px #334155;
+    }
+    .whatsapp-bg {
+      background-color: #0b141a;
+      background-image: radial-gradient(#1f2c34 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen flex antialiased selection:bg-indigo-600 selection:text-white">
+<body class="text-slate-100 min-h-screen flex antialiased selection:bg-indigo-600 selection:text-white overflow-hidden">
 
   <!-- LEFT ENTERPRISE NAVIGATION SIDEBAR -->
   <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-30 select-none">
@@ -51,7 +70,7 @@
       <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-600/20 text-left transition">
         <i class="fa-solid fa-table-list text-indigo-200"></i>
         <span>Delinquency Queue</span>
-        <span class="ml-auto text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/20 text-white">22</span>
+        <span id="navBadgeQueue" class="ml-auto text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/20 text-white">22</span>
       </button>
 
       <button onclick="openTab('telephony')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
@@ -70,6 +89,14 @@
         <span>Relief & Hospicash</span>
       </button>
 
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Demo Presentation Rails</div>
+
+      <button onclick="toggleBorrowerSim()" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-emerald-400 hover:bg-emerald-950/40 font-semibold text-left transition border border-emerald-500/20 bg-emerald-950/20">
+        <i class="fa-solid fa-mobile-screen-button text-emerald-400"></i>
+        <span>Borrower Mobile View</span>
+        <span class="ml-auto text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-mono">DEMO</span>
+      </button>
+
       <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Governance & Audit</div>
 
       <button onclick="openTab('compliance')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
@@ -77,14 +104,14 @@
         <span>RBI Compliance Ledger</span>
       </button>
 
-      <button onclick="openRoiModal()" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-emerald-400 hover:bg-emerald-950/40 hover:text-emerald-300 font-semibold text-left transition border border-emerald-500/20 bg-emerald-950/20">
-        <i class="fa-solid fa-chart-line text-emerald-400"></i>
+      <button onclick="openRoiModal()" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-teal-400 hover:bg-teal-950/40 hover:text-teal-300 font-semibold text-left transition border border-teal-500/20 bg-teal-950/20">
+        <i class="fa-solid fa-chart-line text-teal-400"></i>
         <span>Portfolio ROI Analytics</span>
       </button>
 
       <a href="/inspect" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-indigo-300 hover:bg-indigo-950/40 font-semibold text-left transition border border-indigo-500/20 bg-indigo-950/20 mt-2 block">
         <i class="fa-solid fa-code-compare text-indigo-400"></i>
-        <span>Architecture & Firewall</span>
+        <span>Firewall Inspection</span>
       </a>
     </nav>
 
@@ -104,20 +131,20 @@
   </aside>
 
   <!-- MAIN APPLICATION CONTENT AREA -->
-  <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
     
     <!-- TOP APP HEADER -->
-    <header class="bg-slate-900 border-b border-slate-800 px-5 py-3 flex flex-wrap items-center justify-between gap-4">
+    <header class="bg-slate-900 border-b border-slate-800 px-5 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
       <div>
-        <div class="flex items-center gap-2 text-xs text-slate-400">
+        <div class="flex items-center gap-2 text-[11px] text-slate-400">
           <span>Portfolio</span>
-          <i class="fa-solid fa-chevron-right text-[10px] text-slate-600"></i>
+          <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
           <span class="text-white font-medium">Early Delinquency (1–30 DPD)</span>
         </div>
-        <h2 class="text-base font-extrabold text-white tracking-tight mt-0.5">Active Recovery Queue</h2>
+        <h2 class="text-base font-extrabold text-white tracking-tight mt-0.5">NBFC Recovery Operations Hub</h2>
       </div>
 
-      <!-- Real Operational Telemetry Status -->
+      <!-- Live Telemetry & Quick Action Controls -->
       <div class="flex items-center gap-3 text-xs">
         <div class="px-3 py-1.5 bg-slate-950 rounded-lg border border-slate-800 flex items-center gap-3 text-[11px]">
           <span class="flex items-center gap-1.5 text-slate-300">
@@ -128,31 +155,81 @@
           <span class="text-emerald-400 font-medium flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span> 08:00–19:00 Legal Window
           </span>
-          <span class="text-slate-700">|</span>
+          <span class="text-slate-700 hidden sm:inline">|</span>
           <span class="text-slate-400 hidden sm:inline flex items-center gap-1.5">
-            <i class="fa-solid fa-server text-teal-400"></i> PBX SIP: Connected
+            <i class="fa-solid fa-server text-teal-400"></i> PBX SIP: Live
           </span>
         </div>
 
-        <button onclick="openRoiModal()" class="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-bold flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-chart-pie"></i>
-          <span>Portfolio ROI (+27.8% Lift)</span>
+        <!-- TOGGLE USER SIDEBAR BUTTON (Prominent, High-Contrast) -->
+        <button id="btnToggleSim" onclick="toggleBorrowerSim()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition transform active:scale-95">
+          <i class="fa-solid fa-mobile-screen-button text-sm"></i>
+          <span>Borrower Phone View</span>
+          <span class="px-1.5 py-0.2 rounded bg-black/30 text-[10px] font-mono">DEMO</span>
+        </button>
+
+        <button onclick="openRoiModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-chart-pie text-emerald-400"></i>
+          <span class="hidden md:inline">Portfolio ROI</span>
         </button>
       </div>
     </header>
 
+    <!-- 1-CLICK SCENARIO & BORROWER PROFILE QUICK-SWITCHER PILL BAR -->
+    <div class="bg-slate-950 border-b border-slate-800/80 px-5 py-2 flex items-center gap-2 overflow-x-auto custom-scroll shrink-0">
+      <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+        <i class="fa-solid fa-bolt text-indigo-400"></i> Pitch Scenarios:
+      </span>
+
+      <!-- Scenario Pills -->
+      <button onclick="jumpToPreset('1')" id="pill-s1" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+        <span>S1: Sunita (Hero ₹40k Marathi)</span>
+      </button>
+
+      <button onclick="jumpToPreset('2')" id="pill-s2" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+        <span>S2: Rajesh (Liquidity Token + Mandate)</span>
+      </button>
+
+      <button onclick="jumpToPreset('21')" id="pill-s7" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <span>S7: Anjali (T-24h Bounce Rescue · ₹590 Saved)</span>
+      </button>
+
+      <button onclick="jumpToPreset('3')" id="pill-s4" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+        <span>S4: Suresh (ICU Distress · Hospicash Claim)</span>
+      </button>
+
+      <button onclick="jumpToPreset('22')" id="pill-s8" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+        <span>S8: Kirana 4x Friday Micro-Split</span>
+      </button>
+
+      <button onclick="jumpToPreset('4')" id="pill-s3" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+        <span>S3: Vikram (Prompt Injection Blocked)</span>
+      </button>
+
+      <button onclick="jumpToPreset('5')" id="pill-s5" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+        <span>S5: Manoj (Rogue Agent Audit Fail)</span>
+      </button>
+    </div>
+
     <!-- MAIN TWO-COLUMN SPLIT WORKSPACE -->
-    <main class="flex-1 p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 overflow-hidden">
+    <main class="flex-1 p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 overflow-hidden">
       
       <!-- LEFT PANEL: DELINQUENCY CRM TABLE (5 COLS) -->
-      <div class="lg:col-span-5 flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[calc(100vh-140px)]">
+      <div class="lg:col-span-5 flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[calc(100vh-175px)]">
         
         <!-- Search & Filter Controls -->
-        <div class="p-3.5 border-b border-slate-800 bg-slate-900/90 space-y-2.5">
+        <div class="p-3 border-b border-slate-800 bg-slate-900/90 space-y-2">
           <div class="flex items-center justify-between">
             <div class="text-xs font-bold text-white flex items-center gap-2">
               <i class="fa-solid fa-folder-open text-indigo-400"></i>
-              <span>Delinquent Borrower Registry</span>
+              <span>Borrower Delinquency Registry</span>
             </div>
             <span id="accountCountBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
               22 Accounts
@@ -163,22 +240,6 @@
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
             <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Search by name, loan ID, or phone..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
-          </div>
-
-          <!-- Preset Demonstration Dropdown (Discreet, Fast for Demo Pitch) -->
-          <div class="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-lg border border-slate-800/80">
-            <span class="text-[10px] font-bold text-indigo-400 shrink-0 uppercase tracking-wide">
-              <i class="fa-solid fa-bolt mr-1"></i> Demo Preset:
-            </span>
-            <select id="presetCaseSelect" onchange="jumpToPreset(this.value)" class="flex-1 bg-transparent border-0 text-xs text-slate-200 focus:outline-none font-medium cursor-pointer">
-              <option value="" class="bg-slate-900">Select Preset Case for Live Demo...</option>
-              <option value="1" class="bg-slate-900">Account #1 — Sunita Patil (Marathi · ₹40,000 Hero PTP)</option>
-              <option value="2" class="bg-slate-900">Account #2 — Rajesh Sharma (Hinglish · ₹2,500 Token + AutoPay)</option>
-              <option value="3" class="bg-slate-900">Account #3 — Suresh Patil (Medical Emergency · Hospicash Claim)</option>
-              <option value="4" class="bg-slate-900">Account #4 — Vikram Malhotra (Prompt Injection Waiver · Blocked)</option>
-              <option value="21" class="bg-slate-900">Account #21 — Anjali Deshmukh (T-24h Preventive Rescue · ₹590 Saved)</option>
-              <option value="22" class="bg-slate-900">Account #22 — Sunita Patil (Kirana 4x Weekly Friday Split)</option>
-            </select>
           </div>
 
           <!-- Filter Pills -->
@@ -196,43 +257,49 @@
         </div>
 
         <!-- Footer -->
-        <div class="p-2.5 border-t border-slate-800 bg-slate-900 text-xs flex items-center justify-between text-slate-400">
-          <span>Click any row to open operations desk</span>
+        <div class="p-2 border-t border-slate-800 bg-slate-900 text-xs flex items-center justify-between text-slate-400">
+          <span>Click any row to inspect case</span>
           <button onclick="loadAllAccounts()" class="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
-            <i class="fa-solid fa-rotate-right"></i> Refresh Book
+            <i class="fa-solid fa-rotate-right"></i> Refresh
           </button>
         </div>
 
       </div>
 
       <!-- RIGHT PANEL: BORROWER 360° OPERATIONS & INTERACTION CONSOLE (7 COLS) -->
-      <div class="lg:col-span-7 flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[calc(100vh-140px)]">
+      <div class="lg:col-span-7 flex flex-col bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl h-[calc(100vh-175px)]">
         
         <!-- Customer 360 Dossier Header -->
-        <div class="p-4 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
-          <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-extrabold text-sm shadow-inner">
+        <div class="p-3.5 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-extrabold text-sm shadow-inner shrink-0">
               <span id="custAvatar">SP</span>
             </div>
-            <div>
-              <div class="flex items-center gap-2.5">
-                <h3 id="custName" class="text-base font-extrabold text-white">Select a Borrower</h3>
+            <div class="overflow-hidden">
+              <div class="flex items-center gap-2">
+                <h3 id="custName" class="text-sm font-extrabold text-white truncate">Select a Borrower</h3>
                 <span id="custStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">STATUS</span>
               </div>
-              <div id="custDetailsSub" class="text-[11px] text-slate-400 mt-0.5">
-                Loan Account: LN-00001 · Overdue: ₹0.00 · Mobile: XXXXXX0000 · Lang: Hindi · CIBIL: 742 (Protected)
+              <div id="custDetailsSub" class="text-[10.5px] text-slate-400 truncate mt-0.5">
+                Loan Account: LN-00001 · Overdue: ₹0.00 · Mobile: XXXXXX0000 · Lang: Marathi
               </div>
             </div>
           </div>
 
-          <button onclick="downloadAuditEvidence()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition" title="Export tamper-evident JSON audit dossier">
-            <i class="fa-solid fa-file-shield text-indigo-400"></i>
-            <span>Evidence Pack</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="openBorrowerPhoneToTab('whatsapp')" class="px-2.5 py-1.5 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition" title="View customer WhatsApp thread">
+              <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+              <span class="hidden sm:inline">Borrower WhatsApp</span>
+            </button>
+            <button onclick="downloadAuditEvidence()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition" title="Export tamper-evident JSON audit dossier">
+              <i class="fa-solid fa-file-shield text-indigo-400"></i>
+              <span>Evidence</span>
+            </button>
+          </div>
         </div>
 
         <!-- Internal Console Tabs -->
-        <div class="flex items-center border-b border-slate-800 bg-slate-950/60 px-4 text-xs font-semibold gap-6">
+        <div class="flex items-center border-b border-slate-800 bg-slate-950/60 px-4 text-xs font-semibold gap-6 shrink-0">
           <button id="tabBtn-telephony" onclick="switchConsoleTab('telephony')" class="py-2.5 text-indigo-400 border-b-2 border-indigo-500 flex items-center gap-1.5">
             <i class="fa-solid fa-headset"></i> Call Recording & Dialogue
           </button>
@@ -248,24 +315,24 @@
         <div id="consoleTab-telephony" class="flex-1 flex flex-col overflow-hidden">
           
           <!-- Telephony PBX Station with Animated Audio Waveform -->
-          <div class="p-3 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border-b border-slate-800 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3.5">
-              <button id="audioControlBtn" onclick="togglePlayCallAudio()" class="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 transition transform active:scale-95">
-                <i id="audioControlIcon" class="fa-solid fa-play ml-0.5 text-sm"></i>
+          <div class="p-3 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+            <div class="flex items-center gap-3">
+              <button id="audioControlBtn" onclick="togglePlayCallAudio()" class="w-9 h-9 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 transition transform active:scale-95 shrink-0">
+                <i id="audioControlIcon" class="fa-solid fa-play ml-0.5 text-xs"></i>
               </button>
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-white">Telephony Recording Stream</span>
+                  <span class="text-xs font-bold text-white">Audio Stream</span>
                   <span id="voiceLanguageBadge" class="text-[10px] font-mono px-2 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                    Sarvam Indic Voice (Devanagari)
+                    Sarvam Bulbul:v3 (Devanagari)
                   </span>
                 </div>
-                <p id="audioTelemetryStatus" class="text-[11px] text-slate-400 mt-0.5">Click Play to listen to authenticated Marathi/Hindi voice recording</p>
+                <p id="audioTelemetryStatus" class="text-[10.5px] text-slate-400 mt-0.5">Click Play to listen to authenticated Indic voice recording</p>
               </div>
             </div>
 
             <!-- Waveform Visualizer -->
-            <div id="waveformVisualizer" class="flex items-center gap-1 h-7 px-3 bg-slate-950/60 rounded-lg border border-slate-800/80">
+            <div id="waveformVisualizer" class="flex items-center gap-1 h-6 px-2.5 bg-slate-950/60 rounded-lg border border-slate-800/80">
               <span class="w-1 h-2 bg-indigo-400 rounded-full w-bar-1"></span>
               <span class="w-1 h-3 bg-indigo-400 rounded-full w-bar-2"></span>
               <span class="w-1 h-4 bg-teal-400 rounded-full w-bar-3"></span>
@@ -284,6 +351,20 @@
         <!-- TAB 2: SETTLEMENT & RESTRUCTURING DETAILS -->
         <div id="consoleTab-settlement" class="hidden flex-1 overflow-y-auto custom-scroll p-4 space-y-4 bg-slate-950/40">
           
+          <!-- Outcome Lift Banner -->
+          <div class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-slate-900 border border-emerald-500/30 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-chart-line"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-white block">Deterministic Financial Outcome Engine</span>
+                <span class="text-[10.5px] text-emerald-300">Replaced 68% broken promise rate with on-call token capture and mandate locking.</span>
+              </div>
+            </div>
+            <span class="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/40">+27.8% Lift</span>
+          </div>
+
           <!-- Diagnosis Card -->
           <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
             <div class="flex items-center justify-between text-xs">
@@ -371,7 +452,7 @@
         </div>
 
         <!-- 1-CLICK OPERATIONAL ACTIONS BAR -->
-        <div class="p-3.5 border-t border-slate-800 bg-slate-900 space-y-2">
+        <div class="p-3 border-t border-slate-800 bg-slate-900 space-y-2 shrink-0">
           <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
             <span><i class="fa-solid fa-bolt text-teal-400 mr-1"></i> 1-Click Authorized Settlement Rails</span>
             <span class="font-mono text-emerald-400 text-xs">repayments.saarthi@yesbank</span>
@@ -379,25 +460,25 @@
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             <!-- Send Token UPI -->
-            <button onclick="dispatchTokenPayment()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
+            <button onclick="dispatchTokenPayment()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
               <i class="fa-solid fa-paper-plane text-teal-400 text-sm"></i>
               <span>Send Token UPI</span>
             </button>
 
             <!-- Setup AutoPay Mandate -->
-            <button onclick="setupAutoPayDebit()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
+            <button onclick="setupAutoPayDebit()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
               <i class="fa-solid fa-calendar-check text-indigo-400 text-sm"></i>
               <span>AutoPay Mandate</span>
             </button>
 
             <!-- Hospicash Claim -->
-            <button id="btnHospicashAction" onclick="submitHospicashClaim()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm opacity-50">
+            <button id="btnHospicashAction" onclick="submitHospicashClaim()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm opacity-50">
               <i class="fa-solid fa-hospital text-amber-400 text-sm"></i>
               <span>File Hospicash</span>
             </button>
 
             <!-- Simulate Borrower Settlement -->
-            <button onclick="simulateBorrowerPayment()" class="p-2.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
+            <button onclick="simulateBorrowerPayment()" class="p-2 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/50 text-emerald-300 font-semibold text-center transition flex flex-col items-center justify-center gap-1 shadow-sm">
               <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
               <span>Clear Settlement</span>
             </button>
@@ -407,6 +488,299 @@
       </div>
 
     </main>
+
+    <!-- ============================================================== -->
+    <!-- BORROWER MOBILE PHONE SIMULATOR SIDEBAR (SLIDE-OUT FROM RIGHT) -->
+    <!-- ============================================================== -->
+    <div id="borrowerPhoneDrawer" class="fixed top-0 right-0 h-full w-[430px] bg-slate-950/95 border-l border-slate-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col select-none">
+      
+      <!-- Drawer Header Bar -->
+      <div class="px-4 py-3 border-b border-slate-800 bg-slate-900/90 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-ring"></span>
+          <span class="text-xs font-extrabold text-white">Borrower's Mobile Experience</span>
+          <span class="text-[9.5px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-mono">LIVE DEMO</span>
+        </div>
+        <button onclick="toggleBorrowerSim()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Phone App Switcher Pills inside Drawer -->
+      <div class="px-4 py-2 bg-slate-900/60 border-b border-slate-800/80 flex items-center justify-around text-xs shrink-0">
+        <button id="phoneTabBtn-call" onclick="switchPhoneApp('call')" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-phone"></i> In-Call
+        </button>
+        <button id="phoneTabBtn-whatsapp" onclick="switchPhoneApp('whatsapp')" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1.5 transition">
+          <i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp
+        </button>
+        <button id="phoneTabBtn-upi" onclick="switchPhoneApp('upi')" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-qrcode text-teal-400"></i> UPI Pay
+        </button>
+      </div>
+
+      <!-- Smartphone Frame Container -->
+      <div class="flex-1 p-4 overflow-y-auto custom-scroll flex justify-center items-start">
+        <div class="w-[360px] min-h-[640px] bg-slate-900 rounded-[38px] phone-bezel flex flex-col overflow-hidden shadow-2xl relative">
+          
+          <!-- Smartphone Top Dynamic Island / Speaker Notch -->
+          <div class="h-9 bg-black px-6 flex items-center justify-between text-[11px] text-white shrink-0 z-20">
+            <span id="phoneClock" class="font-mono font-semibold">10:42</span>
+            <div class="w-20 h-4 bg-slate-950 rounded-full flex items-center justify-center gap-1.5 border border-slate-800">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
+            </div>
+            <div class="flex items-center gap-1.5 text-[10px] text-slate-300">
+              <i class="fa-solid fa-signal"></i>
+              <i class="fa-solid fa-wifi"></i>
+              <i class="fa-solid fa-battery-full text-emerald-400"></i>
+            </div>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- PHONE APP 1: INCOMING/ACTIVE VOICE CALL SCREEN -->
+          <!-- ============================================== -->
+          <div id="phoneView-call" class="flex-1 flex flex-col justify-between p-5 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-center relative overflow-hidden">
+            
+            <!-- Caller ID Card -->
+            <div class="mt-4 space-y-2">
+              <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 to-teal-400 mx-auto flex items-center justify-center text-white text-2xl font-black shadow-xl shadow-indigo-600/30 border-2 border-white/20">
+                <i class="fa-solid fa-building-columns"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-extrabold text-white">Saarthi Capital</h4>
+                <p class="text-xs text-indigo-300 font-medium">Autonomous Recovery Teammate</p>
+                <span id="phoneCallLanguageChip" class="inline-block mt-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
+                  मराठी (Mr-IN)
+                </span>
+              </div>
+              <div class="text-[11px] text-emerald-400 font-mono flex items-center justify-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-ring"></span>
+                <span id="phoneCallDuration">00:48 · Active Call</span>
+              </div>
+            </div>
+
+            <!-- Live Spoken Dialogue Caption Bubble -->
+            <div class="my-4 p-3 rounded-2xl bg-slate-800/90 border border-slate-700/80 text-left shadow-lg">
+              <span class="text-[9.5px] font-bold text-indigo-300 uppercase tracking-wide block mb-1">
+                <i class="fa-solid fa-volume-high mr-1"></i> Live Audio Captions:
+              </span>
+              <p id="phoneLiveCaption" class="text-xs text-slate-100 leading-relaxed font-medium">
+                "सुनिता ताई, मी सारथी कॅपिटलकडून कॉल करत आहे..."
+              </p>
+              <div class="mt-2 pt-1.5 border-t border-slate-700 text-[10px] text-slate-400 flex items-center justify-between">
+                <span>RBI Disclosures Verified</span>
+                <span class="text-emerald-400 font-mono">100% Compliant</span>
+              </div>
+            </div>
+
+            <!-- In-Call Actions -->
+            <div class="space-y-3 mb-2">
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="togglePlayCallAudio()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex flex-col items-center justify-center gap-1">
+                  <i class="fa-solid fa-volume-high text-indigo-400"></i>
+                  <span class="text-[10px]">Audio</span>
+                </button>
+                <button onclick="switchPhoneApp('whatsapp')" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex flex-col items-center justify-center gap-1">
+                  <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+                  <span class="text-[10px]">WhatsApp</span>
+                </button>
+                <button onclick="switchPhoneApp('upi')" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex flex-col items-center justify-center gap-1">
+                  <i class="fa-solid fa-qrcode text-teal-400"></i>
+                  <span class="text-[10px]">UPI Pay</span>
+                </button>
+              </div>
+
+              <!-- End Call Button -->
+              <div class="flex items-center justify-center">
+                <button onclick="showToast('Call Completed', 'Dispositions synced to NBFC collections book.')" class="w-14 h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center text-lg shadow-lg shadow-rose-600/40 transition transform active:scale-90">
+                  <i class="fa-solid fa-phone-slash"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ============================================== -->
+          <!-- PHONE APP 2: WHATSAPP INTERACTIVE NOTIFICATION -->
+          <!-- ============================================== -->
+          <div id="phoneView-whatsapp" class="hidden flex-1 flex flex-col justify-between whatsapp-bg text-left relative overflow-hidden">
+            
+            <!-- WhatsApp Chat Top Bar -->
+            <div class="bg-slate-900 border-b border-slate-800 px-3 py-2 flex items-center gap-2.5 shrink-0">
+              <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                <i class="fa-solid fa-building-columns"></i>
+              </div>
+              <div class="overflow-hidden">
+                <div class="flex items-center gap-1">
+                  <span class="text-xs font-bold text-white truncate">Saarthi Capital</span>
+                  <i class="fa-solid fa-circle-check text-emerald-400 text-[11px]" title="Verified Business"></i>
+                </div>
+                <span class="text-[9.5px] text-emerald-400">Official Business Account</span>
+              </div>
+            </div>
+
+            <!-- WhatsApp Message Stream -->
+            <div class="flex-1 p-3 space-y-3 overflow-y-auto custom-scroll text-xs">
+              <div class="flex justify-center">
+                <span class="text-[9px] px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 font-mono">TODAY</span>
+              </div>
+
+              <!-- Received Message Bubble -->
+              <div class="max-w-[90%] rounded-2xl p-3 bg-slate-900 border border-slate-800 text-slate-100 shadow-md space-y-2">
+                <div class="flex items-center justify-between text-[10px] text-indigo-300 font-semibold border-b border-slate-800 pb-1">
+                  <span id="waMsgHeader">Loan Repayment Advisory</span>
+                  <span class="text-slate-500 font-mono">10:42</span>
+                </div>
+                
+                <p id="waMsgBody" class="text-xs text-slate-200 leading-relaxed font-normal">
+                  सुनिता ताई, नमस्कार. तुमच्या विनंतीनुसार ₹४०,००० च्या परतफेडीची UPI लिंक खाली दिली आहे.
+                </p>
+
+                <!-- Interactive UPI Action Card inside WhatsApp -->
+                <div id="waUpiActionCard" class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-[10px] text-slate-400 block">Total Due:</span>
+                      <span id="waCardAmount" class="text-sm font-bold text-white font-mono">₹40,000.00</span>
+                    </div>
+                    <span class="text-[9.5px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">0% FEES</span>
+                  </div>
+
+                  <button onclick="switchPhoneApp('upi')" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 transition">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span id="waPayBtnLabel">Pay ₹40,000 via UPI</span>
+                  </button>
+                </div>
+
+                <!-- Hospicash Relief Badge (S4) -->
+                <div id="waHospicashCard" class="hidden p-2 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-[11px] space-y-1">
+                  <div class="font-bold flex items-center gap-1 text-amber-300">
+                    <i class="fa-solid fa-shield-heart"></i>
+                    <span>Relief Claim #HC-99281-PN</span>
+                  </div>
+                  <p class="text-[10.5px] text-slate-300">
+                    7-day cooling-off pause active. ₹15,000 hospitalization claim submitted to HDFC ERGO.
+                  </p>
+                </div>
+
+                <div class="text-[9px] text-slate-400 flex items-center justify-end gap-1">
+                  <span>Sent by Saarthi AI Engine</span>
+                  <i class="fa-solid fa-check-double text-teal-400"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- WhatsApp Fake Input -->
+            <div class="p-2 bg-slate-900 border-t border-slate-800 flex items-center gap-2 shrink-0">
+              <div class="flex-1 bg-slate-950 border border-slate-800 rounded-full px-3 py-1.5 text-xs text-slate-400">
+                Message...
+              </div>
+              <div class="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs">
+                <i class="fa-solid fa-microphone"></i>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ============================================== -->
+          <!-- PHONE APP 3: INTERACTIVE 1-TAP UPI PAYMENT SHEET -->
+          <!-- ============================================== -->
+          <div id="phoneView-upi" class="hidden flex-1 flex flex-col justify-between p-4 bg-slate-950 text-left relative overflow-hidden">
+            
+            <!-- UPI Gateway Header -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-md bg-teal-500 flex items-center justify-center text-black font-extrabold text-[10px]">
+                    UPI
+                  </span>
+                  <span class="text-xs font-bold text-white">NPCI Bharat Payments</span>
+                </div>
+                <span class="text-[10px] text-slate-400">Verified VPA</span>
+              </div>
+
+              <!-- Payment Beneficiary Card -->
+              <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-400">Paying Beneficiary:</span>
+                  <span class="font-bold text-white">Saarthi Capital Ltd.</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-400">Collection VPA:</span>
+                  <span class="font-mono text-indigo-300 text-[11px]">repayments.saarthi@yesbank</span>
+                </div>
+                <div class="flex items-center justify-between text-xs border-t border-slate-800 pt-2">
+                  <span class="text-slate-400">Loan Account:</span>
+                  <span id="upiSheetLoanId" class="font-mono text-white">LN-00001</span>
+                </div>
+              </div>
+
+              <!-- Big Amount Box -->
+              <div class="p-4 rounded-2xl bg-gradient-to-tr from-slate-900 to-indigo-950/60 border border-indigo-500/30 text-center space-y-1">
+                <span class="text-[10.5px] text-indigo-300 uppercase tracking-wide font-bold">Authorized Repayment Amount</span>
+                <div id="upiSheetAmount" class="text-3xl font-black text-white font-mono">₹40,000.00</div>
+                <span id="upiSheetRailTag" class="inline-block text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">
+                  Instant Token Settlement Rail
+                </span>
+              </div>
+
+              <!-- Bank Selection Card -->
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-[10px]">
+                    SBI
+                  </div>
+                  <div>
+                    <span class="font-bold text-white block">State Bank of India</span>
+                    <span class="text-[10px] text-slate-400">A/C No: •••• 4210</span>
+                  </div>
+                </div>
+                <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+              </div>
+            </div>
+
+            <!-- Pay Now Trigger Button (Simulates Borrower Settling) -->
+            <div class="space-y-2 mt-4">
+              <button onclick="triggerSimulatePaymentFromPhone()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 transition transform active:scale-95">
+                <i class="fa-solid fa-lock text-xs"></i>
+                <span id="upiSheetBtnText">Pay via UPI PIN</span>
+              </button>
+              <p class="text-[10px] text-slate-500 text-center">
+                Tap button to simulate borrower approving payment in real-time.
+              </p>
+            </div>
+
+            <!-- SUCCESS OVERLAY (Shown when Paid) -->
+            <div id="upiSuccessOverlay" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center space-y-3 z-30">
+              <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl font-bold border-2 border-emerald-400">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <div>
+                <h4 class="text-base font-extrabold text-white">Payment Successful</h4>
+                <p id="upiSuccessAmount" class="text-2xl font-black text-emerald-400 font-mono mt-0.5">₹40,000.00</p>
+                <p class="text-xs text-slate-400 mt-1">UTR: <span id="upiSuccessUtr" class="font-mono text-slate-200">YESB0000101</span></p>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-300 w-full">
+                Synchronized with Saarthi Collections Cloud. Account status updated to <strong class="text-emerald-400">PAID</strong>.
+              </div>
+              <button onclick="resetUpiOverlay()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+                Back to Phone Apps
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Bottom Phone Home Indicator Bar -->
+          <div class="h-5 bg-black flex items-center justify-center shrink-0">
+            <div class="w-28 h-1 bg-slate-700 rounded-full"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
   <!-- PORTFOLIO ROI & METRICS MODAL -->
@@ -464,12 +838,15 @@
     </div>
   </div>
 
+  <!-- JAVASCRIPT APP LOGIC -->
   <script>
     let accounts = [];
     let selectedAccount = null;
     let activeFilter = 'all';
     let isPlayingAudio = false;
     let audioPlayer = null;
+    let isBorrowerSimOpen = false;
+    let activePhoneApp = 'call';
 
     // REAL IST CLOCK
     function startClock() {
@@ -480,12 +857,14 @@
         const mm = String(ist.getMinutes()).padStart(2, '0');
         const clockEl = document.getElementById('topClock');
         if (clockEl) clockEl.innerText = `${hh}:${mm} IST`;
+        const pClock = document.getElementById('phoneClock');
+        if (pClock) pClock.innerText = `${hh}:${mm}`;
       };
       setInterval(update, 1000);
       update();
     }
 
-    // TOAST
+    // TOAST NOTIFIER
     function showToast(title, desc) {
       const toast = document.getElementById('toastNotification');
       document.getElementById('toastTitle').innerText = title;
@@ -498,7 +877,46 @@
       }, 3500);
     }
 
-    // TABS
+    // TOGGLE BORROWER SIMULATOR DRAWER
+    function toggleBorrowerSim() {
+      isBorrowerSimOpen = !isBorrowerSimOpen;
+      const drawer = document.getElementById('borrowerPhoneDrawer');
+      const btn = document.getElementById('btnToggleSim');
+      if (isBorrowerSimOpen) {
+        drawer.classList.remove('translate-x-full');
+        btn.classList.add('ring-2', 'ring-emerald-400');
+      } else {
+        drawer.classList.add('translate-x-full');
+        btn.classList.remove('ring-2', 'ring-emerald-400');
+      }
+    }
+
+    function openBorrowerPhoneToTab(tabName) {
+      if (!isBorrowerSimOpen) {
+        toggleBorrowerSim();
+      }
+      switchPhoneApp(tabName);
+    }
+
+    // SWITCH PHONE APPS (Call, WhatsApp, UPI)
+    function switchPhoneApp(appName) {
+      activePhoneApp = appName;
+      ['call', 'whatsapp', 'upi'].forEach(k => {
+        const view = document.getElementById(`phoneView-${k}`);
+        const btn = document.getElementById(`phoneTabBtn-${k}`);
+        if (view && btn) {
+          if (k === appName) {
+            view.classList.remove('hidden');
+            btn.className = "px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold flex items-center gap-1.5 transition";
+          } else {
+            view.classList.add('hidden');
+            btn.className = "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1.5 transition";
+          }
+        }
+      });
+    }
+
+    // TABS IN NBFC CONSOLE
     function switchConsoleTab(tabKey) {
       ['telephony', 'settlement', 'compliance'].forEach(k => {
         const pane = document.getElementById(`consoleTab-${k}`);
@@ -557,6 +975,8 @@
         const res = await fetch('/api/cases?workflow_id=collections');
         accounts = await res.json();
         document.getElementById('accountCountBadge').innerText = `${accounts.length} Accounts`;
+        const qBadge = document.getElementById('navBadgeQueue');
+        if (qBadge) qBadge.innerText = accounts.length;
         renderAccountsTable();
       } catch (err) {
         console.error("Accounts load error:", err);
@@ -655,36 +1075,49 @@
         selectedAccount = await res.json();
         renderAccountsTable();
         renderConsoleDetails();
+        renderBorrowerPhoneView();
       } catch (err) {
         console.error("Failed to select account:", err);
       }
     }
 
-    // JUMP TO PRESET
+    // JUMP TO PRESET SCENARIO
     async function jumpToPreset(presetId) {
       if (!presetId) return;
-      const select = document.getElementById('presetCaseSelect');
-      select.value = presetId;
 
       const scenarioMap = {
         "1": "s1",
         "2": "s2",
         "3": "s4",
         "4": "s3",
+        "5": "s5",
         "21": "s7",
         "22": "s8"
       };
 
+      // Update pill active styling
+      Object.keys(scenarioMap).forEach(k => {
+        const pill = document.getElementById(`pill-${scenarioMap[k]}`);
+        if (pill) {
+          if (k === presetId) {
+            pill.className = "px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm";
+          } else {
+            pill.className = "px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700";
+          }
+        }
+      });
+
       const sKey = scenarioMap[presetId];
       if (sKey) {
         try {
-          showToast(`Loading Account #${presetId}`, `Executing verified conversation and action rails...`);
+          showToast(`Executing Scenario ${sKey.toUpperCase()}`, `Running multi-turn dialogue, policy rules & payment rails...`);
           const sRes = await fetch(`/api/events/scenario/${sKey}`, { method: 'POST' });
           selectedAccount = await sRes.json();
           await loadAllAccounts();
           await fetchMetrics();
           renderConsoleDetails();
-          showToast(`Account #${presetId} Ready`, `${selectedAccount.customer_name} loaded in Operations Console.`);
+          renderBorrowerPhoneView();
+          showToast(`Scenario ${sKey.toUpperCase()} Ready`, `${selectedAccount.customer_name} synced across NBFC & Borrower Views.`);
           return;
         } catch (e) {
           console.warn(e);
@@ -693,7 +1126,7 @@
       selectAccount(presetId);
     }
 
-    // RENDER DETAILS
+    // RENDER DETAILS IN NBFC CONSOLE
     function renderConsoleDetails() {
       if (!selectedAccount) return;
       const a = selectedAccount;
@@ -717,7 +1150,7 @@
         'bg-slate-800 text-slate-400 border border-slate-700'
       }`;
 
-      document.getElementById('voiceLanguageBadge').innerText = `Indic Voice (${lang} Devanagari)`;
+      document.getElementById('voiceLanguageBadge').innerText = `Sarvam Bulbul:v3 (${lang} Devanagari)`;
 
       const hcBtn = document.getElementById('btnHospicashAction');
       const hasHc = a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider);
@@ -776,7 +1209,7 @@
           <div class="h-full flex flex-col items-center justify-center text-slate-500 text-xs py-20">
             <i class="fa-solid fa-headset text-3xl mb-3 text-slate-600"></i>
             <span class="font-semibold text-slate-400">No active recording on file for this account.</span>
-            <span class="text-[11px] text-slate-600 mt-1">Select an account or use Demo Preset above to load verified dialogue.</span>
+            <span class="text-[11px] text-slate-600 mt-1">Select a scenario above to load verified dialogue.</span>
           </div>
         `;
         return;
@@ -808,7 +1241,121 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // AUDIO PLAYBACK
+    // =======================================================
+    // RENDER BORROWER PHONE SIMULATOR VIEW (THE USER SIDE)
+    // =======================================================
+    function renderBorrowerPhoneView() {
+      if (!selectedAccount) return;
+      const a = selectedAccount;
+      const amt = Number(a.amount_due || (a.data && a.data.amount_due) || 0);
+      const tokenAmt = a.instant_recovered_inr > 0 ? a.instant_recovered_inr : (a.data && a.data.instant_recovered_inr) || Math.min(2500, amt);
+      const isPaid = a.status === 'paid';
+
+      // 1. In-Call View
+      document.getElementById('phoneCallLanguageChip').innerText = `${a.language || 'Indic'} (${a.language === 'Marathi' ? 'मराठी' : 'हिन्दी'})`;
+      
+      const lastTurn = (a.transcript && a.transcript.length > 0) ? a.transcript[a.transcript.length - 1] : null;
+      if (lastTurn) {
+        document.getElementById('phoneLiveCaption').innerText = `"${lastTurn.text}"`;
+      } else {
+        document.getElementById('phoneLiveCaption').innerText = `"नमस्कार, मी सारथी कॅपिटलकडून कॉल करत आहे..."`;
+      }
+
+      // 2. WhatsApp View
+      const waHeader = document.getElementById('waMsgHeader');
+      const waBody = document.getElementById('waMsgBody');
+      const waCardAmount = document.getElementById('waCardAmount');
+      const waPayBtn = document.getElementById('waPayBtnLabel');
+      const waUpiCard = document.getElementById('waUpiActionCard');
+      const waHcCard = document.getElementById('waHospicashCard');
+
+      waCardAmount.innerText = `₹${amt.toLocaleString()}`;
+
+      if (a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider)) {
+        waHeader.innerText = "Medical Distress Relief Granted";
+        waBody.innerText = `आदरणीय ${a.customer_name}, आपल्या वडिलांच्या प्रकृतीबद्दल ऐकून वाईट वाटले. आम्ही वसूली तात्काळ ७ दिवसांसाठी थांबवली आहे आणि आपल्या कव्हर अंतर्गत ₹१५,००० चा Hospicash क्लेम दाखल केला आहे.`;
+        waUpiCard.classList.add('hidden');
+        waHcCard.classList.remove('hidden');
+      } else if (a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H')) {
+        waHeader.innerText = "T-24h Preventive Bounce Alert";
+        waBody.innerText = `अंजली ताई, उद्या ₹१८,००० चा EMI आहे. खात्यात शिल्लक कमी असल्याने ₹५९० बाउन्स शुल्क वाचवण्यासाठी आज ₹६,००० भरा व उर्वरित ३ दिवस पुढे ढकला.`;
+        waCardAmount.innerText = `₹6,000.00`;
+        waPayBtn.innerText = `Pay ₹6,000 Token Now (Save ₹590)`;
+        waUpiCard.classList.remove('hidden');
+        waHcCard.classList.add('hidden');
+      } else if (a.instant_recovered_inr > 0 || (a.data && a.data.instant_recovered_inr > 0)) {
+        waHeader.innerText = "Flexible Payment Restructuring";
+        waBody.innerText = `राजेश जी, आपके अनुरोध पर ₹२,५०० का तत्काल टोकन लिंक तैयार है। शेष ₹५,००० आपके शुक्रवार वेतन दिवस AutoPay में लिंक होगा।`;
+        waCardAmount.innerText = `₹${tokenAmt.toLocaleString()}`;
+        waPayBtn.innerText = `Pay ₹${tokenAmt.toLocaleString()} Token via UPI`;
+        waUpiCard.classList.remove('hidden');
+        waHcCard.classList.add('hidden');
+      } else {
+        waHeader.innerText = "Repayment UPI Link (Official)";
+        waBody.innerText = `सुनिता ताई, नमस्कार. तुमच्या विनंतीनुसार ₹४०,००० च्या परतफेडीची सुरक्षित UPI लिंक खाली दिली आहे. कृपया पेमेंट पूर्ण करा.`;
+        waCardAmount.innerText = `₹${amt.toLocaleString()}`;
+        waPayBtn.innerText = `Pay ₹${amt.toLocaleString()} via UPI`;
+        waUpiCard.classList.remove('hidden');
+        waHcCard.classList.add('hidden');
+      }
+
+      // 3. UPI Sheet View
+      document.getElementById('upiSheetLoanId').innerText = `LN-${String(a.id).padStart(5, '0')}`;
+      const payableAmt = (a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H')) ? 6000 : (a.instant_recovered_inr > 0 ? a.instant_recovered_inr : amt);
+      document.getElementById('upiSheetAmount').innerText = `₹${payableAmt.toLocaleString()}`;
+      document.getElementById('upiSheetBtnText').innerText = `Pay ₹${payableAmt.toLocaleString()} via UPI PIN`;
+
+      // Status Tag
+      const railTag = document.getElementById('upiSheetRailTag');
+      if (a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H')) {
+        railTag.innerText = "T-24h Liquidity Buffer Rail (₹590 Saved)";
+      } else if (a.instant_recovered_inr > 0) {
+        railTag.innerText = "Capture Liquidity Rail (Token + AutoPay)";
+      } else {
+        railTag.innerText = "Full PTP Settlement Rail";
+      }
+
+      // Success overlay
+      const successOverlay = document.getElementById('upiSuccessOverlay');
+      if (isPaid) {
+        document.getElementById('upiSuccessAmount').innerText = `₹${payableAmt.toLocaleString()}`;
+        document.getElementById('upiSuccessUtr').innerText = `YESB${String(a.id).padStart(5, '0')}992`;
+        successOverlay.classList.remove('hidden');
+      } else {
+        successOverlay.classList.add('hidden');
+      }
+    }
+
+    // SIMULATE PAYMENT FROM THE BORROWER PHONE (Full Round-Trip)
+    async function triggerSimulatePaymentFromPhone() {
+      if (!selectedAccount) return;
+      try {
+        showToast("Processing Borrower UPI", `Authenticating SBI UPI PIN for ${selectedAccount.customer_name}...`);
+        const res = await fetch(`/api/cases/${selectedAccount.id}/simulate-payment?workflow_id=collections`, { method: 'POST' });
+        selectedAccount = await res.json();
+        
+        // Show success on phone
+        const amt = (selectedAccount.trigger_type === 'PRE_DUE_T24H' || (selectedAccount.data && selectedAccount.data.trigger_type === 'PRE_DUE_T24H')) ? 6000 : selectedAccount.amount_due;
+        document.getElementById('upiSuccessAmount').innerText = `₹${amt.toLocaleString()}`;
+        document.getElementById('upiSuccessUtr').innerText = `YESB${String(selectedAccount.id).padStart(5, '0')}${Math.floor(100 + Math.random() * 900)}`;
+        document.getElementById('upiSuccessOverlay').classList.remove('hidden');
+
+        // Sync NBFC Console
+        await loadAllAccounts();
+        await fetchMetrics();
+        renderConsoleDetails();
+        showToast("Settlement Received", `Payment captured on YesBank VPA! NBFC case status updated to PAID.`);
+      } catch (err) {
+        alert("Payment error: " + err);
+      }
+    }
+
+    function resetUpiOverlay() {
+      document.getElementById('upiSuccessOverlay').classList.add('hidden');
+      switchPhoneApp('whatsapp');
+    }
+
+    // AUDIO PLAYBACK (Bulbul:v3 or SpeechSynthesis)
     async function togglePlayCallAudio() {
       if (!selectedAccount || !selectedAccount.transcript) return;
       const icon = document.getElementById('audioControlIcon');
@@ -819,7 +1366,7 @@
         if (audioPlayer) audioPlayer.pause();
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         isPlayingAudio = false;
-        icon.className = "fa-solid fa-play ml-0.5 text-sm";
+        icon.className = "fa-solid fa-play ml-0.5 text-xs";
         wave.classList.remove('wave-active');
         statusEl.innerText = "Audio playback paused";
         return;
@@ -834,7 +1381,7 @@
       const lastTurn = agentMsgs[agentMsgs.length - 1];
       statusEl.innerText = `Connecting to ${selectedAccount.language || 'Indic'} voice PBX stream...`;
       wave.classList.add('wave-active');
-      icon.className = "fa-solid fa-pause text-sm";
+      icon.className = "fa-solid fa-pause text-xs";
       isPlayingAudio = true;
 
       try {
@@ -852,7 +1399,7 @@
           audioPlayer = new Audio(`data:${data.mime_type || 'audio/mp3'};base64,${data.audio_base64}`);
           audioPlayer.onended = () => {
             isPlayingAudio = false;
-            icon.className = "fa-solid fa-play ml-0.5 text-sm";
+            icon.className = "fa-solid fa-play ml-0.5 text-xs";
             wave.classList.remove('wave-active');
             statusEl.innerText = "Audio stream finished";
           };
@@ -873,7 +1420,7 @@
         else utter.lang = 'en-IN';
         utter.onend = () => {
           isPlayingAudio = false;
-          icon.className = "fa-solid fa-play ml-0.5 text-sm";
+          icon.className = "fa-solid fa-play ml-0.5 text-xs";
           wave.classList.remove('wave-active');
           statusEl.innerText = "Audio stream finished";
         };
@@ -887,11 +1434,13 @@
       if (!selectedAccount) return;
       const amt = selectedAccount.instant_recovered_inr > 0 ? selectedAccount.instant_recovered_inr : Math.min(2500, selectedAccount.amount_due);
       showToast("UPI Token Link Dispatched", `Sent dynamic ₹${amt.toLocaleString()} repayment link to borrower WhatsApp.`);
+      openBorrowerPhoneToTab('whatsapp');
     }
 
     function setupAutoPayDebit() {
       if (!selectedAccount) return;
       showToast("AutoPay Mandate Configured", `Recurring eNACH AutoPay mandate pre-registered with NPCI switch.`);
+      openBorrowerPhoneToTab('whatsapp');
     }
 
     function submitHospicashClaim() {
@@ -901,20 +1450,11 @@
         return;
       }
       showToast("Hospicash Claim Submitted", "Claim packet CLM-HC-99281 auto-dispatched to HDFC ERGO Underwriting Desk.");
+      openBorrowerPhoneToTab('whatsapp');
     }
 
     async function simulateBorrowerPayment() {
-      if (!selectedAccount) return;
-      try {
-        const res = await fetch(`/api/cases/${selectedAccount.id}/simulate-payment?workflow_id=collections`, { method: 'POST' });
-        selectedAccount = await res.json();
-        await loadAllAccounts();
-        await fetchMetrics();
-        renderConsoleDetails();
-        showToast("Settlement Confirmed", `Received ₹${selectedAccount.amount_due.toLocaleString()} via UPI UTR YESB${selectedAccount.id.padStart(5, '0')}01. Account marked PAID.`);
-      } catch (err) {
-        alert("Settlement error: " + err);
-      }
+      triggerSimulatePaymentFromPhone();
     }
 
     function downloadAuditEvidence() {
