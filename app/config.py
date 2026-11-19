@@ -18,4 +18,17 @@ class Settings(BaseSettings):
     INDUSTRY_CALL_CENTRE_COST: float = 52.00
     INDUSTRY_FIELD_VISIT_COST: float = 250.00
 
+    # Telephony Bridge Parameters (Exotel & Twilio)
+    TELEPHONY_PROVIDER: str = os.getenv("TELEPHONY_PROVIDER", "simulated")
+    EXOTEL_ACCOUNT_SID: str = os.getenv("EXOTEL_ACCOUNT_SID", "mock_exotel_sid")
+    EXOTEL_API_KEY: str = os.getenv("EXOTEL_API_KEY", "mock_exotel_key")
+    EXOTEL_API_TOKEN: str = os.getenv("EXOTEL_API_TOKEN", "mock_exotel_token")
+    EXOTEL_CALLER_ID: str = os.getenv("EXOTEL_CALLER_ID", "+918047190000")
+    EXOTEL_SUB_DOMAIN: str = os.getenv("EXOTEL_SUB_DOMAIN", "api.exotel.com")
+
+    TWILIO_ACCOUNT_SID: str = os.getenv("TWILIO_ACCOUNT_SID", "mock_twilio_sid")
+    TWILIO_AUTH_TOKEN: str = os.getenv("TWILIO_AUTH_TOKEN", "mock_twilio_token")
+    TWILIO_FROM_NUMBER: str = os.getenv("TWILIO_FROM_NUMBER", "+18005550199")
+    PUBLIC_BASE_URL: str = os.getenv("PUBLIC_BASE_URL", "https://saarthi.embarko.app")
+
 settings = Settings()

@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger("saarthi.main")
 import os
 import csv
 import json
@@ -7,7 +9,7 @@ import hashlib
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List, Literal
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Request, Response, Query, UploadFile, File
+from fastapi import FastAPI, HTTPException, Request, Response, Query, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +28,8 @@ from agents.supervisor import (
 )
 from agents.compliance import run_compliance_agent, audit_raw_transcript
 from agents.reporter import compute_engine_metrics
+from services.telephony_bridge import telephony_bridge
+from services.sarvam import FALLBACK_MP3_B64
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -156,6 +160,10 @@ def load_sample_book(workflow_id: str = Query(default="collections")):
                 record.data["credit_score"] = int(record.data["credit_score"])
             if "preapproved_amount" in record.data:
                 record.data["preapproved_amount"] = float(record.data["preapproved_amount"])
+            if "has_hospicash_rider" in record.data:
+                val = str(record.data["has_hospicash_rider"]).strip().lower() in ("true", "1", "yes")
+                record.has_hospicash_rider = val
+                record.data["has_hospicash_rider"] = val
 
             save_case(record)
             loaded_count += 1
@@ -694,6 +702,102 @@ async def text_to_speech(req: TTSRequest):
         "language": lang,
         "browser_speech": True,
         "voice_name": voice_name
+    }
+
+
+# ==================== TELEPHONY BRIDGE (EXOTEL & TWILIO PSTN) ====================
+
+class OutboundCallRequest(BaseModel):
+    case_id: str
+    phone: Optional[str] = None
+    provider: Optional[str] = None
+    caller_id: Optional[str] = None
+
+async def synthesize_carrier_audio_bytes(text: str, language: str) -> bytes:
+    lang = language or "Marathi"
+    voice_name = EDGE_VOICE_MAP.get(lang, "mr-IN-AarohiNeural")
+    try:
+        import edge_tts
+        comm = edge_tts.Communicate(text, voice_name, rate="-4%")
+        audio_bytes = b""
+        async for chunk in comm.stream():
+            if chunk["type"] == "audio":
+                audio_bytes += chunk["data"]
+        if audio_bytes:
+            return audio_bytes
+    except Exception as e:
+        logger.warning(f"Carrier edge-tts audio synthesis fallback: {e}")
+    # Minimal valid MP3 audio fallback
+    raw = FALLBACK_MP3_B64
+    pad = len(raw) % 4
+    if pad:
+        raw += "=" * (4 - pad)
+    return base64.b64decode(raw)
+
+@app.post("/api/telephony/call")
+def trigger_outbound_call(req: OutboundCallRequest):
+    case = get_case(req.case_id, workflow_id="collections")
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Case #{req.case_id} not found in collections book")
+    
+    result = telephony_bridge.initiate_outbound_call(
+        case=case,
+        phone_override=req.phone,
+        provider_override=req.provider,
+        caller_id_override=req.caller_id
+    )
+    return result
+
+@app.get("/api/telephony/audio/{case_id}/{turn_index}")
+async def get_carrier_telephony_audio(case_id: str, turn_index: int):
+    case = get_case(case_id, workflow_id="collections")
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+    
+    agent_turns = [t for t in case.transcript if t.speaker == "agent"]
+    text = agent_turns[-1].text if agent_turns else "नमस्कार, मी सारथी कॅपिटलकडून बोलत आहे."
+    audio_bytes = await synthesize_carrier_audio_bytes(text, case.language)
+    return Response(content=audio_bytes, media_type="audio/mpeg")
+
+@app.post("/api/telephony/twilio/voice")
+@app.post("/api/telephony/twilio/gather")
+def twilio_voice_webhook(
+    case_id: str = Query(...),
+    SpeechResult: Optional[str] = Form(default=None),
+    CallSid: Optional[str] = Form(default=None)
+):
+    case = get_case(case_id, workflow_id="collections")
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Case #{case_id} not found")
+    
+    xml_content = telephony_bridge.generate_twiml_turn(case, borrower_speech=SpeechResult)
+    return Response(content=xml_content, media_type="application/xml")
+
+@app.post("/api/telephony/exotel/flow")
+@app.post("/api/telephony/exotel/gather")
+def exotel_flow_webhook(
+    case_id: str = Query(...),
+    SpeechResult: Optional[str] = Form(default=None),
+    CallSid: Optional[str] = Form(default=None)
+):
+    case = get_case(case_id, workflow_id="collections")
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Case #{case_id} not found")
+    
+    flow_json = telephony_bridge.generate_exotel_passthru_turn(case, borrower_speech=SpeechResult)
+    return flow_json
+
+@app.post("/api/telephony/status")
+def telephony_status_callback(
+    CallSid: Optional[str] = Form(default=None),
+    CallStatus: Optional[str] = Form(default=None),
+    DialCallDuration: Optional[str] = Form(default=None)
+):
+    return {
+        "status": "acknowledged",
+        "call_sid": CallSid,
+        "call_status": CallStatus,
+        "duration_seconds": DialCallDuration
     }
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")

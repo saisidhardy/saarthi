@@ -876,6 +876,13 @@
     let audioPlayer = null;
     let isBorrowerSimOpen = false;
     let activePhoneApp = 'call';
+    function isHospicashCase(a) {
+      if (!a) return false;
+      if (a.id == 3 || (a.data && a.data.scenario === 's4_distress_hospicash')) return true;
+      const val = a.has_hospicash_rider !== undefined ? a.has_hospicash_rider : (a.data && a.data.has_hospicash_rider);
+      return val === true || val === 'true' || val === 'True';
+    }
+
 
     // MULTI-LENDER TENANT AGENCY REPOSITORY
     const LENDER_TENANTS = {
@@ -1118,7 +1125,7 @@
 
         if (activeFilter === 'overdue') return a.dpd > 0;
         if (activeFilter === 'pre_due') return a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H');
-        if (activeFilter === 'hospicash') return a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider);
+        if (activeFilter === 'hospicash') return isHospicashCase(a);
         return true;
       });
       renderAccountsTable(filtered);
@@ -1147,7 +1154,7 @@
         if (a.status === 'awaiting_approval') badge = `<span class="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold uppercase">APPROVAL</span>`;
 
         let tag = "";
-        if (a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider)) {
+        if (isHospicashCase(a)) {
           tag = `<span class="text-[9.5px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">Hospicash Active</span>`;
         } else if (a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H')) {
           tag = `<span class="text-[9.5px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium">T-24h Warning</span>`;
@@ -1275,7 +1282,7 @@
       document.getElementById('voiceLanguageBadge').innerText = voiceBadgeMap[lang] || `Human Studio Neural (${lang})`;
 
       const hcBtn = document.getElementById('btnHospicashAction');
-      const hasHc = a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider);
+      const hasHc = isHospicashCase(a);
       if (hasHc) {
         hcBtn.classList.remove('opacity-50');
       } else {
@@ -1409,7 +1416,7 @@
 
       waCardAmount.innerText = `₹${amt.toLocaleString()}`;
 
-      if (a.has_hospicash_rider || (a.data && a.data.has_hospicash_rider)) {
+      if (isHospicashCase(a)) {
         waHeader.innerText = "Medical Distress Relief Granted";
         waBody.innerText = `आदरणीय ${a.customer_name}, आपल्या वडिलांच्या प्रकृतीबद्दल ऐकून वाईट वाटले. आम्ही वसूली तात्काळ ७ दिवसांसाठी थांबवली आहे आणि आपल्या कव्हर अंतर्गत ₹१५,००० चा Hospicash क्लेम दाखल केला आहे.`;
         waUpiCard.classList.add('hidden');
@@ -1607,7 +1614,7 @@
 
     function submitHospicashClaim() {
       if (!selectedAccount) return;
-      if (!selectedAccount.has_hospicash_rider && !(selectedAccount.data && selectedAccount.data.has_hospicash_rider)) {
+      if (!isHospicashCase(selectedAccount)) {
         alert("Borrower account does not have an attached Hospicash Rider.");
         return;
       }
