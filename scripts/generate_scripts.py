@@ -84,7 +84,7 @@ def build_curated_indic_script(row: Dict[str, str]) -> Dict[str, Any]:
         a_script_en = "Hello Sunitaji, identity confirmed. We have recorded a Promise to Pay (PTP) for the 5th. A UPI payment link has been dispatched via WhatsApp. Thank you."
 
     elif acc_id == "2":
-        # Dispute: Rajesh Sharma
+        # Part-Payment: Rajesh Sharma (₹10,000 upfront PhonePe, rest on Friday)
         dialogue = [
             {
                 "turn": 1,
@@ -95,20 +95,20 @@ def build_curated_indic_script(row: Dict[str, str]) -> Dict[str, Any]:
             {
                 "turn": 2,
                 "speaker": "borrower",
-                "text": f"हाँ, {last_4} ही है। अरे भाई, मैं तो 2 दिन पहले ही पूरे ₹{amt:,.0f} Google Pay से भर चुका हूँ! मेरे खाते से कट गए हैं, दोबारा फोन क्यों कर रहे हो?",
-                "translation": f"Yes, it is {last_4}. Brother, I already paid the full ₹{amt:,.0f} via Google Pay 2 days ago! It got debited from my account, why are you calling again?"
+                "text": f"हाँ, {last_4} है। मैं अभी ₹10,000 तुरंत PhonePe से कर देता हूँ, और बाकी ₹15,000 शुक्रवार तक जमा कर दूँगा।",
+                "translation": f"Yes, it is {last_4}. I will pay ₹10,000 immediately via PhonePe, and will deposit the remaining ₹15,000 by Friday."
             },
             {
                 "turn": 3,
                 "speaker": "agent",
-                "text": "राजेश जी, यदि आपके खाते से कटौती हो चुकी है, तो हम इस मामले को तुरंत हमारी सीनियर ऑपरेशंस टीम को हैंडऑफ कर रहे हैं ताकि बैंक स्टेटमेंट वेरीफाई किया जा सके।",
-                "translation": "Rajesh ji, if the amount was already debited from your account, we are immediately escalating this case to our Senior Operations desk to verify your bank statement."
+                "text": "राजेश जी, धन्यवाद। हमारी पॉलिसी के तहत 30% से अधिक का अग्रिम भुगतान स्वीकार कर लिया गया है और शेष के लिए शुक्रवार का PTP दर्ज कर लिया गया है।",
+                "translation": "Thank you Rajesh ji. As per policy, upfront payment over 30% is accepted and PTP for the balance is recorded for Friday."
             }
         ]
-        b_script = f"हाँ, लोन {last_4} ही है। अरे भाई, मैं तो 2 दिन पहले ही पूरे पैसे भर चुका हूँ! मेरे खाते से कट गए हैं, दोबारा फोन क्यों कर रहे हो?"
-        b_script_en = f"Yes, loan is {last_4}. Brother, I already paid in full 2 days ago! Deducted from my bank, why are you calling again?"
-        a_script = "राजेश जी, यदि आपके खाते से कटौती हो चुकी है, तो हम इस मामले को तुरंत हमारी सीनियर ऑपरेशंस टीम को हैंडऑफ कर रहे हैं ताकि बैंक स्टेटमेंट वेरीफाई किया जा सके।"
-        a_script_en = "Rajesh ji, if deduction already happened, we are immediately handing off to our senior ops team to verify bank records."
+        b_script = f"हाँ, {last_4} है। मैं अभी ₹10,000 तुरंत PhonePe से कर देता हूँ, और बाकी ₹15,000 शुक्रवार तक जमा कर दूँगा।"
+        b_script_en = f"Yes, {last_4}. I will pay ₹10,000 immediately via PhonePe, and the rest ₹15,000 by Friday."
+        a_script = "राजेश जी, धन्यवाद। हमारी पॉलिसी के तहत 30% से अधिक का अग्रिम भुगतान स्वीकार कर लिया गया है और शेष के लिए शुक्रवार का PTP दर्ज कर लिया गया है।"
+        a_script_en = "Thank you Rajesh ji. Upfront payment over 30% accepted and PTP logged for balance by Friday."
 
     elif acc_id == "3":
         # Hardship: Suresh Patil (Hospital / Shortfall > ₹10k)
@@ -192,7 +192,7 @@ def build_curated_indic_script(row: Dict[str, str]) -> Dict[str, Any]:
         a_script_en = "For security and RBI borrower privacy, we cannot disclose loan details without verification. Ending call and escalating to verification desk."
 
     elif acc_id == "6":
-        # Avoidance: Arvind Tiwari
+        # Dispute: Amit Joshi (Already paid via Google Pay 2 days ago)
         dialogue = [
             {
                 "turn": 1,
@@ -203,7 +203,34 @@ def build_curated_indic_script(row: Dict[str, str]) -> Dict[str, Any]:
             {
                 "turn": 2,
                 "speaker": "borrower",
-                "text": f"हाँ {last_4} है। अभी मैं बहुत जरूरी मीटिंग में हूँ, बाद में बात करना, फोन काटो...",
+                "text": f"हाँ {last_4} है। अरे भाई, मैं तो 2 दिन पहले ही पूरे पैसे भर चुका हूँ! मेरे खाते से कट गए हैं, दोबारा फोन क्यों कर रहे हो?",
+                "translation": f"Yes it is {last_4}. Brother, I already paid the full amount 2 days ago! Deducted from my bank, why are you calling again?"
+            },
+            {
+                "turn": 3,
+                "speaker": "agent",
+                "text": "अमित जी, यदि आपके खाते से कटौती हो चुकी है, तो हम इस मामले को तुरंत सीनियर ऑपरेशंस टीम को हैंडऑफ कर रहे हैं ताकि बैंक स्टेटमेंट वेरीफाई किया जा सके।",
+                "translation": "Amit ji, if deduction already happened, we are immediately escalating to our Senior Operations team to verify your bank statement."
+            }
+        ]
+        b_script = f"हाँ {last_4} है। अरे भाई, मैं तो 2 दिन पहले ही पूरे पैसे भर चुका हूँ! मेरे खाते से कट गए हैं, दोबारा फोन क्यों कर रहे हो?"
+        b_script_en = f"Yes it is {last_4}. Brother, I already paid in full 2 days ago! Deducted from bank, why call again?"
+        a_script = "अमित जी, यदि आपके खाते से कटौती हो चुकी है, तो हम इस मामले को तुरंत सीनियर ऑपरेशंस टीम को हैंडऑफ कर रहे हैं ताकि बैंक स्टेटमेंट वेरीफाई किया जा सके।"
+        a_script_en = "Amit ji, if deduction already occurred, we are immediately handing off to senior ops team to verify bank records."
+
+    elif acc_id == "7":
+        # Avoidance: Arvind Tiwari (Busy in meeting, disconnects)
+        dialogue = [
+            {
+                "turn": 1,
+                "speaker": "agent",
+                "text": f"नमस्ते {name} जी, सारथी से बात कर रहा हूँ। लोन अकाउंट के आखिरी 4 अंक बताइए?",
+                "translation": f"Hello {name} ji, speaking from Saarthi. Share last 4 digits of loan account?"
+            },
+            {
+                "turn": 2,
+                "speaker": "borrower",
+                "text": f"हाँ {last_4} है। अभी मैं बहुत जरूरी काम में हूँ, बाद में बात करना, फोन काटो...",
                 "translation": f"Yes it is {last_4}. Right now I am in an urgent meeting, talk later, disconnect the phone..."
             },
             {
@@ -351,25 +378,8 @@ def main():
 
         print(f"Generating Account #{acc_id:2s} ({name}, {lang}, ₹{amt}, DPD {dpd}, {scenario})...", end=" ", flush=True)
 
-        entry = None
-        if sarvam_client and acc_id in ["1"]:
-            # Query Sarvam-105B specifically for colloquial nuances
-            prompt = f"Write one natural Pune Marathi sentence for Sunita Patil (grocery shopkeeper, Paytm QR, Rs {amt} loan) saying her shop earnings come on the 5th and she will pay on the 5th. Be colloquial and brief."
-            try:
-                spoken_marathi = generate_with_sarvam(sarvam_client, prompt, "You write colloquial Pune Marathi.")
-                clean_spoken = spoken_marathi.strip().split("\n")[0].replace('"', '')
-                if clean_spoken:
-                    entry = build_curated_indic_script(row)
-                    # Enrich borrower turn 4 with Sarvam-105B generated authentic sentence
-                    entry["dialogue"][3]["text"] = clean_spoken
-                    entry["borrower_script"] = f"हो, {last_4} आहे. {clean_spoken}"
-                    print("Done (Sarvam-105B Enhanced)")
-            except Exception as e:
-                print(f"[Fallback: {e}]", end=" ")
-
-        if not entry:
-            entry = build_curated_indic_script(row)
-            print("Done (Curated Colloquial)")
+        entry = build_curated_indic_script(row)
+        print("Done (Curated Colloquial Indic)")
 
         generated_scripts[acc_id] = entry
         time.sleep(0.05)

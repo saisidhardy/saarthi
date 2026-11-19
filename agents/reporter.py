@@ -66,8 +66,11 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
         paid_val = sum(r.amount_due for r in valid_records if r.status == "paid")
         recovery_pct = round((paid_val / max(total_book_val, 1)) * 100, 1)
 
-        # Average cost per contact
-        avg_cost_contact = round(total_cost / max(started_count, 1), 2) if started_count > 0 else 0.0
+        from services.sarvam import sarvam_service
+        live_pricing = sarvam_service.get_cost_summary()
+
+        # Average cost per contact (computed live from actual usage and pricing.yaml rates)
+        avg_cost_contact = round(total_cost / max(started_count, 1), 2) if started_count > 0 else live_pricing.get("cost_per_contact_inr", 1.68)
 
         return EngineMetrics(
             workflow_id="collections",
@@ -89,7 +92,12 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
                 "paid": paid_count,
                 "escalated": human_touch_count,
                 "recovery_pct": recovery_pct,
-                "our_cost_per_contact": avg_cost_contact
+                "our_cost_per_contact": avg_cost_contact,
+                "cost_label": live_pricing.get("cost_label", "estimated from published rates"),
+                "footnote": live_pricing.get("footnote", "excludes LLM tokens"),
+                "industry_call_centre_cost": live_pricing.get("industry_call_centre_cost", 52.00),
+                "industry_field_visit_cost": live_pricing.get("industry_field_visit_cost", 250.00),
+                "benchmark_label": live_pricing.get("benchmark_label", "reported by other sources")
             }
         )
 

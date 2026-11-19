@@ -56,8 +56,17 @@ def test_account_1_hero_ptp_flow():
     assert metrics.journeys_completed_autonomously >= 1
     assert metrics.cost_per_completed_journey < metrics.industry_call_centre_cost
 
-def test_account_2_dispute_escalation():
+def test_account_2_part_payment_flow():
     case = get_case("2", "collections")
+    updated = run_supervisor_pipeline(case, workflow_id="collections")
+    assert updated.status == "ptp"
+    assert updated.intent == "ptp"
+    assert "Part-payment" in updated.offer_made
+    assert updated.audit_pass is True
+    assert updated.payment_status == "sent"
+
+def test_account_6_dispute_escalation():
+    case = get_case("6", "collections")
     updated = run_supervisor_pipeline(case, workflow_id="collections")
     assert updated.intent == "dispute"
     assert updated.status == "escalated"
@@ -137,6 +146,15 @@ def test_download_evidence_pack():
     assert "rule_checks" in pack
     assert pack["rule_checks"]["calling_hours_compliance"] is not None
     assert pack["compliance_audit"]["audit_pass"] is True
+
+def test_export_dispositions_csv():
+    res = client.get("/api/dispositions/export-csv?workflow_id=collections")
+    assert res.status_code == 200
+    assert "text/csv" in res.headers["content-type"]
+    content = res.text
+    assert "case_id,language,outcome,ptp_date,amount,link_status,audit_result,escalation_reason" in content
+    assert "Sunita Patil" not in content  # CSV has case_id and outcome, not full names
+    assert "1,Marathi" in content
 
 # ==================== LOAN SALES WORKFLOW TESTS ====================
 

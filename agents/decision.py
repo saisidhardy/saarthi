@@ -1,10 +1,11 @@
 import os
 import json
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from typing import Optional, Dict, Any
 from app.models import JourneyRecord, WorkflowStep
 from app.config import settings
+from services.sarvam import sarvam_service
 
 def load_policy_content(policy_path: Optional[str]) -> str:
     if not policy_path:
@@ -15,70 +16,200 @@ def load_policy_content(policy_path: Optional[str]) -> str:
             return f.read()
     return ""
 
+def resolve_date_phrase(phrase: str, reference_date: Optional[date] = None) -> date:
+    """
+    CODE resolves relative dates to ISO dates from today's date.
+    LLMs are explicitly forbidden from calculating dates.
+    """
+    if not reference_date:
+        # Current IST date (UTC + 5:30)
+        reference_date = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date()
+
+    clean = phrase.lower().strip()
+    
+    # 1. Weekday resolution
+    weekdays = {
+        "monday": 0, "सोमवार": 0,
+        "tuesday": 1, "मंगळवार": 1, "मंगलवार": 1,
+        "wednesday": 2, "बुधवार": 2,
+        "thursday": 3, "गुरुवार": 3,
+        "friday": 4, "शुक्रवार": 4,
+        "saturday": 5, "शनिवार": 5,
+        "sunday": 6, "रविवार": 6, "इतवार": 6
+    }
+    for w_name, w_idx in weekdays.items():
+        if w_name in clean:
+            curr_w = reference_date.weekday()
+            days_ahead = (w_idx - curr_w) % 7
+            if days_ahead == 0:
+                days_ahead = 7
+            return reference_date + timedelta(days=days_ahead)
+
+    # 2. Relative day offsets
+    if any(k in clean for k in ["today", "आज"]):
+        return reference_date
+    if any(k in clean for k in ["tomorrow", "कल", "उद्या"]):
+        return reference_date + timedelta(days=1)
+    if any(k in clean for k in ["परसों", "परवा"]):
+        return reference_date + timedelta(days=2)
+    if any(k in clean for k in ["2 days", "2 din", "दोन दिवस", "2 दिवस", "दो दिन"]):
+        return reference_date + timedelta(days=2)
+    if any(k in clean for k in ["3 days", "3 din", "तीन दिवस", "3 दिवस", "तीन दिन"]):
+        return reference_date + timedelta(days=3)
+    if any(k in clean for k in ["4 days", "4 din", "चार दिवस", "4 दिवस"]):
+        return reference_date + timedelta(days=4)
+    if any(k in clean for k in ["5 days", "5 din", "पाच दिवस", "5 दिवस", "पाँच दिन"]):
+        return reference_date + timedelta(days=5)
+    if any(k in clean for k in ["next week", "अगले हफ्ते", "पुढच्या आठवड्यात"]):
+        return reference_date + timedelta(days=5)
+
+    # 3. Specific Day of Month (e.g. "5", "5th", "5 तारखेला", "५", "15", "20 तारीख")
+    day_match = re.search(r"(\b[1-9]\b|\b[12][0-9]\b|\b3[01]\b|[१-९]|[१२][०-९]|[३][०१])", clean)
+    if day_match:
+        raw_val = day_match.group(1)
+        indic_digits = {"०": "0", "१": "1", "२": "2", "३": "3", "४": "4", "५": "5", "६": "6", "७": "7", "८": "8", "९": "9"}
+        for ind, eng in indic_digits.items():
+            raw_val = raw_val.replace(ind, eng)
+        try:
+            target_day = int(raw_val)
+            if target_day >= reference_date.day and (target_day - reference_date.day) <= 10:
+                return reference_date.replace(day=target_day)
+            elif target_day < reference_date.day and (target_day + 30 - reference_date.day) <= 10:
+                # Next month's target day within 10 days
+                return reference_date + timedelta(days=(target_day + 30 - reference_date.day))
+            else:
+                return reference_date + timedelta(days=min(max(target_day - reference_date.day, 2), 6))
+        except Exception:
+            pass
+
+    # Default fallback: 3 days
+    return reference_date + timedelta(days=3)
+
+def extract_amount_from_speech(text: str, total_due: float, loan_id: Optional[str] = None) -> Optional[float]:
+    """
+    Extracts numerical payment amounts from spoken Hinglish/Marathi text.
+    Handles 'half', '10k', '₹10,000', '2500', full payment phrases ('पूर्ण', 'सर्व', 'पूरा', 'full').
+    Explicitly filters out loan_id digits (e.g. 1001, 1002) so identity verification numbers aren't confused with money.
+    """
+    clean = text.lower()
+    
+    # 1. Full payment indicators in Marathi, Hindi, English
+    if any(k in clean for k in ["पूर्ण", "पूरा", "पूरे", "all", "full", "complete", "संपूर्ण", "सर्व", "सगळे", "नक्की सर्व", "full payment"]):
+        return total_due
+
+    # 2. Check for half / 50%
+    if any(k in clean for k in ["half", "आधा", "निम्मे", "50%"]):
+        return round(total_due * 0.5, 2)
+    
+    # 3. 10k style
+    k_match = re.search(r"(\d+(?:\.\d+)?)\s*k\b", clean)
+    if k_match:
+        return float(k_match.group(1)) * 1000.0
+
+    # 4. Extract loan digits to ignore (e.g. 1001, 1002)
+    loan_digits = ""
+    if loan_id:
+        loan_digits = re.sub(r"\D", "", str(loan_id))[-4:]
+
+    # 5. Numerical search
+    matches = re.finditer(r"(?:rs\.?|inr|₹)?\s*(\d{1,3}(?:,\d{3})+|\d{4,6}|\d{3})", clean)
+    found_amounts = []
+    for m in matches:
+        raw = m.group(1).replace(",", "")
+        try:
+            val = float(raw)
+            # Skip loan verification digits
+            if loan_digits and raw == loan_digits:
+                continue
+            if 100 <= val <= total_due:
+                found_amounts.append(val)
+        except ValueError:
+            continue
+
+    if found_amounts:
+        # If there are part payment numbers (e.g. 10,000 out of 25,000), return the part payment
+        part_payments = [v for v in found_amounts if v < total_due]
+        if part_payments:
+            return part_payments[0]
+        return found_amounts[0]
+
+    return None
+
 def run_decision_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None, context: Optional[Dict[str, Any]] = None) -> JourneyRecord:
     """
-    Generic Decision Agent (formerly Negotiation):
-    - Applies the workflow-specific policy document to the dialogue / situation
-    - Operates in SIMULATE mode (deterministic policy rules) or LIVE mode (Sarvam-105B) with auto-fallback
-    - Writes decision outcomes (intent, sentiment, offer_made, terms) to record.data
+    Generic Decision Agent (Negotiation):
+    - Uses Sarvam-105B or deterministic policy to extract borrower intent, amount, and date phrase.
+    - Python CODE computes and resolves relative dates to ISO dates.
+    - Validates against policy (PTP <= 7 days, Part payment >= 30%).
     """
-    today = datetime.now(timezone.utc).date()
+    # Current IST date
+    today = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date()
     max_ptp_date = today + timedelta(days=7)
-    policy_text = load_policy_content(context.get("policy_file") if context else "policies/collections_policy.txt")
 
-    # Compile borrower / customer text
     dialogue_texts = [t.text for t in record.transcript if t.speaker in ("borrower", "customer")]
     full_dialogue = " ".join(dialogue_texts).lower()
 
     workflow_id = record.workflow_id or (context.get("workflow_id") if context else "collections")
 
-    # Handle Loan Sales Workflow
     if workflow_id == "loan_sales":
         return _decision_loan_sales(record, full_dialogue, today)
 
-    # Handle Collections Workflow
-    if not settings.SIMULATE and settings.SARVAM_API_KEY:
+    # Collections Workflow
+    if not settings.SIMULATE and settings.SARVAM_API_KEY and settings.SARVAM_API_KEY != "mock_sarvam_key":
         try:
-            from sarvamai import SarvamAI
-            client = SarvamAI(api_subscription_key=settings.SARVAM_API_KEY, timeout=7.5)
             user_msg = f"""
-            Policy Document:
-            {policy_text}
-
             Borrower: {record.customer_name}
             Loan ID: {record.data.get('loan_id')}
             Amount Due: ₹{record.amount_due}
             DPD: {record.dpd}
             Dialogue transcript:
             {full_dialogue}
+
+            Extract:
+            1. intent: 'ptp' | 'hardship' | 'dispute' | 'avoidance'
+            2. sentiment: 'positive' | 'neutral' | 'anxious' | 'hostile'
+            3. extracted_amount: integer or null (e.g. if borrower says half or 10000)
+            4. extracted_date_phrase: exact relative date text (e.g. 'Friday', '5th', 'tomorrow', '2 days')
+            Output JSON only. Do not compute dates.
             """
-            response = client.chat.completions(
-                model="sarvam-105b",
+            content = sarvam_service.chat_completion(
                 messages=[
-                    {"role": "system", "content": "You are the Decision Agent for Saarthi. Apply the provided policy strictly. Output JSON with: intent ('ptp'|'hardship'|'dispute'|'avoidance'), sentiment, offer_made, ptp_date (YYYY-MM-DD or null), confidence (0.0-1.0), status ('ptp'|'escalated'|'contacted')."},
+                    {"role": "system", "content": "You are the Decision Agent for Saarthi. Extract intent, sentiment, extracted_amount, and extracted_date_phrase. Do NOT compute ISO dates."},
                     {"role": "user", "content": user_msg}
                 ],
                 temperature=0.1
             )
-            raw_content = response.choices[0].message.content
-            json_match = re.search(r"\{.*\}", raw_content, re.DOTALL)
+            json_match = re.search(r"\{.*\}", content, re.DOTALL)
             if json_match:
                 parsed = json.loads(json_match.group(0))
                 record.intent = parsed.get("intent", "ptp")
                 record.sentiment = parsed.get("sentiment", "neutral")
-                record.offer_made = parsed.get("offer_made", "Payment commitment requested")
-                record.ptp_date = parsed.get("ptp_date")
-                record.confidence = float(parsed.get("confidence", 0.9))
-                record.status = parsed.get("status", "ptp")
-                if record.status == "escalated":
-                    record.assigned_human = "Senior Collections Officer"
+                
+                # CODE resolves date phrase
+                date_phrase = parsed.get("extracted_date_phrase") or "3 days"
+                resolved_dt = resolve_date_phrase(date_phrase, today)
+                if resolved_dt > max_ptp_date:
+                    resolved_dt = max_ptp_date
+                record.ptp_date = resolved_dt.strftime("%Y-%m-%d")
+
+                # CODE checks amount
+                ext_amt = parsed.get("extracted_amount")
+                if ext_amt and float(ext_amt) >= (record.amount_due * 0.3):
+                    record.offer_made = f"Part-payment of ₹{float(ext_amt):,.2f} accepted upfront. Balance due on {record.ptp_date}."
+                    record.status = "ptp"
+                else:
+                    record.offer_made = f"Full payment commitment for ₹{record.amount_due:,.2f} on {record.ptp_date}."
+                    record.status = "ptp" if record.intent == "ptp" else "escalated"
+                record.confidence = 0.95
         except Exception:
             record = _deterministic_negotiate_collections(record, full_dialogue, today, max_ptp_date)
     else:
         record = _deterministic_negotiate_collections(record, full_dialogue, today, max_ptp_date)
 
     # Post-validation guardrails
-    if record.intent in ("dispute", "hardship"):
+    if record.status == "awaiting_approval":
+        pass
+    elif record.intent in ("dispute", "hardship"):
         record.status = "escalated"
         record.ptp_date = None
         if record.intent == "dispute":
@@ -95,7 +226,6 @@ def run_decision_agent(record: JourneyRecord, step: Optional[WorkflowStep] = Non
         if not record.ptp_date:
             record.ptp_date = (today + timedelta(days=3)).strftime("%Y-%m-%d")
 
-    # Add trace
     record.add_trace(
         agent="Decision",
         action="Policy Verification & Decision Finalized",
@@ -104,9 +234,9 @@ def run_decision_agent(record: JourneyRecord, step: Optional[WorkflowStep] = Non
 
     return record
 
-def _deterministic_negotiate_collections(record: JourneyRecord, text: str, today, max_ptp_date) -> JourneyRecord:
+def _deterministic_negotiate_collections(record: JourneyRecord, text: str, today: date, max_ptp_date: date) -> JourneyRecord:
     # 1. Dispute detection
-    if any(k in text for k in ["already paid", "cut चुके", "कट गए", "पैसे भर चुका", "गलत", "statement check", "लेजर", "फर्जी"]):
+    if any(k in text for k in ["already paid", "cut चुके", "कट गए", "पैसे भर चुका", "गलत", "statement check", "लेजर", "फर्जी", "कटौती"]):
         record.intent = "dispute"
         record.sentiment = "hostile"
         record.status = "escalated"
@@ -116,8 +246,7 @@ def _deterministic_negotiate_collections(record: JourneyRecord, text: str, today
         return record
 
     # 2. Hardship / Waiver / Restructure detection
-    if any(k in text for k in ["नोकरी", "job", "अडचण", "हॉस्पिटल", "accident", "सूट", "माफी", "waiver", "restructure", "hospital", "तंगी"]):
-        # Shortfall calculation: if borrower needs relief above Rs 10,000
+    if any(k in text for k in ["नोकरी", "job", "अडचण", "हॉस्पिटल", "accident", "सूट", "माफी", "waiver", "restructure", "hospital", "तंगी", "lost my job", "waive"]):
         shortfall = record.amount_due - min(record.amount_due * 0.3, 10000.0)
         if shortfall > 10000.0 and record.data.get("approval_decision") is None:
             record.intent = "hardship"
@@ -133,6 +262,7 @@ def _deterministic_negotiate_collections(record: JourneyRecord, text: str, today
             record.status = "ptp"
             record.offer_made = f"Restructure approved by Credit Committee: Balance of ₹{shortfall:,.2f} restructured."
             record.confidence = 0.98
+            record.ptp_date = (today + timedelta(days=5)).strftime("%Y-%m-%d")
             return record
         else:
             record.intent = "hardship"
@@ -148,38 +278,42 @@ def _deterministic_negotiate_collections(record: JourneyRecord, text: str, today
         record.intent = "avoidance"
         record.sentiment = "neutral"
         record.status = "contacted"
-        record.confidence = 0.88
-        record.offer_made = "Call ended abruptly by borrower. Re-queued for retry window."
+        record.confidence = 0.90
+        record.offer_made = "Follow-up reminder call scheduled within 24 hours."
         return record
 
-    # 4. PTP / Part payment
+    # 4. PTP and Part-Payment Parsing in CODE
     record.intent = "ptp"
-    record.sentiment = "cooperative"
-    record.confidence = 0.94
-    record.status = "ptp"
-    
-    if "5" in text or "५" in text:
-        ptp_dt = today + timedelta(days=3)
-        record.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        record.offer_made = f"Full payment of ₹{record.amount_due:,.2f} committed for {record.ptp_date}."
-    elif any(k in text for k in ["उद्या", "कल", "tomorrow"]):
-        ptp_dt = today + timedelta(days=1)
-        record.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        record.offer_made = f"Next-day payment commitment for ₹{record.amount_due:,.2f} on {record.ptp_date}."
-    elif any(k in text for k in ["30%", "part payment", "हप्ता", "10,000", "15,000"]):
-        part_amt = round(record.amount_due * 0.4, 0)
-        ptp_dt = today + timedelta(days=5)
-        record.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        record.offer_made = f"Part payment of ₹{part_amt:,.2f} immediate + balance due on {record.ptp_date}."
+    record.sentiment = "positive"
+    record.confidence = 0.95
+
+    # CODE resolves date phrase
+    resolved_dt = resolve_date_phrase(text, today)
+    if resolved_dt > max_ptp_date:
+        resolved_dt = max_ptp_date
+    record.ptp_date = resolved_dt.strftime("%Y-%m-%d")
+
+    # CODE extracts amount
+    offered_amt = extract_amount_from_speech(text, record.amount_due, loan_id=record.data.get("loan_id"))
+    if offered_amt and offered_amt < record.amount_due:
+        min_allowed = round(record.amount_due * 0.3, 2)
+        if offered_amt >= min_allowed:
+            record.data["part_payment_offered"] = offered_amt
+            remaining = record.amount_due - offered_amt
+            record.offer_made = f"Part-payment of ₹{offered_amt:,.2f} accepted upfront (>=30%). Balance ₹{remaining:,.2f} due on {record.ptp_date}."
+            record.status = "ptp"
+        else:
+            record.intent = "hardship"
+            record.status = "escalated"
+            record.assigned_human = "Floor Supervisor"
+            record.offer_made = f"Offered part-payment of ₹{offered_amt:,.2f} is below 30% policy threshold (₹{min_allowed:,.2f}). Escalated."
     else:
-        ptp_dt = today + timedelta(days=4)
-        record.ptp_date = ptp_dt.strftime("%Y-%m-%d")
-        record.offer_made = f"Commitment recorded to clear ₹{record.amount_due:,.2f} on {record.ptp_date}."
+        record.offer_made = f"Full payment of ₹{record.amount_due:,.2f} committed for {record.ptp_date}."
+        record.status = "ptp"
 
     return record
 
-def _decision_loan_sales(record: JourneyRecord, text: str, today) -> JourneyRecord:
-    # Loan Sales evaluation: Check custom rate / negotiation first
+def _decision_loan_sales(record: JourneyRecord, text: str, today: date) -> JourneyRecord:
     if any(k in text for k in ["negotiat", "rate is high", "8.75%", "8.5%", "concession", "कम ब्याज", "कमी करा"]):
         record.intent = "hardship"
         record.status = "escalated"
@@ -210,5 +344,4 @@ def _decision_loan_sales(record: JourneyRecord, text: str, today) -> JourneyReco
     )
     return record
 
-# Alias for backward compatibility
 run_negotiation_agent = run_decision_agent

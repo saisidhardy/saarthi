@@ -263,6 +263,36 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
         "Content-Disposition": f"attachment; filename=evidence_pack_{case.id}.json"
     })
 
+# 4e. Export Dispositions CSV: GET /api/dispositions/export-csv
+@app.get("/api/dispositions/export-csv")
+@app.get("/api/cases/export-dispositions")
+def export_dispositions_csv(workflow_id: str = Query(default="collections")):
+    import io
+    cases = get_all_cases(workflow_id)
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["case_id", "language", "outcome", "ptp_date", "amount", "link_status", "audit_result", "escalation_reason"])
+    for c in cases:
+        audit_str = "PASSED" if c.audit_pass is True else ("FAILED" if c.audit_pass is False else "PENDING")
+        esc_reason = c.assigned_human if c.status == "escalated" else "None"
+        if c.audit_pass is False and c.audit_reason:
+            esc_reason = c.audit_reason
+        writer.writerow([
+            c.id,
+            c.language,
+            c.status,
+            c.ptp_date or "N/A",
+            c.amount_due if workflow_id == "collections" else c.data.get("preapproved_amount", 0.0),
+            c.payment_status if workflow_id == "collections" else c.data.get("application_link", "N/A"),
+            audit_str,
+            esc_reason
+        ])
+    return Response(
+        content=output.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=saarthi_dispositions_{workflow_id}.csv"}
+    )
+
 # 5. Borrower / Customer message
 @app.post("/api/cases/{case_id}/message")
 def post_borrower_message(case_id: str, req: MessageRequest, workflow_id: str = Query(default="collections")):

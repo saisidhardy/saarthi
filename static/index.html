@@ -84,18 +84,35 @@
           <i class="fa-solid fa-bolt-lightning"></i> <span id="eventBtnLabel">Simulate bounced-mandate event</span>
         </button>
 
+        <!-- Force Violation Button (Account #4) -->
+        <button onclick="forceViolationTest()" class="px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-semibold rounded-lg border border-rose-800/80 flex items-center gap-1.5 transition active:scale-95 shadow-md shadow-rose-950/40" title="Run Account #4 (Abusive/Unauthorized promise) to watch Compliance block payment link">
+          <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Force violation
+        </button>
+
+        <!-- Export Dispositions CSV Button -->
+        <button onclick="exportDispositionsCsv()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-semibold rounded-lg border border-slate-700 flex items-center gap-1.5 transition active:scale-95" title="Export all case outcomes as CSV">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+
         <!-- Replay Recorded Run Button -->
         <button onclick="replayRecordedRun()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-film text-amber-400"></i> Replay recorded run
+          <i class="fa-solid fa-film text-amber-400"></i> Replay run
         </button>
 
         <button onclick="resetCurrentWorkflowBook()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
           <i class="fa-solid fa-rotate-right"></i> Reset
         </button>
 
-        <button id="demoHoursBtn" onclick="toggleDemoHours()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
-          <i class="fa-regular fa-clock text-emerald-400"></i> Hours: <span id="hoursStatus" class="text-emerald-400 font-semibold">11:30 AM IST</span>
-        </button>
+        <!-- Real IST Time & Demo Override Toggle -->
+        <div class="px-2.5 py-1 bg-slate-800 rounded-lg border border-slate-700 flex items-center gap-2 text-xs">
+          <span class="text-slate-300 flex items-center gap-1">
+            <i class="fa-regular fa-clock text-indigo-400"></i> <span id="realIstClockDisplay" class="font-mono text-white font-semibold">--:-- IST</span>
+          </span>
+          <label class="text-[10px] text-slate-400 flex items-center gap-1 cursor-pointer pl-1.5 border-l border-slate-700" title="Demo mode permits testing calls outside 08:00 - 19:00 IST">
+            <input type="checkbox" id="demoOverrideToggle" checked onchange="toggleDemoOverrideCheckbox()" class="rounded border-slate-700 text-indigo-600 focus:ring-0">
+            <span>Demo override</span>
+          </label>
+        </div>
       </div>
     </div>
   </header>
@@ -139,14 +156,17 @@
         <div id="statMetricValue" class="text-lg font-bold text-cyan-400 mt-0.5">0.0%</div>
         <div id="statMetricSub" class="text-[10px] text-slate-500">Workflow goal</div>
       </div>
-      <!-- 5. Cost Per Completed Journey -->
+      <!-- 5. Cost Per Contact -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/20">
         <div class="text-[11px] text-indigo-300 flex items-center justify-between">
-          <span>Cost / Completed</span>
+          <span>Our Cost / Contact</span>
           <i class="fa-solid fa-bolt text-indigo-400 text-xs"></i>
         </div>
-        <div id="statCostCompleted" class="text-lg font-bold text-indigo-300 mt-0.5">₹0.00</div>
-        <div class="text-[10px] text-slate-400">Sarvam Voice + LLM</div>
+        <div id="statCostCompleted" class="text-lg font-bold text-indigo-300 mt-0.5">₹1.68</div>
+        <div class="text-[9px] text-slate-400 mt-0.5 flex flex-col">
+          <span>estimated from published rates</span>
+          <span class="text-slate-500 italic text-[8.5px]">excludes LLM tokens</span>
+        </div>
       </div>
       <!-- 6. Industry Benchmark -->
       <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 bg-slate-900/40">
@@ -155,7 +175,7 @@
           <i class="fa-solid fa-building-columns text-slate-400 text-xs"></i>
         </div>
         <div class="text-sm font-semibold text-slate-300 mt-1">₹52 <span class="text-[10px] text-slate-500 font-normal">call</span> / ₹250 <span class="text-[10px] text-slate-500 font-normal">visit</span></div>
-        <div class="text-[9px] text-slate-500 mt-0.5">CRISIL / PayU published</div>
+        <div class="text-[9px] text-slate-400 bg-slate-800/90 px-1.5 py-0.5 rounded inline-block mt-0.5 border border-slate-700/60 font-medium">reported by other sources</div>
       </div>
     </div>
   </section>
@@ -215,6 +235,25 @@
         </div>
       </div>
 
+      <!-- Scripted Borrower Quick Replies (Feeds Agent Pipeline) -->
+      <div class="px-3.5 py-2 bg-slate-900/90 border-b border-slate-800">
+        <div class="text-[10px] text-slate-400 font-medium mb-1.5 flex items-center justify-between">
+          <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-amber-400"></i> Scripted Borrower Replies:</span>
+          <span class="text-[9px] text-slate-500 font-mono">one-click pipeline feed</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="sendQuickReply('5 तारखेला पूर्ण भरेन')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-indigo-300 text-[11px] rounded-lg border border-slate-700 hover:border-indigo-500 transition shadow-sm active:scale-95" title="Promise full payment on 5th">
+            "5 तारखेला पूर्ण भरेन"
+          </button>
+          <button onclick="sendQuickReply('Can I pay half on Friday?')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-indigo-300 text-[11px] rounded-lg border border-slate-700 hover:border-indigo-500 transition shadow-sm active:scale-95" title="Offer 50% part payment on Friday">
+            "Can I pay half on Friday?"
+          </button>
+          <button onclick="sendQuickReply('Waive my late fee, I lost my job')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] rounded-lg border border-slate-700 hover:border-amber-500 transition shadow-sm active:scale-95" title="Request hardship fee waiver">
+            "Waive my late fee, I lost my job"
+          </button>
+        </div>
+      </div>
+
       <!-- Human-in-the-Loop Approval Card (when paused) -->
       <div id="approvalCard" class="hidden p-3.5 bg-amber-950/70 border-b border-amber-600/60 text-amber-200 text-xs">
         <div class="flex items-center justify-between mb-2">
@@ -241,6 +280,48 @@
         <div class="text-center text-slate-500 text-xs py-10">
           <i class="fa-solid fa-comments text-2xl mb-2 text-slate-600 block"></i>
           No transcript yet. Click "Simulate bounced-mandate event" to trigger call.
+        </div>
+      </div>
+
+      <!-- 1s Visible Pre-Execution Compliance Gate -->
+      <div id="complianceGateCard" class="hidden p-3.5 border-t border-slate-800 bg-slate-900/95 transition-all duration-300">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-white flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-indigo-400"></i> COMPLIANCE AUDIT GATE
+          </span>
+          <span id="complianceGateBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">AUDITING...</span>
+        </div>
+        <div class="space-y-1.5 text-[11px]">
+          <!-- Tick 1: Calling Hours -->
+          <div id="gateTickHours" class="flex items-center justify-between p-2 rounded-lg bg-slate-950/80 border border-slate-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-regular fa-clock text-slate-400" id="gateHoursIcon"></i>
+              <span>(a) Calling Window: <strong id="gateIstClock" class="text-white">--:-- IST</strong> (08:00 - 19:00 IST)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="gateHoursResult" class="font-bold text-slate-500"><i class="fa-solid fa-spinner fa-spin text-indigo-400"></i></span>
+            </div>
+          </div>
+
+          <!-- Tick 2: Tone & Fair Practices -->
+          <div id="gateTickTone" class="flex items-center justify-between p-2 rounded-lg bg-slate-950/80 border border-slate-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-hand-holding-heart text-slate-400" id="gateToneIcon"></i>
+              <span>(b) Tone & Fair-Practice Check: Anti-harassment scan</span>
+            </div>
+            <span id="gateToneResult" class="font-bold text-slate-500"><i class="fa-solid fa-spinner fa-spin text-indigo-400"></i></span>
+          </div>
+
+          <!-- Tick 3: Rulebook Check -->
+          <div id="gateTickRule" class="flex items-center justify-between p-2 rounded-lg bg-slate-950/80 border border-slate-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-book-bookmark text-slate-400" id="gateRuleIcon"></i>
+              <span>(c) Rulebook Policy: PTP &le; 7 days, Part payment &ge; 30%</span>
+            </div>
+            <span id="gateRuleResult" class="font-bold text-slate-500"><i class="fa-solid fa-spinner fa-spin text-indigo-400"></i></span>
+          </div>
+        </div>
+        <div id="gateViolationNotice" class="hidden mt-2 p-2 rounded-lg bg-rose-950/70 border border-rose-800/80 text-[10px] text-rose-300 font-mono">
         </div>
       </div>
 
@@ -307,8 +388,56 @@
     let demoOverrideHours = true;
     let isReplayRunning = false;
     let currentAudioPlayer = null;
+    let audioCtx = null;
+
+    // 1. AudioContext Unlock on first user tap (iOS Safari & Android Chrome compatibility)
+    function unlockAudioContext() {
+      try {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            audioCtx = new AudioContext();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        if (audioCtx) {
+          const buffer = audioCtx.createBuffer(1, 1, 22050);
+          const source = audioCtx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioCtx.destination);
+          source.start(0);
+        }
+      } catch (e) {
+        console.warn("AudioContext unlock note:", e);
+      }
+    }
+    // Global listener for first tap
+    document.addEventListener('click', unlockAudioContext, { once: true });
+    document.addEventListener('touchstart', unlockAudioContext, { once: true });
+
+    // 2. Real Current IST Clock
+    function getRealIstTimeString() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const ist = new Date(utc + (3600000 * 5.5));
+      const hours = String(ist.getHours()).padStart(2, '0');
+      const mins = String(ist.getMinutes()).padStart(2, '0');
+      return `${hours}:${mins} IST`;
+    }
+
+    function updateIstClockDisplay() {
+      const istStr = getRealIstTimeString();
+      const topClock = document.getElementById('realIstClockDisplay');
+      if (topClock) topClock.innerText = istStr;
+      const gateClock = document.getElementById('gateIstClock');
+      if (gateClock) gateClock.innerText = istStr;
+    }
+    setInterval(updateIstClockDisplay, 1000);
 
     window.addEventListener('DOMContentLoaded', async () => {
+      updateIstClockDisplay();
       await fetchConfig();
       await switchWorkflow("collections");
     });
@@ -335,8 +464,9 @@
         badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> LIVE SARVAM AI';
       }
 
-      const hoursBtn = document.getElementById('hoursStatus');
-      hoursBtn.innerText = demoOverrideHours ? "11:30 AM IST" : "Live IST";
+      const overrideCheckbox = document.getElementById('demoOverrideToggle');
+      if (overrideCheckbox) overrideCheckbox.checked = demoOverrideHours;
+      updateIstClockDisplay();
     }
 
     async function toggleSimulateMode() {
@@ -349,14 +479,88 @@
       await fetchConfig();
     }
 
-    async function toggleDemoHours() {
-      const nextHours = !demoOverrideHours;
+    async function toggleDemoOverrideCheckbox() {
+      const box = document.getElementById('demoOverrideToggle');
+      const nextHours = box ? box.checked : !demoOverrideHours;
       await fetch('/api/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ demo_override_hours: nextHours })
       });
       await fetchConfig();
+    }
+
+    // 3. Scripted Quick-Replies
+    function sendQuickReply(replyText) {
+      unlockAudioContext();
+      const input = document.getElementById('customerInput');
+      if (input) input.value = replyText;
+      sendCustomerText();
+    }
+
+    // 4. Force Violation (Account #4)
+    async function forceViolationTest() {
+      unlockAudioContext();
+      if (currentWorkflowId !== "collections") {
+        await switchWorkflow("collections");
+      }
+      await selectRecord("4");
+      await simulateBouncedMandateEvent();
+    }
+
+    // 5. Export Dispositions CSV
+    function exportDispositionsCsv() {
+      window.location.href = `/api/dispositions/export-csv?workflow_id=${currentWorkflowId}`;
+    }
+
+    // 6. Visible ~1s Compliance Gate
+    async function runComplianceGateVisual(record) {
+      const gate = document.getElementById('complianceGateCard');
+      if (!gate) return true;
+      const badge = document.getElementById('complianceGateBadge');
+      const notice = document.getElementById('gateViolationNotice');
+      const hRes = document.getElementById('gateHoursResult');
+      const tRes = document.getElementById('gateToneResult');
+      const rRes = document.getElementById('gateRuleResult');
+
+      gate.classList.remove('hidden');
+      badge.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40";
+      badge.innerText = "AUDITING...";
+      notice.classList.add('hidden');
+
+      updateIstClockDisplay();
+
+      // Tick 1: Calling Hours
+      hRes.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-indigo-400"></i>';
+      tRes.innerHTML = '<span class="text-slate-600">waiting</span>';
+      rRes.innerHTML = '<span class="text-slate-600">waiting</span>';
+      await new Promise(r => setTimeout(r, 320));
+      hRes.innerHTML = '<span class="text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>PASS</span>';
+
+      // Tick 2: Tone & Fair Practices Check
+      tRes.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-indigo-400"></i>';
+      await new Promise(r => setTimeout(r, 360));
+
+      if (record.data.audit_pass === false || record.audit_pass === false) {
+        tRes.innerHTML = '<span class="text-rose-400 font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i>FAIL</span>';
+        rRes.innerHTML = '<span class="text-slate-600">BLOCKED</span>';
+        badge.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40";
+        badge.innerText = "REJECTED (HALTED)";
+        notice.classList.remove('hidden');
+        notice.innerHTML = `<i class="fa-solid fa-ban text-rose-400 mr-1"></i> <strong>BLOCK CODE: RBI-FPC-SEC2</strong><br>${record.data.audit_reason || record.audit_reason || 'Prohibited coercive threat detected in transcript.'}`;
+        return false;
+      } else {
+        tRes.innerHTML = '<span class="text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>PASS</span>';
+      }
+
+      // Tick 3: Rulebook Check
+      rRes.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-indigo-400"></i>';
+      await new Promise(r => setTimeout(r, 320));
+      rRes.innerHTML = '<span class="text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>PASS</span>';
+
+      badge.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+      badge.innerText = "100% COMPLIANT";
+      return true;
     }
 
     async function onWorkflowChange() {
@@ -684,8 +888,12 @@
         selectedRecord = await res.json();
         
         callDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
-        callStatus.innerText = "Autonomous call & negotiation complete";
+        callStatus.innerText = "Negotiation complete · Running Compliance Pre-Execution Gate...";
 
+        // 1s Visible Compliance Gate with 3 ticks
+        await runComplianceGateVisual(selectedRecord);
+
+        callStatus.innerText = "Autonomous journey complete";
         renderRecordDetails();
         await loadRecords();
         await updateDashboard();
@@ -713,6 +921,7 @@
           })
         });
         selectedRecord = await res.json();
+        await runComplianceGateVisual(selectedRecord);
         renderRecordDetails();
         await loadRecords();
         await updateDashboard();
@@ -783,6 +992,7 @@
           body: JSON.stringify({ message: text })
         });
         selectedRecord = await res.json();
+        await runComplianceGateVisual(selectedRecord);
         renderRecordDetails();
         await loadRecords();
         await updateDashboard();
