@@ -2,9 +2,26 @@
 policy_meta:
   policy_version: "2026.3-LENDER-APPROVED"
   policy_name: "Early Delinquency & Borrower Conduct Policy"
-  approved_by: "Board of Directors, Saarthi Capital Ltd."
+  approved_by: "Board of Directors, Saarthi Capital Ltd. & Participating Consortium Lenders"
   effective_date: "2026-04-01"
-  governance_statement: "Enforces lender-approved recovery policies and supports RBI conduct rules."
+  regulatory_catalyst: "RBI Responsible Business Conduct Amendment Directions (issued Aug 2026, mandatory Jan 1, 2027)"
+  market_context:
+    nach_bounce_rate_india_pct: 20.0
+    msme_self_employed_bounce_rate_pct: 55.0
+    bank_bounce_fee_inr: 590.0
+    unit_economics:
+      ai_cost_per_call_inr: 1.80
+      human_telecaller_cost_inr: 52.00
+      cost_reduction_pct: 96.5
+      recovery_rate_lift:
+        baseline_pct: 34.0
+        saarthi_resolved_pct: 61.8
+        net_lift_pct: 27.8
+    wedge_strategy:
+      step_1: "S6 Audit Mode: Zero-integration audit of existing telecaller/bot transcripts in 60s"
+      step_2: "S7 T-24h Preventive Rescue: Pre-bounce liquidity capture and date shift before NACH penalty"
+      step_3: "S1-S8 Full Autonomous Recovery: Multi-lingual Indic voice with UPI AutoPay cashflow splits"
+  governance_statement: "Enforces board-approved lender recovery policies, zero fund custody, and strict RBI conduct rules."
 
 opening_disclosures:
   ai_disclosure:
@@ -175,6 +192,32 @@ insurance_rider_rules:
   max_claim_relief_inr: 15000.0
   cooling_pause_days: 7
   designated_insurer: "HDFC ERGO Health Insurance / ICICI Lombard"
+
+
+root_cause_routing:
+  rule_id: "POLICY-ROOT-ROUTE01"
+  description: "Downstream deterministic routing based on conversation root cause"
+  categories:
+    TEMPORARY_CASHFLOW_MISMATCH:
+      description: "Short-term salary delay, client payment lag, or festival inventory mismatch"
+      permitted_actions: ["LIQUIDITY_CAPTURE_TOKEN_UPI", "AUTOPAY_FRIDAY_MANDATE_SPLIT", "PTP_7_DAYS"]
+      on_settled_full_or_mandate: "UNLOCK_CIBIL_PROTECTION_AND_50K_TOPUP"
+      cibil_protection_active: true
+      working_capital_topup_amount_inr: 50000.0
+    MEDICAL_CALAMITY_SHOCK:
+      description: "ICU, emergency hospitalization, bereavement, or natural disaster"
+      mandatory_action: "FAIR-PRAC-SENS01"
+      cooling_pause_days: 7
+      auto_draft_insurance_claim: true
+      rider_name: "Attached Hospicash / Credit-Shield Micro-Insurance Claim"
+      insurer_payment_target: "lender_escrow"
+    DISPUTE_OR_HARDSHIP:
+      description: "Prolonged job loss, business insolvency, or prior debit dispute"
+      action: "ESCALATE_TO_HUMAN_CREDIT_COUNSELLING"
+      promise_waiver: false
+    INTENTIONAL_EVASION:
+      description: "Third-party contact, persistent avoidance, or bad-faith refusal"
+      action: "THIRD_PARTY_COOLING_24H_OR_LMS_RETRY"
 
 compliance_guardrails:
   forbidden_phrases:

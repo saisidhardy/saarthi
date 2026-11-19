@@ -339,3 +339,93 @@ def test_loan_sales_lead_1_qualification():
     updated = run_supervisor_pipeline(lead, workflow_id="loan_sales")
     assert updated.status == "qualified"
     assert updated.data.get("application_link") is not None
+
+
+# ==================== PHASE 5: DETERMINISTIC ENGINE TESTS ====================
+
+def test_policy_liq_capture_01():
+    """
+    POLICY-LIQ-CAPTURE01 ('Never Leave Call Empty-Handed'):
+    Whenever offered_amount < total_overdue:
+    - (a) instant_token_upi: Immediate partial UPI link for cash available today (min ₹1,000 / >=25%)
+    - (b) locked_autopay_schedule: Remaining balance split across weekly Friday AutoPay debits
+    """
+    case = get_case("2", "collections")
+    updated = run_supervisor_pipeline(case, workflow_id="collections")
+    assert updated.status == "ptp"
+    
+    # Assert instant token link
+    assert "instant_token_upi" in updated.data
+    assert "upi://pay?pa=repayments.saarthi@yesbank" in updated.data["instant_token_upi"]
+    assert "am=2500.00" in updated.data["instant_token_upi"]
+    
+    # Assert locked recurring AutoPay schedule
+    assert "locked_autopay_schedule" in updated.data
+    sched = updated.data["locked_autopay_schedule"]
+    assert len(sched) >= 1
+    assert sched[0]["weekday"] == "Friday"
+    assert "upi://mandate?pa=repayments.saarthi@yesbank" in sched[0]["mandate_link"]
+    
+    # Assert liquidity metrics
+    assert updated.instant_recovered_inr == 2500.0
+    assert updated.locked_mandate_inr == 5000.0
+    assert updated.data.get("rule_id_liq") == "POLICY-LIQ-CAPTURE01"
+
+def test_policy_prev_fee_01():
+    """
+    POLICY-PREV-FEE01 (T-24h Preventive Bounce Rescue):
+    Intercepts low-balance accounts 24h before debit, collects buffer payment today,
+    shifts remaining debit +3 days, and logs bounce_fee_saved_inr = 590 + cibil_protected = True.
+    """
+    res = client.post("/api/events/pre-due-risk", json={
+        "account_id": "21",
+        "balance_inr": 6200.0,
+        "workflow_id": "collections"
+    })
+    assert res.status_code == 200
+    case_data = res.json()
+    assert case_data["trigger_type"] == "PRE_DUE_T24H"
+    assert case_data["bounce_fee_saved_inr"] == 590.0
+    assert case_data["data"]["cibil_protected"] is True
+    assert case_data["data"]["policy_firewall"]["rule_id"] == "POLICY-PREV-FEE01"
+    assert case_data["instant_recovered_inr"] == 6000.0
+    assert case_data["locked_mandate_inr"] == 12000.0
+
+def test_policy_root_route_01():
+    """
+    POLICY-ROOT-ROUTE01 (Root-Cause Downstream Action):
+    - MEDICAL_CALAMITY_SHOCK: 7-day pause + auto-drafted Hospicash claim (insurer pays EMI)
+    - TEMPORARY_CASHFLOW_MISMATCH: On paid -> unlocks CIBIL score protection + ₹50,000 top-up
+    """
+    # Test Medical Calamity with Hospicash
+    case3 = get_case("3", "collections")
+    res_med = run_supervisor_pipeline(case3, workflow_id="collections")
+    assert res_med.root_cause == "MEDICAL_CALAMITY_SHOCK"
+    assert res_med.payment_link is None  # Zero borrower link
+    assert res_med.hospicash_claim is not None
+    assert res_med.hospicash_claim["rider_name"] == "Saarthi Credit-Shield Hospicash Benefit"
+    assert res_med.hospicash_claim["max_relief_amount_inr"] == 15000.0
+    assert res_med.instant_recovered_inr == 15000.0  # Paid by insurer
+
+    # Test Cashflow Mismatch Payment -> Top-up unlocked
+    pay_res = client.post("/api/cases/1/simulate-payment?workflow_id=collections")
+    assert pay_res.status_code == 200
+    paid = pay_res.json()
+    assert paid["status"] == "paid"
+    assert paid["data"]["cibil_protection_active"] is True
+    assert paid["data"]["working_capital_topup_unlocked"] is True
+    assert paid["data"]["topup_amount_inr"] == 50000.0
+    assert "CIBIL Score Protection Active" in paid["data"]["downstream_status"]
+
+def test_policy_waiver_no_01():
+    """
+    POLICY-WAIVER-NO01 (Adversarial Prompt Injection / Waiver Prohibition):
+    Borrower demands waiver or tries prompt injection -> BLOCKED by engine -> Zero link -> Human escalation.
+    """
+    case4 = get_case("4", "collections")
+    res_adv = run_supervisor_pipeline(case4, workflow_id="collections")
+    assert res_adv.status == "escalated"
+    assert res_adv.payment_link is None
+    assert res_adv.data["policy_firewall"]["status"] == "BLOCKED"
+    assert res_adv.data["policy_firewall"]["rule_id"] == "POLICY-WAIVER-NO01"
+    assert res_adv.assigned_human == "Credit Committee (Waiver Exception Desk)"

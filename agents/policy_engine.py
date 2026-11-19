@@ -465,6 +465,35 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             needs_approval = shortfall > 10000.0
             record.data["needs_approval"] = needs_approval
             record.root_cause = "TEMPORARY_CASHFLOW_MISMATCH"
+            record.data["root_cause"] = "TEMPORARY_CASHFLOW_MISMATCH"
+            record.data["root_cause_rule"] = "POLICY-ROOT-ROUTE01"
+
+            # POLICY-LIQ-CAPTURE01: Split into immediate token UPI + locked recurring AutoPay mandate
+            lender_vpa = "repayments.saarthi@yesbank"
+            token_amt = float(offered_amt)
+            instant_token_upi = f"upi://pay?pa={lender_vpa}&pn=Saarthi+Capital+Repayments&am={token_amt:.2f}&cu=INR"
+            record.data["instant_token_upi"] = instant_token_upi
+            
+            curr_w = today.weekday()
+            days_to_fri = (4 - curr_w) % 7
+            if days_to_fri == 0:
+                days_to_fri = 7
+            
+            num_mandate_splits = min(3, max(1, int(shortfall // 2000) if shortfall >= 4000 else 1))
+            split_amount = round(shortfall / num_mandate_splits, 2)
+            locked_autopay_schedule = []
+            for i in range(num_mandate_splits):
+                fri_date = today + timedelta(days=days_to_fri + (i * 7))
+                locked_autopay_schedule.append({
+                    "installment": i + 1,
+                    "due_date": fri_date.strftime("%Y-%m-%d"),
+                    "weekday": "Friday",
+                    "amount_inr": split_amount,
+                    "mandate_link": f"upi://mandate?pa={lender_vpa}&pn=Saarthi+AutoPay&am={split_amount:.2f}&recurrence=WEEKLY&cu=INR"
+                })
+            record.data["locked_autopay_schedule"] = locked_autopay_schedule
+            record.data["rule_id_liq"] = "POLICY-LIQ-CAPTURE01"
+            record.data["policy_liq_capture_rule"] = "POLICY-LIQ-CAPTURE01"
 
             downstream = {
                 "cibil_protection_status": "PROTECTED (Part-Payment Structured)",

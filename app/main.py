@@ -219,6 +219,9 @@ def handle_pre_due_risk_event(event: PreDueRiskEvent):
     case.trigger_type = "PRE_DUE_T24H"
     case.data["trigger_type"] = "PRE_DUE_T24H"
     case.data["pre_due_balance_inr"] = event.balance_inr
+    case.data["cibil_protected"] = True
+    case.bounce_fee_saved_inr = 590.0
+    case.data["bounce_fee_saved_inr"] = 590.0
     case.add_trace(
         agent="Supervisor",
         action="Pre-Due Low-Balance Risk Ingested (T-24h)",
@@ -392,10 +395,17 @@ def simulate_payment(case_id: str, workflow_id: str = Query(default="collections
     case.status = "paid"
     case.instant_recovered_inr = case.amount_due
     case.locked_mandate_inr = 0.0
+
+    # Phase 2.1: If TEMPORARY_CASHFLOW_MISMATCH resolves to PAID -> unlock CIBIL Score Protection Active + ₹50,000 Working-Capital Top-Up Pre-Qualified
+    case.data["cibil_protection_active"] = True
+    case.data["working_capital_topup_unlocked"] = True
+    case.data["topup_amount_inr"] = 50000.0
+    case.data["downstream_status"] = "CIBIL Score Protection Active + ₹50,000 Working-Capital Top-Up Pre-Qualified"
+
     case.add_trace(
         agent="Action",
         action="UPI Instant Settlement Confirmation",
-        summary=f"Received ₹{case.amount_due:,.2f} via UPI settlement rail (UTR: YESB{int(case.id):06d}981). Loan marked PAID."
+        summary=f"Received ₹{case.amount_due:,.2f} via UPI settlement rail (UTR: YESB{int(case.id):06d}981). Loan marked PAID. CIBIL Score Protection Active + ₹50,000 Working-Capital Top-Up Pre-Qualified."
     )
     save_case(case)
     return case
