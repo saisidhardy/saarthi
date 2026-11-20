@@ -4,7 +4,7 @@
 > **Track 3 · Autonomous AI Teammates | Paytm Build for India AI Hackathon**  
 > Built on **Sarvam Indic AI Stack** (Sarvam-105B, Saaras:v3, Bulbul:v3) · Python 3.12 + FastAPI + SQLite + Tailwind CSS
 
-[![Tests: 32 Passed](https://img.shields.io/badge/pytest-32%2F32%20passing-emerald)](https://github.com/saisidhardy/saarthi)
+[![Tests: 33 Passed](https://img.shields.io/badge/pytest-33%2F33%20passing-emerald)](https://github.com/saisidhardy/saarthi)
 [![Compliance: Supports RBI Rules](https://img.shields.io/badge/RBI%20Conduct-Enforces%20Lender%20Policy%20(Demo)-teal)](https://github.com/saisidhardy/saarthi)
 [![Simulated Engine: Active](https://img.shields.io/badge/Engine-Deterministic%20Policy%20Firewall-blue)](https://github.com/saisidhardy/saarthi)
 
@@ -142,7 +142,7 @@ cd saarthi
 pip install -r requirements.txt
 ```
 
-### Run Full Test Suite (24/24 Passing)
+### Run Full Test Suite (33/33 Passing)
 ```bash
 pytest tests/ -v
 ```
