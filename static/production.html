@@ -6,222 +6,11 @@
   <title>Saarthi Enterprise Collections Cloud | Operations & Recovery Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-      <style>
-    :root {
-      --bg:            #F7F6F2;   /* page background, warm off-white */
-      --surface:       #FFFFFF;   /* cards, sidebar, top bar */
-      --border:        #DEDBD2;   /* subtle borders */
-      --text:          #1C2B2A;   /* high-contrast deep slate text */
-      --text-muted:    #5B6B69;   /* muted labels */
-      --accent:        #0F766E;   /* deep teal: primary button, active tab */
-      --accent-soft:   #E3F3F0;   /* selected row, info chips */
-      --accent-text:   #0B524C;   /* text on accent-soft */
-      --warn-bg:       #FBE9C6;   /* subtle status warning */
-      --warn-text:     #7A4A05;
-      --danger-bg:     #FBE0DC;   /* subtle status danger */
-      --danger-text:   #8F2A1D;
+      
 
-      --font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    }
 
-    * {
-      font-family: var(--font-family) !important;
-      transition: all 150ms ease-in-out;
-      box-sizing: border-box;
-    }
 
-    body {
-      background-color: var(--bg) !important;
-      color: var(--text) !important;
-      font-size: 14px !important;
-      font-weight: 400 !important;
-      line-height: 1.5;
-    }
 
-    /* Font Weights Strictly 400 and 500 Only */
-    h1, h2, h3, h4, h5, h6, b, strong, th,
-    .font-bold, .font-semibold, .font-black, .font-extrabold, .font-medium {
-      font-weight: 500 !important;
-    }
-    .font-normal, span, p, td, li, input, select, textarea {
-      font-weight: 400 !important;
-    }
-
-    /* Strict Font Sizes: 12 / 14 / 16 / 24 / 32 */
-    .text-xs, .text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\] {
-      font-size: 12px !important;
-    }
-    .text-sm, .text-\[13px\] {
-      font-size: 14px !important;
-    }
-    .text-base {
-      font-size: 16px !important;
-    }
-    .text-lg, .text-xl, .text-2xl {
-      font-size: 24px !important;
-    }
-    .text-3xl, .text-4xl, .text-5xl {
-      font-size: 32px !important;
-    }
-
-    /* Clean Minimalist Surfaces */
-    aside, header, nav, .bg-slate-900, .bg-slate-950, .bg-slate-900\/90, .bg-slate-950\/60,
-    .bg-slate-950\/40, .bg-slate-950\/50, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-900\/80 {
-      background-color: var(--surface) !important;
-    }
-    .bg-slate-800, .bg-slate-800\/60, .bg-slate-800\/40, .bg-slate-800\/80, .bg-slate-850 {
-      background-color: var(--bg) !important;
-    }
-
-    /* Clean Subtle Borders (No loud neon outlines) */
-    .border-slate-800, .border-slate-700, .border-slate-800\/80, .border-slate-700\/60, .border-slate-700\/50,
-    .border-slate-900, .divide-slate-800, .divide-slate-800\/60 {
-      border-color: var(--border) !important;
-    }
-
-    /* Clean Contrast Text */
-    .text-white, .text-slate-100, .text-slate-200, .text-slate-300, h1, h2, h3, h4, th {
-      color: var(--text) !important;
-    }
-    .text-slate-400, .text-slate-500, .text-slate-600 {
-      color: var(--text-muted) !important;
-    }
-
-    /* Neutral Icons (No rainbow clutter) */
-    i.fa-solid, i.fa-regular, i.fa-brands {
-      color: var(--text-muted);
-    }
-    .text-accent, i.text-accent {
-      color: var(--accent) !important;
-    }
-
-    /* Accent: Deep Teal (Single Brand Colour) */
-    .bg-indigo-600, .bg-indigo-500, .bg-teal-600, .bg-emerald-600, .hover\:bg-indigo-500:hover,
-    .hover\:bg-teal-500:hover, .hover\:bg-emerald-500:hover {
-      background-color: var(--accent) !important;
-      color: #FFFFFF !important;
-    }
-    .text-indigo-400, .text-indigo-300, .text-indigo-500, .text-teal-400, .text-teal-300, .text-emerald-400, .text-emerald-300 {
-      color: var(--accent) !important;
-    }
-    .border-indigo-500, .border-indigo-600, .border-teal-500, .border-emerald-500 {
-      border-color: var(--accent) !important;
-    }
-    .bg-indigo-950, .bg-indigo-950\/40, .bg-indigo-950\/30, .bg-teal-950, .bg-teal-950\/40,
-    .bg-indigo-500\/10, .bg-indigo-500\/20, .bg-teal-500\/10, .bg-teal-500\/20, .bg-emerald-500\/10, .bg-emerald-500\/20 {
-      background-color: var(--accent-soft) !important;
-      color: var(--accent-text) !important;
-    }
-
-    /* Subtle Status Colours: Warm Sand for Warnings, Muted Rose for Danger */
-    .bg-amber-500\/10, .bg-amber-500\/20, .bg-amber-950, .bg-amber-950\/60, .bg-amber-950\/80 {
-      background-color: var(--warn-bg) !important;
-      color: var(--warn-text) !important;
-      border-color: var(--warn-bg) !important;
-    }
-    .text-amber-400, .text-amber-300, .text-amber-500 {
-      color: var(--warn-text) !important;
-    }
-    .bg-rose-500\/10, .bg-rose-500\/20, .bg-rose-950, .bg-rose-950\/60, .bg-rose-950\/80, .bg-rose-600 {
-      background-color: var(--danger-bg) !important;
-      color: var(--danger-text) !important;
-      border-color: var(--danger-bg) !important;
-    }
-    .text-rose-400, .text-rose-300, .text-rose-500 {
-      color: var(--danger-text) !important;
-    }
-
-    /* Button Hierarchy:
-       Primary = solid teal (Send Token UPI)
-       Secondary = white with border (AutoPay Mandate, File Hospicash)
-       Tertiary = plain text (Clear Settlement)
-    */
-    .btn-primary, button.btn-primary {
-      background-color: var(--accent) !important;
-      color: #FFFFFF !important;
-      font-weight: 500 !important;
-      border: 1px solid var(--accent) !important;
-      border-radius: 8px !important;
-      padding: 6px 14px !important;
-      cursor: pointer;
-      box-shadow: none !important;
-    }
-    .btn-primary:hover {
-      background-color: var(--accent-text) !important;
-      border-color: var(--accent-text) !important;
-    }
-    .btn-secondary, button.btn-secondary {
-      background-color: var(--surface) !important;
-      color: var(--text) !important;
-      border: 1px solid var(--border) !important;
-      font-weight: 500 !important;
-      border-radius: 8px !important;
-      padding: 6px 14px !important;
-      cursor: pointer;
-      box-shadow: none !important;
-    }
-    .btn-secondary:hover {
-      background-color: var(--bg) !important;
-      border-color: var(--accent) !important;
-    }
-    .btn-tertiary, button.btn-tertiary {
-      background: transparent !important;
-      border: none !important;
-      color: var(--text-muted) !important;
-      font-weight: 500 !important;
-      padding: 6px 10px !important;
-      cursor: pointer;
-    }
-    .btn-tertiary:hover {
-      color: var(--text) !important;
-      text-decoration: underline;
-    }
-
-    /* Selected Row & Clean Hover States */
-    tr.selected-row, tr[aria-selected="true"] {
-      background-color: var(--accent-soft) !important;
-      border-left: 3px solid var(--accent) !important;
-    }
-    tr:hover {
-      background-color: var(--bg) !important;
-    }
-
-    /* Minimalist Waveform */
-    @keyframes waveBar {
-      0%, 100% { height: 4px; }
-      50% { height: 18px; }
-    }
-    .wave-active .w-bar-1 { animation: waveBar 0.8s infinite 0.1s ease-in-out; }
-    .wave-active .w-bar-2 { animation: waveBar 0.8s infinite 0.25s ease-in-out; }
-    .wave-active .w-bar-3 { animation: waveBar 0.8s infinite 0.4s ease-in-out; }
-    .wave-active .w-bar-4 { animation: waveBar 0.8s infinite 0.2s ease-in-out; }
-    .wave-active .w-bar-5 { animation: waveBar 0.8s infinite 0.35s ease-in-out; }
-
-    /* Custom Scrollbar */
-    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
-    .custom-scroll::-webkit-scrollbar-track { background: var(--bg); }
-    .custom-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-    /* Strip all box shadows for flat, minimalist look */
-    .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-md {
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-    }
-
-    /* Clean Chat Transcript Bubbles */
-    .chat-bubble-agent {
-      background-color: var(--surface) !important;
-      border: 1px solid var(--border) !important;
-      color: var(--text) !important;
-      border-radius: 8px !important;
-    }
-    .chat-bubble-borrower {
-      background-color: var(--bg) !important;
-      border: 1px solid var(--border) !important;
-      color: var(--text) !important;
-      border-radius: 8px !important;
-    }
-  </style>
 <style id="step6-palette">
     :root {
       /* STEP 6 SPECIFIED PALETTE */
@@ -236,11 +25,15 @@
       --purple:  #8B5CF6;   /* "Understand" step (tint #EFE8FD) */
       --red:     #E2574C;   /* "Detect" step and failures (tint #FDE8E6) */
 
-      /* Tints */
-      --purple-tint: #EFE8FD;
-      --red-tint:    #FDE8E6;
-      --teal-tint:   #DDF4F0;
-      --teal-text:   #0A5F54;
+      /* Step Tints */
+      --purple-tint:  #EFE8FD;
+      --purple-text:  #5B21B6;
+      --red-tint:     #FDE8E6;
+      --red-text:     #B91C1C;
+      --teal-tint:    #DDF4F0;
+      --teal-text:    #0A5F54;
+      --saffron-tint: #FEF3C7;
+      --saffron-text: #92400E;
 
       /* Canonical aliases */
       --bg:            var(--cream);
@@ -251,19 +44,36 @@
       --accent:        var(--indigo);
       --accent-soft:   var(--purple-tint);
       --accent-text:   var(--indigo);
-      --warn-bg:       #FEF3C7;
-      --warn-text:     #92400E;
+      --warn-bg:       var(--saffron-tint);
+      --warn-text:     var(--saffron-text);
       --danger-bg:     var(--red-tint);
-      --danger-text:   var(--red);
+      --danger-text:   var(--red-text);
 
       --font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
+    /* Universal Font Family strictly preserving FontAwesome icons */
+    body, body *:not(i):not([class*="fa-"]):not([class*="fas"]):not([class*="far"]):not([class*="fab"]):not([class*="fa"]) {
+      font-family: var(--font-family) !important;
+    }
+    i, .fa, .fas, .far, .fab, .fa-solid, .fa-regular, .fa-brands, [class*="fa-"] {
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "FontAwesome" !important;
+      font-style: normal !important;
+      font-variant: normal !important;
+      text-rendering: auto !important;
+      -webkit-font-smoothing: antialiased !important;
+    }
+
     /* Flat colours only, no gradients or shadows */
     *, *::before, *::after {
-      font-family: var(--font-family) !important;
       box-shadow: none !important;
       text-shadow: none !important;
+      transition: all 150ms ease-in-out;
+      box-sizing: border-box;
+    }
+    [class*="bg-gradient-"], .shadow, .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+      background-image: none !important;
+      box-shadow: none !important;
     }
 
     body, html {
@@ -279,8 +89,11 @@
     .font-bold, .font-semibold, .font-black, .font-extrabold, .font-medium {
       font-weight: 500 !important;
     }
-    .font-normal, span, p, td, li, input, select, textarea {
-      font-weight: 400 !important;
+    .font-normal, span, p, td, li, input, select, textarea, div {
+      font-weight: 400;
+    }
+    .font-medium, strong, th {
+      font-weight: 500 !important;
     }
 
     /* Strict Font Sizes: 12 / 14 / 16 / 24 / 32 */
@@ -300,35 +113,69 @@
       font-size: 32px !important;
     }
 
-    /* Top Header: --indigo with white text */
-    header, .app-header {
-      background-color: var(--indigo) !important;
-      border-bottom: 1px solid var(--line) !important;
-    }
-    header h2, header h3, header span, header div, header p {
-      color: #FFFFFF !important;
-    }
-    header .text-slate-400, header .text-slate-500, header .text-slate-600 {
-      color: rgba(255, 255, 255, 0.85) !important;
-    }
-
-    /* Page background: --cream */
-    .bg-slate-950, .bg-slate-950\/50, .bg-slate-950\/60, .bg-slate-950\/40, .bg-slate-950\/80 {
+    /* Canvas / Page background: --cream */
+    main, .bg-slate-950, .bg-slate-950\/50, .bg-slate-950\/60, .bg-slate-950\/40, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-900\/50 {
       background-color: var(--cream) !important;
     }
 
     /* Panels & Cards: --card */
-    aside, .bg-slate-900, .bg-slate-800, .bg-slate-800\/60, .bg-slate-800\/80, .bg-slate-900\/60, .bg-slate-900\/80, .panel-card {
+    aside, .panel-card, .bg-slate-900:not(header), .bg-slate-800:not(header), .bg-slate-800\/60, .bg-slate-800\/80, .bg-slate-900\/60, .bg-slate-900\/80, .card {
       background-color: var(--card) !important;
     }
 
     /* Structural Borders: --line */
-    .border-slate-800, .border-slate-700, .border-slate-800\/80, .border-slate-800\/60, .border-slate-900, .border-slate-600 {
+    .border-slate-800, .border-slate-700, .border-slate-800\/80, .border-slate-800\/60, .border-slate-900, .border-slate-600, .border-line {
       border-color: var(--line) !important;
     }
 
-    /* Text: --ink (high contrast) */
-    .text-white, .text-slate-100, .text-slate-200, .text-slate-300 {
+    /* Top Header: --indigo with crisp white text */
+    header, .app-header, header.bg-slate-900, header.border-b, [role="banner"] {
+      background-color: var(--indigo) !important;
+      border-bottom: 1px solid var(--line) !important;
+    }
+    header h1, header h2, header h3, header span, header div, header p, header a {
+      color: #FFFFFF !important;
+    }
+    header .text-slate-400, header .text-slate-500, header .text-slate-600, header .text-slate-300, header .text-slate-700 {
+      color: rgba(255, 255, 255, 0.85) !important;
+    }
+    header .text-emerald-400, header .text-teal-400, header .text-indigo-400 {
+      color: #A7F3D0 !important;
+    }
+    header [class*="border-"] {
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+    header .bg-slate-950, header .bg-slate-900, header .bg-slate-800, header .bg-white\/10, header .bg-indigo-950\/60, header .bg-slate-950\/70 {
+      background-color: rgba(0, 0, 0, 0.25) !important;
+      color: #FFFFFF !important;
+    }
+    
+    /* Top Header Action Buttons */
+    #btnToggleSim {
+      background-color: var(--saffron) !important;
+      color: var(--ink) !important;
+      border: none !important;
+      font-weight: 500 !important;
+    }
+    #btnToggleSim * {
+      color: var(--ink) !important;
+    }
+    header button:not(#btnToggleSim) {
+      background-color: rgba(255, 255, 255, 0.18) !important;
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    }
+    header button:not(#btnToggleSim):hover {
+      background-color: rgba(255, 255, 255, 0.3) !important;
+      color: #FFFFFF !important;
+    }
+    header button:not(#btnToggleSim) * {
+      color: #FFFFFF !important;
+    }
+
+    /* Base Text: --ink (high contrast on light card/canvas) */
+    .text-white:not(header *):not(.btn-primary):not(.btn-primary *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(button.bg-indigo-700):not(button.bg-indigo-700 *):not(.bubble-borrower):not(.bubble-borrower *):not(#audioControlBtn):not(#audioControlBtn *):not(button[id^="pill-"].bg-indigo-600):not(button[id^="pill-"].bg-indigo-600 *):not(button[id^="pill-"].bg-teal-700):not(button[id^="pill-"].bg-teal-700 *):not(.items-end .rounded-2xl):not(.items-end .rounded-2xl *),
+    .text-slate-100, .text-slate-200, .text-slate-300 {
       color: var(--ink) !important;
     }
 
@@ -338,44 +185,89 @@
     }
 
     /* Avatar: --saffron */
-    #custAvatar, .avatar-saffron {
+    #custAvatar, .avatar-saffron, .bg-amber-500.rounded-full {
       background-color: var(--saffron) !important;
-      color: #FFFFFF !important;
+      color: var(--ink) !important;
+      font-weight: 500 !important;
     }
 
-    /* Primary buttons: --indigo */
+    /* Primary buttons: --indigo with white text */
     .btn-primary, button.bg-indigo-600, button.bg-indigo-700, #audioControlBtn {
       background-color: var(--indigo) !important;
       color: #FFFFFF !important;
       border: none !important;
     }
+    .btn-primary *, button.bg-indigo-600 *, button.bg-indigo-700 *, #audioControlBtn * {
+      color: #FFFFFF !important;
+    }
 
-    /* Payment & Act buttons: --saffron */
+    /* Payment & Act buttons: --saffron with high-contrast --ink text (6.99:1 contrast) */
     .btn-payment, #btnSimulatePayment, #btnDisburseToken, button.bg-amber-500, button.bg-amber-600, #btnKhataMic {
       background-color: var(--saffron) !important;
-      color: #FFFFFF !important;
+      color: var(--ink) !important;
+      font-weight: 500 !important;
       border: none !important;
+    }
+    .btn-payment *, #btnSimulatePayment *, #btnDisburseToken *, #btnKhataMic * {
+      color: var(--ink) !important;
+    }
+    .btn-payment:hover, #btnSimulatePayment:hover, button.bg-amber-500:hover {
+      background-color: #E58E00 !important;
+    }
+
+    /* Secondary buttons (Clear Settlement, WhatsApp, etc.): clean white card with --line border */
+    .btn-secondary, button.bg-slate-800, button.bg-slate-700, button.bg-slate-800\/80, button.bg-slate-900 {
+      background-color: var(--card) !important;
+      border: 1px solid var(--line) !important;
+      color: var(--ink) !important;
+    }
+    .btn-secondary:hover, button.bg-slate-800:hover, button.bg-slate-700:hover {
+      background-color: var(--cream) !important;
+      border-color: var(--muted) !important;
+      color: var(--ink) !important;
+    }
+    .btn-secondary *, button.bg-slate-800 *, button.bg-slate-700 * {
+      color: var(--ink) !important;
     }
 
     /* Passed-check chips & "Prove" step: --teal, bg #DDF4F0, text #0A5F54 */
-    .chip-passed, .bg-emerald-500\/20, .bg-teal-500\/20 {
-      background-color: #DDF4F0 !important;
-      color: #0A5F54 !important;
+    .chip-passed, .bg-emerald-500\/20, .bg-teal-500\/20, .step-prove, [class*="bg-emerald-500\/20"], [class*="bg-teal-500\/20"] {
+      background-color: var(--teal-tint) !important;
+      color: var(--teal-text) !important;
       border: 1px solid var(--teal) !important;
     }
-
-    /* "Understand" step: --purple with tint #EFE8FD */
-    .step-understand, .bg-purple-500\/20, .bg-purple-950\/40 {
-      background-color: #EFE8FD !important;
-      color: var(--purple) !important;
-      border: 1px solid var(--purple) !important;
+    .chip-passed *, .bg-emerald-500\/20 *, .bg-teal-500\/20 *, .step-prove * {
+      color: var(--teal-text) !important;
     }
 
-    /* "Detect" step & failures: --red with tint #FDE8E6 */
-    .step-detect, .bg-rose-500\/20, .bg-red-500\/20 {
-      background-color: #FDE8E6 !important;
-      color: var(--red) !important;
+    /* "Understand" step: --purple with tint #EFE8FD, text #5B21B6 */
+    .step-understand, .bg-purple-500\/20, .bg-purple-950\/40, [class*="bg-purple-500\/20"] {
+      background-color: var(--purple-tint) !important;
+      color: var(--purple-text) !important;
+      border: 1px solid var(--purple) !important;
+    }
+    .step-understand *, .bg-purple-500\/20 *, [class*="bg-purple-500\/20"] * {
+      color: var(--purple-text) !important;
+    }
+
+    /* "Detect" step & failures: --red with tint #FDE8E6, text #B91C1C */
+    .step-detect, .bg-rose-500\/20, .bg-red-500\/20, [class*="bg-rose-500\/20"], [class*="bg-red-500\/20"] {
+      background-color: var(--red-tint) !important;
+      color: var(--red-text) !important;
       border: 1px solid var(--red) !important;
+    }
+    .step-detect *, .bg-rose-500\/20 *, .bg-red-500\/20 *, [class*="bg-rose-500\/20"] * {
+      color: var(--red-text) !important;
+    }
+
+    /* "Act" step: --saffron with tint #FEF3C7, text #92400E */
+    .step-act, .bg-amber-500\/20, [class*="bg-amber-500\/20"] {
+      background-color: var(--saffron-tint) !important;
+      color: var(--saffron-text) !important;
+      border: 1px solid var(--saffron) !important;
+    }
+    .step-act *, .bg-amber-500\/20 *, [class*="bg-amber-500\/20"] * {
+      color: var(--saffron-text) !important;
     }
 
     /* Chat Bubbles: borrower chat bubble = --indigo */
@@ -398,16 +290,103 @@
       color: var(--ink) !important;
     }
 
-    /* Scenario Active Pills */
-    button[id^="pill-"].bg-indigo-600, button[id^="pill-"].bg-teal-700 {
+    /* Left Sidebar */
+    aside {
+      background-color: var(--card) !important;
+      border-right: 1px solid var(--line) !important;
+    }
+    aside #lenderTenantSelect {
+      background-color: var(--cream) !important;
+      border: 1px solid var(--line) !important;
+      color: var(--ink) !important;
+    }
+    aside nav button {
+      background-color: transparent !important;
+      color: var(--muted) !important;
+      border: 1px solid transparent !important;
+      border-radius: 8px !important;
+    }
+    aside nav button:hover {
+      background-color: var(--cream) !important;
+      color: var(--ink) !important;
+    }
+    aside nav button.bg-indigo-600, aside nav button.active, aside nav button[class*="bg-indigo-600"] {
       background-color: var(--indigo) !important;
       color: #FFFFFF !important;
       border: 1px solid var(--indigo) !important;
     }
-    button[id^="pill-"]:not(.bg-indigo-600):not(.bg-teal-700) {
+    aside nav button.bg-indigo-600 *, aside nav button.active * {
+      color: #FFFFFF !important;
+    }
+    aside nav button #navBadgeQueue {
+      background-color: #F0E6D2 !important;
+      color: var(--ink) !important;
+    }
+    aside nav button.bg-indigo-600 #navBadgeQueue {
+      background-color: rgba(255, 255, 255, 0.25) !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Accounts Table Rows */
+    #accountsTableContainer > div {
+      border-bottom: 1px solid var(--line) !important;
+      background-color: var(--card) !important;
+      transition: background-color 150ms ease;
+    }
+    #accountsTableContainer > div:hover {
+      background-color: #FAF7F0 !important;
+    }
+    #accountsTableContainer > div.bg-indigo-950\/50, 
+    #accountsTableContainer > div[class*="border-indigo-500"],
+    #accountsTableContainer > div[class*="border-l-4"] {
+      background-color: var(--purple-tint) !important;
+      border-left: 4px solid var(--indigo) !important;
+    }
+    #accountsTableContainer > div.bg-indigo-950\/50 .text-white,
+    #accountsTableContainer > div .font-bold {
+      color: var(--ink) !important;
+    }
+    #accountsTableContainer > div .text-slate-400 {
+      color: var(--muted) !important;
+    }
+
+    /* Scenario Active Pills */
+    button[id^="pill-"].bg-indigo-600, button[id^="pill-"].bg-teal-700, button[id^="pill-"].active {
+      background-color: var(--indigo) !important;
+      color: #FFFFFF !important;
+      border: 1px solid var(--indigo) !important;
+    }
+    button[id^="pill-"].bg-indigo-600 *, button[id^="pill-"].bg-teal-700 * {
+      color: #FFFFFF !important;
+    }
+    button[id^="pill-"]:not(.bg-indigo-600):not(.bg-teal-700):not(.active) {
       background-color: var(--card) !important;
       color: var(--ink) !important;
       border: 1px solid var(--line) !important;
+    }
+    button[id^="pill-"]:hover {
+      background-color: #FAF7F0 !important;
+    }
+
+    /* Tabs (Call Dialogue, Settlement Rails, Call Plan, etc.) */
+    div[id^="tabBtn-"], button[id^="tabBtn-"] {
+      color: var(--muted) !important;
+      border-bottom: 2px solid transparent !important;
+      font-weight: 400 !important;
+      transition: all 150ms ease;
+    }
+    div[id^="tabBtn-"]:hover, button[id^="tabBtn-"]:hover {
+      color: var(--ink) !important;
+    }
+    div[id^="tabBtn-"].text-indigo-400, button[id^="tabBtn-"].text-indigo-400,
+    div[id^="tabBtn-"].border-indigo-500, button[id^="tabBtn-"].border-indigo-500,
+    button[id^="tabBtn-"].border-b-2 {
+      color: var(--indigo) !important;
+      border-bottom-color: var(--indigo) !important;
+      font-weight: 500 !important;
+    }
+    button[id^="tabBtn-"] i {
+      color: inherit !important;
     }
 
     /* Drawer & Phone Frame */
@@ -418,6 +397,56 @@
     .phone-bezel {
       background-color: var(--card) !important;
       border: 3px solid var(--line) !important;
+    }
+    .phone-screen {
+      background-color: var(--cream) !important;
+    }
+
+    /* Form controls */
+    input, select, textarea {
+      background-color: var(--card) !important;
+      border: 1px solid var(--line) !important;
+      color: var(--ink) !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--indigo) !important;
+      outline: none !important;
+    }
+    input::placeholder, textarea::placeholder {
+      color: var(--muted) !important;
+    }
+
+    /* Modals */
+    #roiModal, #paymentModal, .modal-backdrop {
+      background-color: rgba(43, 36, 56, 0.5) !important;
+    }
+    #roiModal > div, #paymentModal > div, .modal-card {
+      background-color: var(--card) !important;
+      border: 1px solid var(--line) !important;
+    }
+
+    /* Tables across audit, callplan, outcomes */
+    table {
+      border-color: var(--line) !important;
+    }
+    thead tr {
+      background-color: #FAF7F0 !important;
+      border-bottom: 1px solid var(--line) !important;
+    }
+    thead th {
+      color: var(--muted) !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+    }
+    tbody tr {
+      background-color: var(--card) !important;
+      border-bottom: 1px solid var(--line) !important;
+    }
+    tbody tr:hover {
+      background-color: #FAF7F0 !important;
+    }
+    td {
+      color: var(--ink) !important;
     }
   </style>
 
