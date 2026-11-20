@@ -1852,7 +1852,7 @@
 
         // 6. Refresh UI components
         renderDialogueStream();
-        renderAccountsTable(accountsData);
+        renderAccountsTable(accounts);
         showToast("Merchant QR Auto-Sweep Activated!", `CIBIL Protected (715). ₹${Number(data.locked_mandate_inr).toLocaleString()} locked into settlement sweep.`);
 
       } catch (err) {
@@ -1865,7 +1865,6 @@
 
     function triggerSimulatedKhataVoice() {
       triggerKhataVoiceConfirm("हो, १०% QR कट चालेल");
-    }
     }
 
     // SIMULATE PAYMENT FROM THE BORROWER PHONE (Full Round-Trip)
