@@ -429,3 +429,51 @@ def test_policy_waiver_no_01():
     assert res_adv.data["policy_firewall"]["status"] == "BLOCKED"
     assert res_adv.data["policy_firewall"]["rule_id"] == "POLICY-WAIVER-NO01"
     assert res_adv.assigned_human == "Credit Committee (Waiver Exception Desk)"
+
+def test_policy_qr_sweep_01_borrower_activation():
+    """
+    POLICY-QR-SWEEP01 (Borrower-Side Voice-First Khata + 10% Pay-As-You-Sell QR Auto-Sweep):
+    Validates sweep_pct, activates merchant QR sweep, protects CIBIL (680 -> 715),
+    locks overdue into mandate, waives ₹590 bounce fee, records voice confirmation in Evidence Pack.
+    """
+    # 1. Test invalid sweep_pct rejected
+    inv_res = client.post("/api/borrower/qr-sweep-activate", json={
+        "journey_id": "1",
+        "sweep_pct": 99,
+        "voice_confirmation_text": "हो, ९९% कट चालेल"
+    })
+    assert inv_res.status_code == 400
+
+    # 2. Test valid 10% activation for Case 1 (Sunita Patil)
+    act_res = client.post("/api/borrower/qr-sweep-activate", json={
+        "journey_id": "1",
+        "sweep_pct": 10,
+        "voice_confirmation_text": "हो, १०% QR कट चालेल",
+        "workflow_id": "collections"
+    })
+    assert act_res.status_code == 200
+    data = act_res.json()
+    assert data["success"] is True
+    assert data["rule_id"] == "POLICY-QR-SWEEP01"
+    assert data["repayment_rail"] == "MERCHANT_QR_SWEEP_10PCT"
+    assert data["cibil_protected"] is True
+    assert "PROTECTED" in data["cibil_score_display"]
+    assert data["bounce_fee_waived_inr"] == 590.0
+    assert data["locked_mandate_inr"] == 40000.0
+    assert "सुनीता" in data["voice_response"]
+
+    # 3. Verify Evidence Pack records borrower voice and trace
+    ev_res = client.get("/api/cases/1/evidence-pack")
+    assert ev_res.status_code == 200
+    pack = ev_res.json()
+    assert pack["action_deliverables"]["repayment_rail"] == "MERCHANT_QR_SWEEP_10PCT"
+    assert pack["action_deliverables"]["cibil_protected"] is True
+    assert pack["rule_checks"]["qr_auto_sweep_policy"] == "PASSED [POLICY-QR-SWEEP01] (10% Pay-As-You-Sell Auto-Sweep)"
+    
+    # Check transcript contains voice confirmation
+    transcripts = [t["text"] for t in pack["transcript"]]
+    assert any("हो, १०% QR कट चालेल" in t for t in transcripts)
+
+    # Check trace contains Voice Khata Sweep
+    traces = [t["summary"] for t in pack["trace_timeline"]]
+    assert any("POLICY-QR-SWEEP01" in t for t in traces)

@@ -193,6 +193,14 @@ insurance_rider_rules:
   cooling_pause_days: 7
   designated_insurer: "HDFC ERGO Health Insurance / ICICI Lombard"
 
+qr_sweep_rules:
+  rule_id: "POLICY-QR-SWEEP01"
+  description: "Borrower-side voice-confirmed 10% pay-as-you-sell QR auto-sweep recovery"
+  allow_merchant_qr_sweep: true
+  default_sweep_pct: 10
+  cibil_protection_bonus_pts: 35
+  bounce_fee_waived_inr: 590.0
+
 
 root_cause_routing:
   rule_id: "POLICY-ROOT-ROUTE01"

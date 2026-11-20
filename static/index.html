@@ -480,6 +480,9 @@
           <button onclick="sendQuickReply('दर शुक्रवारी 10-10 हजार करून 4 आठवड्यांत भरू का?')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-purple-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-purple-500 transition shadow-sm active:scale-95" title="4-week Kirana Cashflow Friday micro-split (S8)">
             "दर शुक्रवारी 10k x 4 आठवडे"
           </button>
+          <button onclick="sendQuickReply('हो, १०% QR कट चालेल')" class="px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10.5px] rounded-lg border border-amber-500/50 hover:border-amber-400 transition shadow-sm active:scale-95" title="Merchant QR 10% Pay-As-You-Sell Auto-Sweep (POLICY-QR-SWEEP01)">
+            "हो, १०% QR कट चालेल (Voice Khata)"
+          </button>
         </div>
       </div>
 
@@ -714,6 +717,38 @@
               Captured immediate token liquidity via UPI, locked balance into legally binding AutoPay schedule.
             </p>
           </div>
+        </div>
+      </div>
+
+      <!-- OUTCOME CARD 5: BORROWER VOICE KHATA & 10% QR AUTO-SWEEP (POLICY-QR-SWEEP01) -->
+      <div id="qrSweepOutcomeCard" class="hidden p-3 border-t border-amber-500/40 bg-gradient-to-br from-amber-950/20 via-slate-900 to-amber-950/20 text-xs transition-all duration-300">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-amber-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-store text-amber-400"></i> VOICE-FIRST KHATA + 10% PAY-AS-YOU-SELL QR SWEEP
+          </span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">POLICY-QR-SWEEP01</span>
+        </div>
+        <div class="bg-slate-950/90 border border-amber-500/30 rounded-xl p-2.5 space-y-1.5 text-[11px]">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Merchant Voice Confirmation:</span>
+            <span class="text-white font-mono font-bold">"हो, १०% QR कट चालेल"</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Pay-As-You-Sell Rate:</span>
+            <span class="text-amber-300 font-bold font-mono">10% of daily QR settlements</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">CIBIL Score Shield:</span>
+            <span class="text-emerald-400 font-bold font-mono">680 &rarr; 715 (PROTECTED +35 pts)</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Bounce Fee Waived:</span>
+            <span class="text-emerald-400 font-bold font-mono">&plus;₹590.00 Saved</span>
+          </div>
+        </div>
+        <div class="text-[10px] text-amber-300/80 mt-1.5 flex items-center justify-between">
+          <span class="flex items-center gap-1"><i class="fa-solid fa-circle-check text-emerald-400"></i> Locked into NPCI merchant settlement rail. Zero lump-sum stress.</span>
+          <a href="/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-semibold">Open Phone View &rarr;</a>
         </div>
       </div>
 
@@ -1485,6 +1520,17 @@
         }
       } else {
         whyCard.classList.add('hidden');
+      }
+
+      // 5. Render QR Auto-Sweep Card (POLICY-QR-SWEEP01)
+      const qrCard = document.getElementById('qrSweepOutcomeCard');
+      const isQrActive = r.repayment_rail === 'MERCHANT_QR_SWEEP_10PCT' || (r.data && (r.data.repayment_rail === 'MERCHANT_QR_SWEEP_10PCT' || r.data.qr_sweep_active));
+      if (qrCard) {
+        if (isQrActive) {
+          qrCard.classList.remove('hidden');
+        } else {
+          qrCard.classList.add('hidden');
+        }
       }
 
       updateWorkflowStepCards(r);

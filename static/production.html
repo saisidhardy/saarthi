@@ -316,6 +316,10 @@
           </div>
 
           <div class="flex items-center gap-2">
+            <button id="btnOpenBorrowerPhone" onclick="openBorrowerPhoneToTab('khata')" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition transform active:scale-95" title="Open Borrower Phone View (Voice Khata & 10% QR Auto-Sweep)">
+              <i class="fa-solid fa-mobile-screen-button text-xs"></i>
+              <span>Open Borrower Phone View 📱</span>
+            </button>
             <button onclick="openBorrowerPhoneToTab('whatsapp')" class="px-2.5 py-1.5 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition" title="View customer WhatsApp thread">
               <i class="fa-brands fa-whatsapp text-emerald-400"></i>
               <span class="hidden sm:inline">Borrower WhatsApp</span>
@@ -447,6 +451,30 @@
             </p>
           </div>
 
+          <!-- Borrower Voice Khata & 10% QR Auto-Sweep Card (POLICY-QR-SWEEP01) -->
+          <div id="qrSweepSettlementBox" class="p-3.5 rounded-xl bg-gradient-to-r from-amber-950/30 via-slate-900 to-amber-950/20 border-2 border-amber-500/30 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-extrabold text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
+                <i class="fa-solid fa-store text-amber-400"></i> Voice-First Khata + 10% Pay-As-You-Sell QR Sweep
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">POLICY-QR-SWEEP01</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Enables merchants and self-employed borrowers to auto-route 10% of daily QR scan settlements directly toward overdue EMI. Zero lump-sum pressure, ₹590 bounce fee waived, and CIBIL score protected (+35 bonus points).
+            </p>
+            <div class="flex items-center justify-between pt-1">
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-emerald-400 font-mono font-bold"><i class="fa-solid fa-shield-halved mr-1"></i> CIBIL: 680 → 715 Protected</span>
+                <span class="text-slate-500">|</span>
+                <span class="text-slate-300 font-mono">Bounce Fee: <strong class="text-emerald-400">₹590 Saved</strong></span>
+              </div>
+              <button onclick="openBorrowerPhoneToTab('khata')" class="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition transform active:scale-95">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <span>Open in Phone View</span>
+              </button>
+            </div>
+          </div>
+
         </div>
 
         <!-- TAB 3: RBI COMPLIANCE & LEGAL AUDIT -->
@@ -536,15 +564,18 @@
       </div>
 
       <!-- Phone App Switcher Pills inside Drawer -->
-      <div class="px-4 py-2 bg-slate-900/60 border-b border-slate-800/80 flex items-center justify-around text-xs shrink-0">
-        <button id="phoneTabBtn-call" onclick="switchPhoneApp('call')" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold flex items-center gap-1.5 transition">
+      <div class="px-2 py-2 bg-slate-900/60 border-b border-slate-800/80 flex items-center justify-around text-xs shrink-0 gap-1">
+        <button id="phoneTabBtn-call" onclick="switchPhoneApp('call')" class="px-2 py-1 rounded-lg bg-indigo-600 text-white font-bold flex items-center gap-1 transition text-[11px]">
           <i class="fa-solid fa-phone"></i> In-Call
         </button>
-        <button id="phoneTabBtn-whatsapp" onclick="switchPhoneApp('whatsapp')" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1.5 transition">
+        <button id="phoneTabBtn-whatsapp" onclick="switchPhoneApp('whatsapp')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1 transition text-[11px]">
           <i class="fa-brands fa-whatsapp text-emerald-400"></i> WhatsApp
         </button>
-        <button id="phoneTabBtn-upi" onclick="switchPhoneApp('upi')" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1.5 transition">
+        <button id="phoneTabBtn-upi" onclick="switchPhoneApp('upi')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1 transition text-[11px]">
           <i class="fa-solid fa-qrcode text-teal-400"></i> UPI Pay
+        </button>
+        <button id="phoneTabBtn-khata" onclick="switchPhoneApp('khata')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1 transition text-[11px]">
+          <i class="fa-solid fa-book-open text-amber-400"></i> Voice Khata
         </button>
       </div>
 
@@ -800,6 +831,146 @@
 
           </div>
 
+          <!-- ======================================================== -->
+          <!-- PHONE APP 4: VERNACULAR VOICE KHATA & 10% QR AUTO-SWEEP  -->
+          <!-- ======================================================== -->
+          <div id="phoneView-khata" class="hidden flex-1 flex flex-col justify-between p-4 bg-gradient-to-b from-[#131b26] via-[#0b111a] to-[#060911] text-left relative overflow-y-auto custom-scroll">
+            
+            <!-- Top Khata Header / Shop Tag -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-amber-500/20">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs border border-amber-500/30">
+                    <i class="fa-solid fa-store"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-black text-amber-200">डिजिटल व्यापारी खाते · Digital Khata</h4>
+                    <p id="khataBorrowerSub" class="text-[9.5px] text-slate-400">Sunita Patil · Kirana Store</p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9.5px] font-bold border border-emerald-500/30 flex items-center gap-1">
+                  <i class="fa-solid fa-shield-halved text-[9px]"></i> RBI Protected
+                </span>
+              </div>
+
+              <!-- Clean Notebook-Style Vernacular Khata Card -->
+              <div class="rounded-2xl p-3.5 bg-gradient-to-br from-amber-950/30 via-slate-900 to-amber-950/20 border-2 border-amber-500/30 shadow-xl relative overflow-hidden">
+                <div class="absolute -top-6 -right-6 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+                
+                <!-- 3 Crystal-Clear Numbers -->
+                <div class="space-y-3 relative z-10">
+                  
+                  <!-- Metric 1: Total Due -->
+                  <div class="flex items-center justify-between bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <div>
+                      <span class="text-[10px] font-bold text-slate-400 block">एकूण थकबाकी (Total Due)</span>
+                      <span class="text-[9px] text-slate-500">Overdue EMI balance</span>
+                    </div>
+                    <div id="khataTotalDue" class="text-xl font-black text-rose-400 font-mono">₹40,000</div>
+                  </div>
+
+                  <!-- Metric 2: Pay-As-You-Sell QR Cut -->
+                  <div class="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/40 space-y-1">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <span class="text-[10.5px] font-black text-amber-300 block flex items-center gap-1">
+                          <i class="fa-solid fa-qrcode text-xs"></i> दैनिक QR कपात (Pay-As-You-Sell QR Cut)
+                        </span>
+                        <span class="text-[9px] text-amber-200/70">10% automatic settlement sweep</span>
+                      </div>
+                      <div class="text-2xl font-black text-amber-300 font-mono">10%</div>
+                    </div>
+                    <p class="text-[9.5px] text-amber-200/90 leading-snug pt-1 border-t border-amber-500/20">
+                      💡 <strong>₹१,००० च्या QR स्कॅनवर:</strong> ₹९०० तुमच्या खात्यात, फक्त ₹१०० EMI ला — कोणतीही एकदम रक्कम भरण्याची चिंता नाही.
+                      <span class="block text-[8.5px] text-slate-400 mt-0.5">(₹900 to your bank, ₹100 to EMI per ₹1,000 QR scan — zero lump-sum stress)</span>
+                    </p>
+                  </div>
+
+                  <!-- Metric 3: Bounce Fee Saved -->
+                  <div class="flex items-center justify-between bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/40">
+                    <div>
+                      <span class="text-[10px] font-bold text-emerald-300 block">बैंक बाउन्स दंड वाचला (Bounce Fee Saved)</span>
+                      <span class="text-[9px] text-emerald-400/80">NACH penalty instantly waived</span>
+                    </div>
+                    <div class="text-xl font-black text-emerald-400 font-mono">₹590</div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Live CIBIL Score Protection Meter -->
+              <div class="rounded-xl p-3 bg-slate-900 border border-slate-800 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-[10.5px] font-bold text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-gauge-high text-teal-400"></i> CIBIL Score Protection Meter
+                  </span>
+                  <span id="cibilScoreBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-bold transition-all duration-500">
+                    680 → 715 (PENDING)
+                  </span>
+                </div>
+                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden p-0.5 border border-slate-800 relative">
+                  <div id="cibilProgressBar" class="h-full rounded-full bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-400 transition-all duration-700" style="width: 60%;"></div>
+                </div>
+                <div class="flex justify-between text-[9px] text-slate-400 font-mono">
+                  <span>Current: 680 (At Risk)</span>
+                  <span class="text-emerald-400 font-bold">+35 pts Boost upon Voice Consent</span>
+                  <span class="text-emerald-400">715 (Protected)</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Voice-First Confirmation Area ("बोलून मंजूर करा / Speak to Confirm") -->
+            <div class="space-y-3 my-2 text-center">
+              
+              <!-- Voice Response Bubble (Displays Saarthi Marathi Reply after consent) -->
+              <div id="khataVoiceResponseCard" class="hidden p-3 rounded-2xl bg-indigo-950/80 border border-indigo-500/50 text-left shadow-lg transition-all duration-500">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9.5px] font-black text-indigo-300 uppercase tracking-wide flex items-center gap-1">
+                    <i class="fa-solid fa-headset"></i> सारथी व्हॉईस पुष्टीकरण (Saarthi Voice Reply)
+                  </span>
+                  <span class="text-[9px] font-mono text-emerald-400"><i class="fa-solid fa-circle-check"></i> Activated</span>
+                </div>
+                <p id="khataVoiceResponseText" class="text-xs text-white leading-relaxed font-semibold">
+                  "धन्यवाद सुनीता ताई! तुमचा १०% दैनिक QR ऑटो-स्वीप सुरू झाला आहे आणि तुमचा CIBIL स्कोअर सुरक्षित आहे."
+                </p>
+              </div>
+
+              <!-- Main Large Microphone Button -->
+              <div class="flex flex-col items-center justify-center space-y-2">
+                <button id="btnKhataVoiceMic" onclick="triggerKhataVoiceConfirm()" class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-400 text-slate-950 flex flex-col items-center justify-center text-2xl font-black shadow-xl shadow-amber-500/30 border-4 border-slate-900 transition transform hover:scale-105 active:scale-90 group relative">
+                  <span id="khataMicPulseRing" class="absolute inset-0 rounded-full bg-amber-400 opacity-0 group-hover:opacity-40 animate-ping"></span>
+                  <i id="khataMicIcon" class="fa-solid fa-microphone text-2xl relative z-10"></i>
+                </button>
+                <div class="text-center">
+                  <span class="text-xs font-black text-amber-300 block">बोलून मंजूर करा / Speak to Confirm</span>
+                  <span class="text-[10px] text-slate-400">Tap mic to speak vernacular voice consent</span>
+                </div>
+              </div>
+
+              <!-- 1-Tap Fallback Voice Chip for Stage Demos -->
+              <div>
+                <button onclick="triggerSimulatedKhataVoice()" class="w-full py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-200 text-xs font-bold flex items-center justify-center gap-1.5 transition transform active:scale-95 shadow-sm">
+                  <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-xs"></i>
+                  <span>Simulate Marathi Voice: <em>"हो, १०% QR कट चालेल"</em></span>
+                </button>
+                <span class="text-[9px] text-slate-500 mt-1 block">1-tap failsafe for noisy conference & stage presentations</span>
+              </div>
+
+            </div>
+
+            <!-- Bottom Back & Status Link -->
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+              <button onclick="switchPhoneApp('upi')" class="hover:text-white flex items-center gap-1">
+                <i class="fa-solid fa-arrow-left"></i> Standard UPI
+              </button>
+              <span id="khataActiveStatusBadge" class="text-amber-400 font-mono font-semibold">
+                POLICY-QR-SWEEP01 Ready
+              </span>
+            </div>
+
+          </div>
+
           <!-- Bottom Phone Home Indicator Bar -->
           <div class="h-5 bg-black flex items-center justify-center shrink-0">
             <div class="w-28 h-1 bg-slate-700 rounded-full"></div>
@@ -1016,22 +1187,29 @@
       switchPhoneApp(tabName);
     }
 
-    // SWITCH PHONE APPS (Call, WhatsApp, UPI)
+    // SWITCH PHONE APPS (Call, WhatsApp, UPI, Khata)
     function switchPhoneApp(appName) {
       activePhoneApp = appName;
-      ['call', 'whatsapp', 'upi'].forEach(k => {
+      ['call', 'whatsapp', 'upi', 'khata'].forEach(k => {
         const view = document.getElementById(`phoneView-${k}`);
         const btn = document.getElementById(`phoneTabBtn-${k}`);
         if (view && btn) {
           if (k === appName) {
             view.classList.remove('hidden');
-            btn.className = "px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold flex items-center gap-1.5 transition";
+            if (k === 'khata') {
+              btn.className = "px-2 py-1 rounded-lg bg-amber-500 text-slate-950 font-black flex items-center gap-1 transition text-[11px] shadow-sm";
+            } else {
+              btn.className = "px-2 py-1 rounded-lg bg-indigo-600 text-white font-bold flex items-center gap-1 transition text-[11px]";
+            }
           } else {
             view.classList.add('hidden');
-            btn.className = "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1.5 transition";
+            btn.className = "px-2 py-1 rounded-lg text-slate-400 hover:text-white font-semibold flex items-center gap-1 transition text-[11px]";
           }
         }
       });
+      if (appName === 'khata') {
+        renderBorrowerKhataView();
+      }
     }
 
     // TABS IN NBFC CONSOLE
@@ -1490,6 +1668,204 @@
       } else {
         successOverlay.classList.add('hidden');
       }
+
+      // 4. Update Vernacular Voice Khata View
+      renderBorrowerKhataView();
+    }
+
+    // =======================================================
+    // BORROWER VOICE KHATA & 10% QR AUTO-SWEEP LOGIC
+    // =======================================================
+    function openBorrowerKhataView() {
+      openBorrowerPhoneToTab('khata');
+    }
+
+    function renderBorrowerKhataView() {
+      if (!selectedAccount) return;
+      const a = selectedAccount;
+      const amt = Number(a.amount_due || (a.data && a.data.amount_due) || 40000);
+
+      const totalDueEl = document.getElementById('khataTotalDue');
+      if (totalDueEl) totalDueEl.innerText = `₹${amt.toLocaleString()}`;
+
+      const subEl = document.getElementById('khataBorrowerSub');
+      if (subEl) subEl.innerText = `${a.customer_name || 'Borrower'} · ${a.language || 'Marathi'} Business Account`;
+
+      const isSweepActive = a.repayment_rail === 'MERCHANT_QR_SWEEP_10PCT' || 
+                            (a.data && (a.data.repayment_rail === 'MERCHANT_QR_SWEEP_10PCT' || a.data.qr_sweep_active)) || 
+                            a.cibil_protected;
+
+      const cibilBadge = document.getElementById('cibilScoreBadge');
+      const cibilBar = document.getElementById('cibilProgressBar');
+      const voiceRespCard = document.getElementById('khataVoiceResponseCard');
+      const voiceRespText = document.getElementById('khataVoiceResponseText');
+      const statusBadge = document.getElementById('khataActiveStatusBadge');
+
+      if (isSweepActive) {
+        if (cibilBadge) {
+          cibilBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold";
+          cibilBadge.innerText = (a.data && a.data.cibil_score_display) || "CIBIL Score: 680 → 715 (PROTECTED ✅)";
+        }
+        if (cibilBar) {
+          cibilBar.style.width = "100%";
+          cibilBar.className = "h-full rounded-full bg-emerald-400 transition-all duration-700 shadow-md shadow-emerald-400/50";
+        }
+        if (voiceRespCard) {
+          voiceRespCard.classList.remove('hidden');
+          const firstName = a.customer_name ? a.customer_name.split(' ')[0] : 'सुनीता';
+          if (voiceRespText && !voiceRespText.innerText.includes('धन्यवाद')) {
+            voiceRespText.innerText = `"धन्यवाद ${firstName} ताई! तुमचा १०% दैनिक QR ऑटो-स्वीप सुरू झाला आहे आणि तुमचा CIBIL स्कोअर सुरक्षित आहे."`;
+          }
+        }
+        if (statusBadge) {
+          statusBadge.innerText = "10% QR Sweep Active (Locked)";
+          statusBadge.className = "text-emerald-400 font-mono font-semibold";
+        }
+      } else {
+        if (cibilBadge) {
+          cibilBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-bold";
+          cibilBadge.innerText = "680 → 715 (PENDING)";
+        }
+        if (cibilBar) {
+          cibilBar.style.width = "60%";
+          cibilBar.className = "h-full rounded-full bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-400 transition-all duration-700";
+        }
+        if (voiceRespCard) voiceRespCard.classList.add('hidden');
+        if (statusBadge) {
+          statusBadge.innerText = "POLICY-QR-SWEEP01 Ready";
+          statusBadge.className = "text-amber-400 font-mono font-semibold";
+        }
+      }
+    }
+
+    async function triggerKhataVoiceConfirm(customText) {
+      if (!selectedAccount) {
+        alert("Please select a borrower account first.");
+        return;
+      }
+      const a = selectedAccount;
+      const voiceText = customText || "हो, १०% QR कट चालेल";
+
+      const micIcon = document.getElementById('khataMicIcon');
+      const micPulse = document.getElementById('khataMicPulseRing');
+      if (micPulse) micPulse.classList.add('opacity-80', 'animate-ping');
+      if (micIcon) micIcon.className = "fa-solid fa-spinner fa-spin text-2xl relative z-10";
+
+      showToast("Voice Consent Ingested", `Processing Marathi voice confirmation: "${voiceText}"`);
+
+      try {
+        const res = await fetch('/api/borrower/qr-sweep-activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            journey_id: String(a.id),
+            sweep_pct: 10,
+            voice_confirmation_text: voiceText,
+            workflow_id: 'collections'
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Failed to activate QR sweep");
+        }
+
+        const data = await res.json();
+
+        // 1. Update in-memory account
+        a.repayment_rail = data.repayment_rail;
+        a.cibil_protected = true;
+        a.locked_mandate_inr = data.locked_mandate_inr;
+        a.bounce_fee_saved_inr = data.bounce_fee_waived_inr;
+        if (!a.data) a.data = {};
+        a.data.repayment_rail = data.repayment_rail;
+        a.data.cibil_protected = true;
+        a.data.locked_mandate_inr = data.locked_mandate_inr;
+        a.data.bounce_fee_saved_inr = data.bounce_fee_waived_inr;
+        a.data.qr_sweep_active = true;
+        a.data.cibil_score_display = data.cibil_score_display;
+
+        // Append transcript locally
+        if (!a.transcript) a.transcript = [];
+        a.transcript.push({ speaker: 'borrower', text: voiceText, ts: 'Just now' });
+        a.transcript.push({ speaker: 'agent', text: data.voice_response, ts: 'Just now' });
+
+        // 2. Animate CIBIL Meter to bright green
+        const cibilBadge = document.getElementById('cibilScoreBadge');
+        const cibilBar = document.getElementById('cibilProgressBar');
+        if (cibilBadge) {
+          cibilBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold transition-all duration-500";
+          cibilBadge.innerText = data.cibil_score_display || "CIBIL Score: 680 → 715 (PROTECTED ✅)";
+        }
+        if (cibilBar) {
+          cibilBar.style.width = "100%";
+          cibilBar.className = "h-full rounded-full bg-emerald-400 transition-all duration-700 shadow-md shadow-emerald-400/50";
+        }
+
+        // 3. Display Voice Response Bubble
+        const voiceRespCard = document.getElementById('khataVoiceResponseCard');
+        const voiceRespText = document.getElementById('khataVoiceResponseText');
+        if (voiceRespCard) voiceRespCard.classList.remove('hidden');
+        if (voiceRespText) voiceRespText.innerText = `"${data.voice_response}"`;
+
+        const statusBadge = document.getElementById('khataActiveStatusBadge');
+        if (statusBadge) {
+          statusBadge.innerText = "10% QR Sweep Active (Locked)";
+          statusBadge.className = "text-emerald-400 font-mono font-semibold";
+        }
+
+        // 4. Play audio TTS in Marathi/Indic voice
+        try {
+          const ttsRes = await fetch('/api/voice/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: data.voice_response,
+              language: a.language || 'Marathi',
+              speaker: 'aarohi'
+            })
+          });
+          const ttsData = await ttsRes.json();
+          if (ttsData.audio_base64) {
+            const player = new Audio(`data:${ttsData.mime_type || 'audio/mp3'};base64,${ttsData.audio_base64}`);
+            player.play().catch(e => console.log('Audio autoplay blocked:', e));
+          }
+        } catch (e) {
+          console.log('Audio synthesis fallback');
+        }
+
+        // 5. Update KPI Strip in Lender Command Center
+        const kpis = data.kpis;
+        if (kpis) {
+          const lockedEl = document.getElementById('kpiFutureLocked');
+          if (lockedEl) lockedEl.innerText = Number(kpis.future_cash_locked_inr || 0).toLocaleString();
+          
+          const reliefEl = document.getElementById('kpiReliefPrevented');
+          if (reliefEl) reliefEl.innerText = Number(kpis.npa_and_fees_prevented_inr || 0).toLocaleString();
+          
+          const modalLocked = document.getElementById('modalFutureLocked');
+          if (modalLocked) modalLocked.innerText = Number(kpis.future_cash_locked_inr || 0).toLocaleString();
+          
+          const modalRelief = document.getElementById('modalRelief');
+          if (modalRelief) modalRelief.innerText = Number(kpis.npa_and_fees_prevented_inr || 0).toLocaleString();
+        }
+
+        // 6. Refresh UI components
+        renderDialogueStream();
+        renderAccountsTable(accountsData);
+        showToast("Merchant QR Auto-Sweep Activated!", `CIBIL Protected (715). ₹${Number(data.locked_mandate_inr).toLocaleString()} locked into settlement sweep.`);
+
+      } catch (err) {
+        showToast("Error", err.message);
+      } finally {
+        if (micPulse) micPulse.classList.remove('opacity-80', 'animate-ping');
+        if (micIcon) micIcon.className = "fa-solid fa-microphone text-2xl relative z-10";
+      }
+    }
+
+    function triggerSimulatedKhataVoice() {
+      triggerKhataVoiceConfirm("हो, १०% QR कट चालेल");
+    }
     }
 
     // SIMULATE PAYMENT FROM THE BORROWER PHONE (Full Round-Trip)

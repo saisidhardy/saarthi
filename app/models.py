@@ -83,7 +83,8 @@ class JourneyRecord(BaseModel):
                 "has_hospicash_rider", "policy_number", "hospicash_claim",
                 "bounce_fee_saved_inr", "root_cause", "downstream_action",
                 "pre_due_balance_inr", "instant_recovered_inr", "locked_mandate_inr",
-                "why_recovery_increased"
+                "why_recovery_increased", "repayment_rail", "cibil_protected",
+                "qr_sweep_active", "qr_sweep_pct"
             ]:
                 if k in values:
                     data[k] = values[k]
@@ -393,6 +394,24 @@ class JourneyRecord(BaseModel):
     @why_recovery_increased.setter
     def why_recovery_increased(self, val: Optional[Dict[str, Any]]):
         self.data["why_recovery_increased"] = val
+
+    @computed_field
+    @property
+    def repayment_rail(self) -> Optional[str]:
+        return self.data.get("repayment_rail")
+
+    @repayment_rail.setter
+    def repayment_rail(self, val: Optional[str]):
+        self.data["repayment_rail"] = val
+
+    @computed_field
+    @property
+    def cibil_protected(self) -> bool:
+        return bool(self.data.get("cibil_protected", False))
+
+    @cibil_protected.setter
+    def cibil_protected(self, val: bool):
+        self.data["cibil_protected"] = bool(val)
 
     @computed_field
     @property

@@ -240,6 +240,95 @@ def handle_pre_due_risk_event(event: PreDueRiskEvent):
     updated = run_supervisor_pipeline(case, workflow_id=w_id)
     return updated
 
+# 4b-3. Borrower Voice-First Khata & 10% QR Auto-Sweep: POST /api/borrower/qr-sweep-activate
+class QRSweepActivateRequest(BaseModel):
+    journey_id: str
+    sweep_pct: int = 10
+    voice_confirmation_text: Optional[str] = "हो, १०% QR कट चालेल"
+    workflow_id: Optional[str] = "collections"
+
+@app.post("/api/borrower/qr-sweep-activate")
+def activate_borrower_qr_sweep(req: QRSweepActivateRequest):
+    w_id = req.workflow_id or "collections"
+    case = get_case(req.journey_id, workflow_id=w_id)
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Borrower journey #{req.journey_id} not found in {w_id}")
+
+    if req.sweep_pct <= 0 or req.sweep_pct > 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid sweep percentage. POLICY-QR-SWEEP01 permits 1% to 50% (default: 10%)."
+        )
+
+    # Enforce POLICY-QR-SWEEP01
+    case.repayment_rail = f"MERCHANT_QR_SWEEP_{req.sweep_pct}PCT"
+    case.data["repayment_rail"] = f"MERCHANT_QR_SWEEP_{req.sweep_pct}PCT"
+    case.cibil_protected = True
+    case.data["cibil_protected"] = True
+    case.locked_mandate_inr = float(case.amount_due)
+    case.data["locked_mandate_inr"] = float(case.amount_due)
+    case.bounce_fee_saved_inr = 590.0
+    case.data["bounce_fee_saved_inr"] = 590.0
+    case.data["qr_sweep_active"] = True
+    case.data["qr_sweep_pct"] = req.sweep_pct
+    case.data["cibil_score_lift"] = 35
+    case.data["cibil_score_display"] = "680 → 715 (PROTECTED ✅)"
+
+    if case.status not in ("paid",):
+        case.status = "ptp"
+
+    # Append borrower voice confirmation to transcript
+    voice_text = req.voice_confirmation_text or "हो, १०% QR कट चालेल"
+    case.add_transcript(speaker="borrower", text=voice_text)
+
+    # Saarthi personalized Indic voice confirmation
+    name_map = {"sunita": "सुनीता", "rajesh": "राजेश", "suresh": "सुरेश", "anjali": "अंजली", "vikram": "विक्रम", "manoj": "मनोज"}
+    first_name_raw = case.customer_name.split()[0] if case.customer_name else "ग्राहक"
+    first_name = name_map.get(first_name_raw.lower(), first_name_raw)
+    pct_str = "१०" if req.sweep_pct == 10 else str(req.sweep_pct)
+
+    if case.language == "Marathi" or "sunita" in case.customer_name.lower() or "सुनीता" in case.customer_name:
+        agent_reply = f"धन्यवाद {first_name} ताई! तुमचा {pct_str}% दैनिक QR ऑटो-स्वीप सुरू झाला आहे आणि तुमचा CIBIL स्कोअर सुरक्षित आहे."
+    elif case.language == "Telugu":
+        agent_reply = f"ధన్యవాదాలు {first_name} గారు! మీ {req.sweep_pct}% రోజువారీ QR ఆటో-స్వీప్ ప్రారంభించబడింది మరియు మీ CIBIL స్కోర్ రక్షించబడింది."
+    elif case.language == "Tamil":
+        agent_reply = f"நன்றி {first_name} அவர்களே! உங்கள் {req.sweep_pct}% தினசரி QR ஆட்டோ-ஸ்வீப் தொடங்கப்பட்டது மற்றும் உங்கள் CIBIL பாதுகாக்கப்பட்டுள்ளது."
+    elif case.language == "Kannada":
+        agent_reply = f"ಧನ್ಯವಾದಗಳು {first_name} ಅವರೇ! ನಿಮ್ಮ {req.sweep_pct}% ದೈನಂದಿನ QR ಆಟೋ-ಸ್ವೀಪ್ ಸಕ್ರಿಯವಾಗಿದೆ ಮತ್ತು ನಿಮ್ಮ CIBIL ಸ್ಕೋರ್ ಸುರಕ್ಷಿತವಾಗಿದೆ."
+    else:
+        agent_reply = f"धन्यवाद {first_name} जी! आपका {req.sweep_pct}% दैनिक QR ऑटो-स्वीप शुरू हो गया है और आपका CIBIL स्कोर सुरक्षित है।"
+
+    case.add_transcript(speaker="agent", text=agent_reply)
+
+    # Add audit trace for Evidence Pack
+    case.add_trace(
+        agent="BorrowerKhataPortal",
+        action="Voice QR Auto-Sweep Activation",
+        summary=f"Borrower voice-confirmed {req.sweep_pct}% Pay-As-You-Sell QR auto-sweep ('{voice_text}'). CIBIL score boosted +35 pts (680 -> 715 Protected). ₹590 bounce fee waived. Locked mandate ₹{case.amount_due:,.2f} under POLICY-QR-SWEEP01.",
+        badge="Voice Khata Sweep"
+    )
+
+    save_case(case)
+
+    # Compute updated KPIs
+    updated_kpis = compute_engine_metrics(workflow_id=w_id)
+
+    return {
+        "success": True,
+        "message": f"Merchant QR {req.sweep_pct}% Auto-Sweep successfully activated",
+        "rule_id": "POLICY-QR-SWEEP01",
+        "journey_id": case.id,
+        "repayment_rail": case.data.get("repayment_rail"),
+        "cibil_protected": True,
+        "cibil_score_lift": 35,
+        "cibil_score_display": "680 → 715 (PROTECTED ✅)",
+        "locked_mandate_inr": case.amount_due,
+        "bounce_fee_waived_inr": 590.0,
+        "voice_response": agent_reply,
+        "kpis": updated_kpis.model_dump(),
+        "case": case.model_dump()
+    }
+
 # 4c. Human-in-the-Loop Approval: POST /api/cases/{case_id}/approve & /reject
 @app.post("/api/cases/{case_id}/approve")
 def approve_case_restructure(case_id: str, req: ApprovalRequest):
@@ -325,7 +414,8 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
             "calling_hours_compliance": "PASSED [POLICY-CALL-WINDOW01] (08:00 - 19:00 IST Window)",
             "anti_coercion_scan": "PASSED [RBI-FPC-TONE01] (Zero abusive / threat terms detected)" if case.audit_pass else "FAILED (Prohibited terms detected)",
             "ptp_policy_compliance": "PASSED [POLICY-PTP-MAX01] (PTP <= 7 days)" if case.status == "ptp" else "N/A",
-            "daily_contact_frequency": "PASSED [POLICY-CALL-FREQ01] (Attempts <= 2 calls/day)"
+            "daily_contact_frequency": "PASSED [POLICY-CALL-FREQ01] (Attempts <= 2 calls/day)",
+            "qr_auto_sweep_policy": "PASSED [POLICY-QR-SWEEP01] (10% Pay-As-You-Sell Auto-Sweep)" if case.data.get("qr_sweep_active") else "N/A"
         },
         "decision_outcome": {
             "intent": case.intent,
@@ -337,6 +427,9 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
         "action_deliverables": {
             "payment_link": case.payment_link,
             "payment_status": case.payment_status,
+            "repayment_rail": case.data.get("repayment_rail") or ("MERCHANT_QR_SWEEP_10PCT" if case.data.get("qr_sweep_active") else "UPI_DIRECT_OR_AUTOPAY"),
+            "qr_sweep_active": bool(case.data.get("qr_sweep_active", False)),
+            "cibil_protected": bool(case.data.get("cibil_protected", False)),
             "lender_vpa": "repayments.saarthi@yesbank",
             "repayment_direct_label": "Pays directly to Saarthi Capital Ltd.'s account (demo)",
             "whatsapp_message": case.data.get("whatsapp_message")
