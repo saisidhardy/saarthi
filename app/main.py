@@ -851,7 +851,13 @@ def get_demo_audio(language: str):
         "hindi": "demo_hindi.mp3",
         "hi": "demo_hindi.mp3",
         "telugu": "demo_telugu.mp3",
-        "te": "demo_telugu.mp3"
+        "te": "demo_telugu.mp3",
+        "marathi": "demo_marathi.mp3",
+        "mr": "demo_marathi.mp3",
+        "tamil": "demo_tamil.mp3",
+        "ta": "demo_tamil.mp3",
+        "kannada": "demo_kannada.mp3",
+        "kn": "demo_kannada.mp3"
     }
     fname = fname_map.get(lang_lower, "demo_hindi.mp3")
     fpath = os.path.join(STATIC_DIR, "audio", fname)
@@ -859,6 +865,11 @@ def get_demo_audio(language: str):
         from fastapi.responses import FileResponse
         return FileResponse(fpath, media_type="audio/mpeg")
     raise HTTPException(status_code=404, detail="Audio file not found")
+
+@app.get("/api/voice/speak")
+async def get_stream_speak_audio(text: str = Query(...), language: Optional[str] = Query(default="Hindi")):
+    audio_bytes = await synthesize_carrier_audio_bytes(text, language)
+    return Response(content=audio_bytes, media_type="audio/mpeg")
 
 
 # ==================== TELEPHONY BRIDGE (EXOTEL & TWILIO PSTN) ====================
@@ -910,8 +921,14 @@ async def get_carrier_telephony_audio(case_id: str, turn_index: int):
     if not case:
         raise HTTPException(status_code=404, detail="Case not found")
     
-    agent_turns = [t for t in case.transcript if t.speaker == "agent"]
-    text = agent_turns[-1].text if agent_turns else "नमस्कार, मी सारथी कॅपिटलकडून बोलत आहे."
+    # If turn_index is valid, synthesize that turn
+    if case.transcript and 0 <= turn_index < len(case.transcript):
+        turn = case.transcript[turn_index]
+        text = turn.text
+    else:
+        agent_turns = [t for t in case.transcript if t.speaker == "agent"]
+        text = agent_turns[-1].text if agent_turns else "नमस्कार, मी सारथी कॅपिटलकडून बोलत आहे."
+    
     audio_bytes = await synthesize_carrier_audio_bytes(text, case.language)
     return Response(content=audio_bytes, media_type="audio/mpeg")
 

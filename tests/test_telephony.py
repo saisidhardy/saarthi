@@ -51,3 +51,17 @@ def test_telephony_status_callback():
     })
     assert res.status_code == 200
     assert res.json()["call_status"] == "completed"
+
+def test_voice_demo_and_stream_endpoints():
+    # 6. Verify demo audio files for all supported languages
+    for lang in ["english", "hindi", "telugu", "marathi", "tamil", "kannada"]:
+        r = client.get(f"/api/voice/demo-audio/{lang}")
+        assert r.status_code == 200
+        assert "audio/mpeg" in r.headers["content-type"]
+        assert len(r.content) > 1000
+
+    # 7. Verify dynamic stream speak
+    r_speak = client.get("/api/voice/speak?text=Test&language=English")
+    assert r_speak.status_code == 200
+    assert "audio/mpeg" in r_speak.headers["content-type"]
+    assert len(r_speak.content) > 100

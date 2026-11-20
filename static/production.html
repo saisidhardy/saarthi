@@ -6,19 +6,19 @@
   <title>Saarthi Enterprise Collections Cloud | Operations & Recovery Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
+      <style>
     :root {
       --bg:            #F7F6F2;   /* page background, warm off-white */
       --surface:       #FFFFFF;   /* cards, sidebar, top bar */
-      --border:        #DEDBD2;
-      --text:          #1C2B2A;
-      --text-muted:    #5B6B69;
-      --accent:        #0F766E;   /* deep teal: primary button, active tab, selected row border, progress bar */
-      --accent-soft:   #E3F3F0;   /* selected row, rule-ID tags, info chips */
+      --border:        #DEDBD2;   /* subtle borders */
+      --text:          #1C2B2A;   /* high-contrast deep slate text */
+      --text-muted:    #5B6B69;   /* muted labels */
+      --accent:        #0F766E;   /* deep teal: primary button, active tab */
+      --accent-soft:   #E3F3F0;   /* selected row, info chips */
       --accent-text:   #0B524C;   /* text on accent-soft */
-      --warn-bg:       #FBE9C6;   /* Hospicash, T-24h */
+      --warn-bg:       #FBE9C6;   /* subtle status warning */
       --warn-text:     #7A4A05;
-      --danger-bg:     #FBE0DC;   /* Escalated, failed checks */
+      --danger-bg:     #FBE0DC;   /* subtle status danger */
       --danger-text:   #8F2A1D;
 
       --font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -48,7 +48,7 @@
     }
 
     /* Strict Font Sizes: 12 / 14 / 16 / 24 / 32 */
-    .text-xs, .text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\], .text-\[11\.5px\] {
+    .text-xs, .text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\] {
       font-size: 12px !important;
     }
     .text-sm, .text-\[13px\] {
@@ -64,10 +64,7 @@
       font-size: 32px !important;
     }
 
-    /* Global Light Theme Surface & Background Overrides */
-    body, html {
-      background-color: var(--bg) !important;
-    }
+    /* Clean Minimalist Surfaces */
     aside, header, nav, .bg-slate-900, .bg-slate-950, .bg-slate-900\/90, .bg-slate-950\/60,
     .bg-slate-950\/40, .bg-slate-950\/50, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-900\/80 {
       background-color: var(--surface) !important;
@@ -76,13 +73,13 @@
       background-color: var(--bg) !important;
     }
 
-    /* Border Overrides */
+    /* Clean Subtle Borders (No loud neon outlines) */
     .border-slate-800, .border-slate-700, .border-slate-800\/80, .border-slate-700\/60, .border-slate-700\/50,
     .border-slate-900, .divide-slate-800, .divide-slate-800\/60 {
       border-color: var(--border) !important;
     }
 
-    /* Text Color Overrides (Strict contrast > 4.5:1) */
+    /* Clean Contrast Text */
     .text-white, .text-slate-100, .text-slate-200, .text-slate-300, h1, h2, h3, h4, th {
       color: var(--text) !important;
     }
@@ -90,7 +87,15 @@
       color: var(--text-muted) !important;
     }
 
-    /* Accent Overrides: DEEP TEAL is the ONLY brand color */
+    /* Neutral Icons (No rainbow clutter) */
+    i.fa-solid, i.fa-regular, i.fa-brands {
+      color: var(--text-muted);
+    }
+    .text-accent, i.text-accent {
+      color: var(--accent) !important;
+    }
+
+    /* Accent: Deep Teal (Single Brand Colour) */
     .bg-indigo-600, .bg-indigo-500, .bg-teal-600, .bg-emerald-600, .hover\:bg-indigo-500:hover,
     .hover\:bg-teal-500:hover, .hover\:bg-emerald-500:hover {
       background-color: var(--accent) !important;
@@ -108,7 +113,7 @@
       color: var(--accent-text) !important;
     }
 
-    /* Status Colors ONLY: Amber for Warnings / Sensitive, Red for Danger / Failures */
+    /* Subtle Status Colours: Warm Sand for Warnings, Muted Rose for Danger */
     .bg-amber-500\/10, .bg-amber-500\/20, .bg-amber-950, .bg-amber-950\/60, .bg-amber-950\/80 {
       background-color: var(--warn-bg) !important;
       color: var(--warn-text) !important;
@@ -126,10 +131,10 @@
       color: var(--danger-text) !important;
     }
 
-    /* Button System:
-       Primary: solid teal (Send Token UPI)
-       Secondary: white with border (AutoPay Mandate, File Hospicash)
-       Tertiary: plain text (Clear Settlement)
+    /* Button Hierarchy:
+       Primary = solid teal (Send Token UPI)
+       Secondary = white with border (AutoPay Mandate, File Hospicash)
+       Tertiary = plain text (Clear Settlement)
     */
     .btn-primary, button.btn-primary {
       background-color: var(--accent) !important;
@@ -139,11 +144,11 @@
       border-radius: 8px !important;
       padding: 6px 14px !important;
       cursor: pointer;
-      transition: all 150ms ease-in-out !important;
+      box-shadow: none !important;
     }
     .btn-primary:hover {
-      background-color: #0b524c !important;
-      border-color: #0b524c !important;
+      background-color: var(--accent-text) !important;
+      border-color: var(--accent-text) !important;
     }
     .btn-secondary, button.btn-secondary {
       background-color: var(--surface) !important;
@@ -153,7 +158,7 @@
       border-radius: 8px !important;
       padding: 6px 14px !important;
       cursor: pointer;
-      transition: all 150ms ease-in-out !important;
+      box-shadow: none !important;
     }
     .btn-secondary:hover {
       background-color: var(--bg) !important;
@@ -166,17 +171,13 @@
       font-weight: 500 !important;
       padding: 6px 10px !important;
       cursor: pointer;
-      transition: all 150ms ease-in-out !important;
     }
     .btn-tertiary:hover {
       color: var(--text) !important;
+      text-decoration: underline;
     }
 
-    /* Selection & Table Styling */
-    ::selection {
-      background-color: var(--accent-soft) !important;
-      color: var(--accent-text) !important;
-    }
+    /* Selected Row & Clean Hover States */
     tr.selected-row, tr[aria-selected="true"] {
       background-color: var(--accent-soft) !important;
       border-left: 3px solid var(--accent) !important;
@@ -185,21 +186,10 @@
       background-color: var(--bg) !important;
     }
 
-    /* Phone Bezel in Light Theme */
-    .phone-bezel {
-      border: 8px solid var(--border) !important;
-      background-color: var(--surface) !important;
-      box-shadow: 0 10px 30px rgba(28, 43, 42, 0.08) !important;
-    }
-    .whatsapp-bg {
-      background-color: #ECE5DD !important;
-      background-image: none !important;
-    }
-
-    /* Waveform Animation */
+    /* Minimalist Waveform */
     @keyframes waveBar {
-      0%, 100% { height: 6px; }
-      50% { height: 24px; }
+      0%, 100% { height: 4px; }
+      50% { height: 18px; }
     }
     .wave-active .w-bar-1 { animation: waveBar 0.8s infinite 0.1s ease-in-out; }
     .wave-active .w-bar-2 { animation: waveBar 0.8s infinite 0.25s ease-in-out; }
@@ -207,22 +197,29 @@
     .wave-active .w-bar-4 { animation: waveBar 0.8s infinite 0.2s ease-in-out; }
     .wave-active .w-bar-5 { animation: waveBar 0.8s infinite 0.35s ease-in-out; }
 
-    /* Custom Scrollbar for Warm Light Theme */
-    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    /* Custom Scrollbar */
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
     .custom-scroll::-webkit-scrollbar-track { background: var(--bg); }
     .custom-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-    /* Skeleton Loaders */
-    .skeleton-loader {
-      background: linear-gradient(90deg, #F0EEE9 25%, #E6E4DE 50%, #F0EEE9 75%);
-      background-size: 200% 100%;
-      animation: skeletonShimmer 1.5s infinite;
-      border-radius: 6px;
+    /* Strip all box shadows for flat, minimalist look */
+    .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-md {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
     }
-    @keyframes skeletonShimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+
+    /* Clean Chat Transcript Bubbles */
+    .chat-bubble-agent {
+      background-color: var(--surface) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text) !important;
+      border-radius: 8px !important;
+    }
+    .chat-bubble-borrower {
+      background-color: var(--bg) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text) !important;
+      border-radius: 8px !important;
     }
   </style>
 </head>
@@ -233,7 +230,7 @@
     
     <!-- Workspace Brand Header -->
     <div class="p-4 border-b border-slate-800 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-teal-400 flex items-center justify-center shadow-lg shadow-indigo-600/30 shrink-0">
+      <div class="w-9 h-9 rounded-xl  justify-center shadow-lg shadow-indigo-600/30 shrink-0">
         <i class="fa-solid fa-building-columns text-white text-base"></i>
       </div>
       <div class="overflow-hidden">
@@ -388,7 +385,7 @@
         </div>
 
         <!-- TOGGLE USER SIDEBAR BUTTON (Prominent, High-Contrast) -->
-        <button id="btnToggleSim" onclick="toggleBorrowerSim()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition transform active:scale-95">
+        <button id="btnToggleSim" onclick="toggleBorrowerSim()" class="px-3.5 py-1.5 :from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition transform active:scale-95">
           <i class="fa-solid fa-mobile-screen-button text-sm"></i>
           <span>Borrower Phone View</span>
           <span class="px-1.5 py-0.2 rounded bg-black/30 text-[10px] font-mono">DEMO</span>
@@ -408,52 +405,52 @@
       </span>
 
       <!-- Scenario Pills -->
-      <button onclick="jumpToPreset('1')" id="pill-s1" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm">
+      <button onclick="jumpToPreset('1')" id="pill-s1" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-teal-700 text-white font-medium">
         <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
         <span>S1: Sunita (Hero ₹40k Marathi)</span>
       </button>
 
-      <button onclick="jumpToPreset('2')" id="pill-s2" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('2')" id="pill-s2" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
         <span>S2: Rajesh (Liquidity Token + Mandate)</span>
       </button>
 
-      <button onclick="jumpToPreset('21')" id="pill-s7" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('21')" id="pill-s7" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
         <span>S7: Anjali (T-24h Bounce Rescue · Buffer Captured)</span>
       </button>
 
-      <button onclick="jumpToPreset('3')" id="pill-s4" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('3')" id="pill-s4" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
         <span>S4: Suresh (ICU Distress · Hospicash Claim)</span>
       </button>
 
-      <button onclick="jumpToPreset('22')" id="pill-s8" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('22')" id="pill-s8" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
         <span>S8: Kirana 4x Friday Micro-Split</span>
       </button>
 
-      <button onclick="jumpToPreset('23')" id="pill-s9" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('23')" id="pill-s9" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
         <span>S9: Kavitha (Telugu · ₹32k Salary Mandate)</span>
       </button>
 
-      <button onclick="jumpToPreset('24')" id="pill-s10" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('24')" id="pill-s10" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
         <span>S10: Senthil (Tamil · ₹28k Merchant Split)</span>
       </button>
 
-      <button onclick="jumpToPreset('25')" id="pill-s11" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('25')" id="pill-s11" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
         <span>S11: Manjunath (Kannada · ₹22k Agritech Harvest)</span>
       </button>
 
-      <button onclick="jumpToPreset('4')" id="pill-s3" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('4')" id="pill-s3" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
         <span>S3: Vikram (Prompt Injection Blocked)</span>
       </button>
 
-      <button onclick="jumpToPreset('5')" id="pill-s5" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
+      <button onclick="jumpToPreset('5')" id="pill-s5" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700">
         <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
         <span>S5: Manoj (Rogue Agent Audit Fail)</span>
       </button>
@@ -528,7 +525,7 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <button id="btnOpenBorrowerPhone" onclick="openBorrowerPhoneToTab('khata')" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition transform active:scale-95" title="Open Borrower Phone View (Voice Khata & 10% QR Auto-Sweep)">
+            <button id="btnOpenBorrowerPhone" onclick="openBorrowerPhoneToTab('khata')" class="px-3 py-1.5 :from-amber-400 hover:to-orange-300 text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition transform active:scale-95" title="Open Borrower Phone View (Voice Khata & 10% QR Auto-Sweep)">
               <i class="fa-solid fa-mobile-screen-button text-xs"></i>
               <span>Open Borrower Phone View 📱</span>
             </button>
@@ -591,7 +588,7 @@
               </div>
             </div>
 
-            <!-- Demo Voice Quick Actions: English, Hindi, Telugu -->
+            <!-- Demo Voice Quick Actions: English, Hindi, Telugu, Marathi -->
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="text-xs font-medium mr-1" style="color: var(--text-muted);">Voice Demo:</span>
               <button onclick="playVoiceDemo('english')" class="px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1.5 hover:shadow-sm" style="background-color: var(--surface); color: var(--text); border: 1px solid var(--border);" title="Play English Voice Demo">
@@ -602,6 +599,9 @@
               </button>
               <button onclick="playVoiceDemo('telugu')" class="px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1.5 hover:shadow-sm" style="background-color: var(--surface); color: var(--text); border: 1px solid var(--border);" title="Play Telugu Voice Demo">
                 <span>🇮🇳 Telugu</span>
+              </button>
+              <button onclick="playVoiceDemo('marathi')" class="px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1.5 hover:shadow-sm" style="background-color: var(--surface); color: var(--text); border: 1px solid var(--border);" title="Play Marathi Voice Demo">
+                <span>🇮🇳 Marathi</span>
               </button>
             </div>
 
@@ -616,7 +616,7 @@
           </div>
 
           <!-- Dialogue Stream Container -->
-          <div id="dialogueContainer" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3 bg-slate-950/50">
+          <div id="dialogueContainer" class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3" style="background-color: var(--bg);">
             <!-- Rendered by JS -->
           </div>
 
@@ -801,7 +801,7 @@
           <!-- Side-by-Side Comparison Cards (Saarthi vs Baseline) -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Saarthi Card -->
-            <div class="p-4 rounded-xl bg-gradient-to-br from-indigo-950/50 to-slate-900 border border-indigo-500/40 space-y-3">
+            <div class="p-4 rounded-xl /50 to-slate-900 border border-indigo-500/40 space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
                   <i class="fa-solid fa-shield-halved"></i> Saarthi Evaluated Group
@@ -825,7 +825,7 @@
             </div>
 
             <!-- Baseline Card -->
-            <div class="p-4 rounded-xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 space-y-3">
+            <div class="p-4 rounded-xl ">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
                   <i class="fa-solid fa-user-group"></i> Baseline / Standard Bot Group
@@ -1022,7 +1022,7 @@
                 <span class="text-slate-500">|</span>
                 <span class="text-slate-400 font-mono">Mandate: Revocable by borrower in UPI app</span>
               </div>
-              <button onclick="openBorrowerPhoneToTab('khata')" class="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition transform active:scale-95">
+              <button onclick="openBorrowerPhoneToTab('khata')" class="px-3 py-1 :from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition transform active:scale-95">
                 <i class="fa-solid fa-mobile-screen-button"></i>
                 <span>Open in Phone View</span>
               </button>
@@ -1152,11 +1152,11 @@
           <!-- ============================================== -->
           <!-- PHONE APP 1: INCOMING/ACTIVE VOICE CALL SCREEN -->
           <!-- ============================================== -->
-          <div id="phoneView-call" class="flex-1 flex flex-col justify-between p-5 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-center relative overflow-hidden">
+          <div id="phoneView-call" class="flex-1 flex flex-col justify-between p-5  overflow-hidden">
             
             <!-- Caller ID Card -->
             <div class="mt-4 space-y-2">
-              <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-600 to-teal-400 mx-auto flex items-center justify-center text-white text-2xl font-black shadow-xl shadow-indigo-600/30 border-2 border-white/20">
+              <div class="w-20 h-20 rounded-full  justify-center text-white text-2xl font-black shadow-xl shadow-indigo-600/30 border-2 border-white/20">
                 <i class="fa-solid fa-building-columns"></i>
               </div>
               <div>
@@ -1329,7 +1329,7 @@
               </div>
 
               <!-- Big Amount Box -->
-              <div class="p-4 rounded-2xl bg-gradient-to-tr from-slate-900 to-indigo-950/60 border border-indigo-500/30 text-center space-y-1">
+              <div class="p-4 rounded-2xl /60 border border-indigo-500/30 text-center space-y-1">
                 <span class="text-[10.5px] text-indigo-300 uppercase tracking-wide font-bold">Authorized Repayment Amount</span>
                 <div id="upiSheetAmount" class="text-3xl font-black text-white font-mono">₹40,000.00</div>
                 <span id="upiSheetRailTag" class="inline-block text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">
@@ -1354,7 +1354,7 @@
 
             <!-- Pay Now Trigger Button (Simulates Borrower Settling) -->
             <div class="space-y-2 mt-4">
-              <button onclick="triggerSimulatePaymentFromPhone()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 transition transform active:scale-95">
+              <button onclick="triggerSimulatePaymentFromPhone()" class="w-full py-3.5 rounded-2xl :from-emerald-500 hover:to-teal-400 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 transition transform active:scale-95">
                 <i class="fa-solid fa-lock text-xs"></i>
                 <span id="upiSheetBtnText">Simulate Payment</span>
               </button>
@@ -1386,7 +1386,7 @@
           <!-- ======================================================== -->
           <!-- PHONE APP 4: VERNACULAR VOICE KHATA & 10% QR AUTO-SWEEP  -->
           <!-- ======================================================== -->
-          <div id="phoneView-khata" class="hidden flex-1 flex flex-col justify-between p-4 bg-gradient-to-b from-[#131b26] via-[#0b111a] to-[#060911] text-left relative overflow-y-auto custom-scroll">
+          <div id="phoneView-khata" class="hidden flex-1 flex flex-col justify-between p-4 [#131b26] via-[#0b111a] to-[#060911] text-left relative overflow-y-auto custom-scroll">
             
             <!-- Top Khata Header / Shop Tag -->
             <div class="space-y-3">
@@ -1406,7 +1406,7 @@
               </div>
 
               <!-- Clean Notebook-Style Vernacular Khata Card -->
-              <div class="rounded-2xl p-3.5 bg-gradient-to-br from-amber-950/30 via-slate-900 to-amber-950/20 border-2 border-amber-500/30 shadow-xl relative overflow-hidden">
+              <div class="rounded-2xl p-3.5 /30 via-slate-900 to-amber-950/20 border-2 border-amber-500/30 shadow-xl relative overflow-hidden">
                 <div class="absolute -top-6 -right-6 w-20 h-20 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
                 
                 <!-- 3 Crystal-Clear Numbers -->
@@ -1485,7 +1485,7 @@
 
               <!-- Main Large Microphone Button -->
               <div class="flex flex-col items-center justify-center space-y-2">
-                <button id="btnKhataVoiceMic" onclick="triggerKhataVoiceConfirm()" class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-400 text-slate-950 flex flex-col items-center justify-center text-2xl font-black shadow-xl shadow-amber-500/30 border-4 border-slate-900 transition transform hover:scale-105 active:scale-90 group relative">
+                <button id="btnKhataVoiceMic" onclick="triggerKhataVoiceConfirm()" class="w-20 h-20 rounded-full  flex-col items-center justify-center text-2xl font-black shadow-xl shadow-amber-500/30 border-4 border-slate-900 transition transform hover:scale-105 active:scale-90 group relative">
                   <span id="khataMicPulseRing" class="absolute inset-0 rounded-full bg-amber-400 opacity-0 group-hover:opacity-40 animate-ping"></span>
                   <i id="khataMicIcon" class="fa-solid fa-microphone text-2xl relative z-10"></i>
                 </button>
@@ -2181,9 +2181,9 @@
         const pill = document.getElementById(`pill-${scenarioMap[k]}`);
         if (pill) {
           if (k === presetId) {
-            pill.className = "px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm";
+            pill.className = "px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-teal-700 text-white font-medium";
           } else {
-            pill.className = "px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700";
+            pill.className = "px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-white text-slate-700 border border-slate-300 hover:border-teal-700";
           }
         }
       });
@@ -2295,31 +2295,42 @@
       box.innerHTML = '';
       if (!transcript || transcript.length === 0) {
         box.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-slate-500 text-xs py-20">
-            <i class="fa-solid fa-headset text-3xl mb-3 text-slate-600"></i>
-            <span class="font-semibold text-slate-400">No active recording on file for this account.</span>
-            <span class="text-[11px] text-slate-600 mt-1">Select a scenario above to load verified dialogue.</span>
+          <div class="h-full flex flex-col items-center justify-center text-xs py-20" style="color: var(--text-muted);">
+            <i class="fa-solid fa-headset text-3xl mb-3 opacity-60"></i>
+            <span class="font-medium" style="color: var(--text);">No active recording on file for this account.</span>
+            <span class="text-[11px] mt-1">Select a scenario above to load verified dialogue.</span>
           </div>
         `;
         return;
       }
 
-      transcript.forEach(t => {
+      transcript.forEach((t, idx) => {
         const isAgent = t.speaker === 'agent';
         const msgDiv = document.createElement('div');
+        msgDiv.id = `turn-msg-${idx}`;
         msgDiv.className = `flex flex-col ${isAgent ? 'items-start' : 'items-end'}`;
         
         let complianceTag = "";
         if (isAgent && (t.text.includes("AI") || t.text.includes("एआय"))) {
-          complianceTag = `<span class="text-[9px] text-emerald-400 font-mono mt-1 block"><i class="fa-solid fa-check mr-0.5"></i> Upfront AI Identity Disclosed [DISC-AI-01]</span>`;
+          complianceTag = `<span class="text-[9px] font-mono mt-1 block" style="color: var(--accent);"><i class="fa-solid fa-check mr-0.5"></i> Upfront AI Identity Disclosed [DISC-AI-01]</span>`;
         }
 
+        const speakerName = isAgent ? 'Saarthi AI Voice Agent' : (selectedAccount ? selectedAccount.customer_name : 'Borrower');
+
         msgDiv.innerHTML = `
-          <span class="text-[10px] text-slate-500 mb-0.5 px-1">${isAgent ? 'Saarthi AI Voice Agent' : selectedAccount.customer_name} (${t.ts})</span>
-          <div class="max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${
+          <div class="flex items-center gap-2 mb-1 px-1">
+            <span class="text-[11px] font-medium" style="color: var(--text-muted);">${speakerName} (${t.ts})</span>
+            <button onclick="playTurnAudio(${idx})" id="turnPlayBtn-${idx}" class="text-[10px] px-2 py-0.5 rounded border flex items-center gap-1 transition hover:opacity-80 active:scale-95" style="border-color: var(--border); background-color: var(--surface); color: var(--accent);" title="Listen to this line">
+              <i class="fa-solid fa-volume-high text-[9px]"></i>
+              <span>Listen</span>
+            </button>
+          </div>
+          <div id="turnBubble-${idx}" class="max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed transition shadow-sm ${
+            isAgent ? 'rounded-tl-sm' : 'rounded-tr-sm'
+          }" style="${
             isAgent 
-              ? 'bg-indigo-950/80 border border-indigo-700/40 text-indigo-100 rounded-tl-sm shadow-sm' 
-              : 'bg-slate-800 border border-slate-700 text-slate-100 rounded-tr-sm shadow-sm'
+              ? 'background-color: var(--accent-soft); border: 1px solid rgba(15, 118, 110, 0.25); color: var(--accent-text);' 
+              : 'background-color: var(--surface); border: 1px solid var(--border); color: var(--text);'
           }">
             <div class="text-[12.5px]">${t.text}</div>
             ${complianceTag}
@@ -2510,7 +2521,7 @@
         }
         if (cibilBar) {
           cibilBar.style.width = "60%";
-          cibilBar.className = "h-full rounded-full bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-400 transition-all duration-700";
+          cibilBar.className = "h-full rounded-full ";
         }
         if (voiceRespCard) voiceRespCard.classList.add('hidden');
         if (statusBadge) {
@@ -2597,24 +2608,8 @@
         }
 
         // 4. Play audio TTS in Marathi/Indic voice
-        try {
-          const ttsRes = await fetch('/api/voice/tts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: data.voice_response,
-              language: a.language || 'Marathi',
-              speaker: 'aarohi'
-            })
-          });
-          const ttsData = await ttsRes.json();
-          if (ttsData.audio_base64) {
-            const player = new Audio(`data:${ttsData.mime_type || 'audio/mp3'};base64,${ttsData.audio_base64}`);
-            player.play().catch(e => console.log('Audio autoplay blocked:', e));
-          }
-        } catch (e) {
-          console.log('Audio synthesis fallback');
-        }
+        const agentVoiceText = data.voice_response || "धन्यवाद सुनिता ताई. आपल्या दुकानाच्या क्यूआर कोडवर दहा टक्के ऑटो-स्वीप सक्रिय करण्यात आला आहे.";
+        playAudioStreamUrl(`/api/voice/speak?text=${encodeURIComponent(agentVoiceText)}&language=Marathi`, agentVoiceText, 'Marathi');
 
         // 5. Update KPI Strip in Lender Command Center
         const kpis = data.kpis;
@@ -2633,8 +2628,10 @@
         }
 
         // 6. Refresh UI components
-        renderDialogueStream();
+        renderTranscriptDialogue(selectedAccount ? selectedAccount.transcript : []);
         renderAccountsTable(accounts);
+        renderConsoleDetails();
+        renderBorrowerPhoneView();
         showToast("Merchant QR Auto-Sweep Activated!", `Auto-Sweep Active. ₹${Number(data.locked_mandate_inr).toLocaleString()} locked into settlement sweep.`);
 
       } catch (err) {
@@ -2646,7 +2643,11 @@
     }
 
     function triggerSimulatedKhataVoice() {
-      triggerKhataVoiceConfirm("हो, १०% QR कट चालेल");
+      const phrase = "हो, १०% QR कट चालेल";
+      showToast("Voice Simulation", `Borrower speaking: "${phrase}"`);
+      speakWithWebSpeech(phrase, 'Marathi', () => {
+        triggerKhataVoiceConfirm(phrase);
+      });
     }
 
     // SIMULATE PAYMENT FROM THE BORROWER PHONE (Full Round-Trip)
@@ -2680,106 +2681,268 @@
 
     // AUDIO PLAYBACK (Bulbul:v3 or SpeechSynthesis)
     
-    // ==========================================
-    // VOICE AGENT DEMO RUNNER (ENGLISH, HINDI, TELUGU)
-    // ==========================================
-    async function playVoiceDemo(lang) {
-      const langKey = lang.toLowerCase();
-      const icon = document.getElementById('audioControlIcon');
-      const wave = document.getElementById('waveformVisualizer');
-      const statusEl = document.getElementById('audioTelemetryStatus');
-      const badge = document.getElementById('voiceLanguageBadge');
+    // ========================================================
+    // BULLET-PROOF INDIC & ENGLISH VOICE AUDIO ENGINE (STREAMING & TTS)
+    // ========================================================
+    let globalAudioPlayer = null;
+    let audioCtx = null;
+    let isPlayingAudio = false;
+    let activeTurnAudioIndex = null;
+    let sequentialPlaybackTimer = null;
 
-      if (isPlayingAudio) {
-        if (audioPlayer) audioPlayer.pause();
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        isPlayingAudio = false;
+    function getAudioPlayer() {
+      if (!globalAudioPlayer) {
+        globalAudioPlayer = document.getElementById('globalAudioPlayer');
+        if (!globalAudioPlayer) {
+          globalAudioPlayer = document.createElement('audio');
+          globalAudioPlayer.id = 'globalAudioPlayer';
+          globalAudioPlayer.preload = 'auto';
+          document.body.appendChild(globalAudioPlayer);
+        }
       }
-
-      let accId = '2'; // Hindi default
-      let displayLang = 'Hindi';
-      let voiceSpeaker = 'hi-IN-SwaraNeural';
-      let demoPhrase = 'नमस्ते राजेश जी, मैं सारथी हूँ, डेमो लेंडर ए की ओर से आपकी ईएमआई के संदर्भ में एआई कॉल कर रही हूँ। आपके अनुरोध पर पच्चीस सौ रुपये का अग्रिम टोकन स्वीकार कर लिया गया है, और शेष राशि के लिए शुक्रवार का ऑटो-पे मैंडेट शेड्यूल कर दिया गया है।';
-
-      if (langKey === 'english') {
-        accId = '4'; // Vikram Malhotra
-        displayLang = 'English';
-        voiceSpeaker = 'en-IN-NeerjaNeural';
-        demoPhrase = 'Hello Mr. Malhotra, this is Saarthi, an automated AI recovery assistant calling on behalf of Demo Lender A regarding your overdue loan repayment. As per our board-approved policy, autonomous waivers are not permitted, but we can offer an extension of up to 7 days.';
-      } else if (langKey === 'telugu') {
-        accId = '23'; // Kavitha Reddy
-        displayLang = 'Telugu';
-        voiceSpeaker = 'te-IN-ShrutiNeural';
-        demoPhrase = 'నమస్కారం కవిత గారు, నేను సారథి, డెమో లెండర్ బి తరపున మీ ఈఎంఐ చెల్లింపు కోసం మాట్లాడుతున్నాను. శుక్రవారం నాడు ముప్పై రెండు వేల రూపాయల పూర్తి చెల్లింపు కోసం మీ ప్రామిస్ టు పే నమోదు చేయబడింది. ధన్యవాదాలు.';
-      }
-
-      // Jump to that preset account in UI
-      jumpToPreset(accId);
-
-      badge.innerText = `${displayLang} Voice (${voiceSpeaker})`;
-      statusEl.innerText = `Connecting to ${displayLang} neural voice stream...`;
-      wave.classList.add('wave-active');
-      icon.className = "fa-solid fa-pause text-xs";
-      isPlayingAudio = true;
-
-      // 1. Play static high-fidelity MP3 stream
-      try {
-        const audioUrl = `/api/voice/demo-audio/${langKey}`;
-        if (audioPlayer) audioPlayer.pause();
-        audioPlayer = new Audio(audioUrl);
-        audioPlayer.onended = () => {
-          isPlayingAudio = false;
-          icon.className = "fa-solid fa-play ml-0.5 text-xs";
-          wave.classList.remove('wave-active');
-          statusEl.innerText = `${displayLang} voice playback completed`;
-        };
-        audioPlayer.onerror = () => {
-          console.warn("Static audio error, trying Web Speech API...");
-          speakWithWebSpeech(demoPhrase, langKey);
-        };
-        await audioPlayer.play();
-        statusEl.innerText = `Playing ${displayLang} Neural Voice Demo (${voiceSpeaker})`;
-        return;
-      } catch (err) {
-        console.warn("Direct play error:", err);
-        speakWithWebSpeech(demoPhrase, langKey);
-      }
+      return globalAudioPlayer;
     }
 
-    function speakWithWebSpeech(text, langKey) {
-      if (!('speechSynthesis' in window)) return;
+    function unlockAudioContext() {
+      try {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) audioCtx = new AudioContext();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const p = getAudioPlayer();
+        if (p && !p.src) {
+          p.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+          p.play().catch(() => {});
+        }
+      } catch (e) {
+        console.warn("AudioContext unlock note:", e);
+      }
+    }
+    document.addEventListener('click', unlockAudioContext, { once: true });
+    document.addEventListener('touchstart', unlockAudioContext, { once: true });
+
+    function stopAllAudio() {
+      if (sequentialPlaybackTimer) {
+        clearTimeout(sequentialPlaybackTimer);
+        sequentialPlaybackTimer = null;
+      }
+      if (globalAudioPlayer) {
+        globalAudioPlayer.pause();
+        globalAudioPlayer.currentTime = 0;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isPlayingAudio = false;
+      activeTurnAudioIndex = null;
+      
+      const icon = document.getElementById('audioControlIcon');
+      if (icon) icon.className = "fa-solid fa-play ml-0.5 text-xs";
+      
+      const wave = document.getElementById('waveformVisualizer');
+      if (wave) wave.classList.remove('wave-active');
+      
+      document.querySelectorAll('[id^="turnBubble-"]').forEach(b => {
+        b.style.outline = '';
+      });
+      document.querySelectorAll('[id^="turnPlayBtn-"]').forEach(btn => {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high text-[9px]"></i> <span>Listen</span>';
+      });
+    }
+
+    function playAudioStreamUrl(url, fallbackText, lang, onEndCallback) {
+      unlockAudioContext();
+      stopAllAudio();
+      
+      isPlayingAudio = true;
+      const icon = document.getElementById('audioControlIcon');
+      if (icon) icon.className = "fa-solid fa-pause text-xs";
+      const wave = document.getElementById('waveformVisualizer');
+      if (wave) wave.classList.add('wave-active');
+
+      const player = getAudioPlayer();
+      player.src = url;
+      
+      let endedHandled = false;
+      const handleEnd = () => {
+        if (endedHandled) return;
+        endedHandled = true;
+        stopAllAudio();
+        if (onEndCallback) onEndCallback();
+      };
+
+      player.onended = handleEnd;
+      player.onerror = (e) => {
+        console.warn("Direct audio stream failed, falling back to Web Speech synthesis:", e);
+        speakWithWebSpeech(fallbackText, lang, onEndCallback);
+      };
+
+      player.play().catch(err => {
+        console.warn("Audio play promise rejected, using Web Speech fallback:", err);
+        speakWithWebSpeech(fallbackText, lang, onEndCallback);
+      });
+    }
+
+    function speakWithWebSpeech(text, lang, onEndCallback) {
+      if (!('speechSynthesis' in window)) {
+        if (onEndCallback) onEndCallback();
+        return;
+      }
       window.speechSynthesis.cancel();
+      isPlayingAudio = true;
+      const icon = document.getElementById('audioControlIcon');
+      if (icon) icon.className = "fa-solid fa-pause text-xs";
+      const wave = document.getElementById('waveformVisualizer');
+      if (wave) wave.classList.add('wave-active');
+
       const utter = new SpeechSynthesisUtterance(text);
-      if (langKey === 'telugu') utter.lang = 'te-IN';
-      else if (langKey === 'hindi') utter.lang = 'hi-IN';
-      else utter.lang = 'en-IN';
+      const l = (lang || '').toLowerCase();
+      if (l.includes('te')) utter.lang = 'te-IN';
+      else if (l.includes('mr')) utter.lang = 'mr-IN';
+      else if (l.includes('ta')) utter.lang = 'ta-IN';
+      else if (l.includes('kn')) utter.lang = 'kn-IN';
+      else if (l.includes('en')) utter.lang = 'en-IN';
+      else utter.lang = 'hi-IN';
+
       utter.rate = 0.95;
       utter.onend = () => {
-        isPlayingAudio = false;
-        document.getElementById('audioControlIcon').className = "fa-solid fa-play ml-0.5 text-xs";
-        document.getElementById('waveformVisualizer').classList.remove('wave-active');
-        document.getElementById('audioTelemetryStatus').innerText = "Voice playback completed";
+        stopAllAudio();
+        if (onEndCallback) onEndCallback();
+      };
+      utter.onerror = () => {
+        stopAllAudio();
+        if (onEndCallback) onEndCallback();
       };
       window.speechSynthesis.speak(utter);
     }
 
-    async function togglePlayCallAudio() {
-      if (isPlayingAudio) {
-        if (audioPlayer) audioPlayer.pause();
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        isPlayingAudio = false;
-        document.getElementById('audioControlIcon').className = "fa-solid fa-play ml-0.5 text-xs";
-        document.getElementById('waveformVisualizer').classList.remove('wave-active');
-        document.getElementById('audioTelemetryStatus').innerText = "Playback paused";
+    async function playTurnAudio(turnIdx) {
+      if (!selectedAccount || !selectedAccount.transcript || !selectedAccount.transcript[turnIdx]) return;
+      const turn = selectedAccount.transcript[turnIdx];
+      const lang = selectedAccount.language || 'Hindi';
+      
+      stopAllAudio();
+
+      const statusEl = document.getElementById('audioTelemetryStatus');
+      const turnBtn = document.getElementById(`turnPlayBtn-${turnIdx}`);
+      const turnBubble = document.getElementById(`turnBubble-${turnIdx}`);
+      const speakerLabel = turn.speaker === 'agent' ? 'Saarthi AI Voice' : selectedAccount.customer_name;
+      
+      if (statusEl) statusEl.innerText = `Speaking [${speakerLabel}]: "${turn.text.slice(0, 45)}..."`;
+      if (turnBtn) turnBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[9px]"></i> <span>Playing</span>';
+      if (turnBubble) {
+        turnBubble.style.outline = '2px solid var(--accent)';
+        turnBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // Update phone live caption
+      const phoneCap = document.getElementById('phoneLiveCaption');
+      if (phoneCap) phoneCap.innerText = `"${turn.text}"`;
+
+      const audioUrl = `/api/telephony/audio/${selectedAccount.id}/${turnIdx}`;
+      playAudioStreamUrl(audioUrl, turn.text, lang, () => {
+        if (statusEl) statusEl.innerText = "Turn audio completed";
+        if (turnBtn) turnBtn.innerHTML = '<i class="fa-solid fa-volume-high text-[9px]"></i> <span>Listen</span>';
+        if (turnBubble) turnBubble.style.outline = '';
+      });
+    }
+
+    async function playSequentialDialogue(startIndex = 0) {
+      if (!selectedAccount || !selectedAccount.transcript || startIndex >= selectedAccount.transcript.length) {
+        stopAllAudio();
+        const statusEl = document.getElementById('audioTelemetryStatus');
+        if (statusEl) statusEl.innerText = "Full conversation playback completed";
         return;
       }
 
-      let lang = (selectedAccount && selectedAccount.language) ? selectedAccount.language.toLowerCase() : 'hindi';
-      if (lang.includes('te')) lang = 'telugu';
-      else if (lang.includes('en')) lang = 'english';
-      else lang = 'hindi';
+      const turn = selectedAccount.transcript[startIndex];
+      const lang = selectedAccount.language || 'Hindi';
+      const statusEl = document.getElementById('audioTelemetryStatus');
+      const turnBubble = document.getElementById(`turnBubble-${startIndex}`);
+      const speakerLabel = turn.speaker === 'agent' ? 'Saarthi AI Voice' : selectedAccount.customer_name;
+      
+      activeTurnAudioIndex = startIndex;
+      if (statusEl) statusEl.innerText = `Turn ${startIndex + 1}/${selectedAccount.transcript.length} [${speakerLabel}]: "${turn.text.slice(0, 40)}..."`;
+      
+      document.querySelectorAll('[id^="turnBubble-"]').forEach(b => b.style.outline = '');
+      if (turnBubble) {
+        turnBubble.style.outline = '2px solid var(--accent)';
+        turnBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
 
-      await playVoiceDemo(lang);
+      const phoneCap = document.getElementById('phoneLiveCaption');
+      if (phoneCap) phoneCap.innerText = `"${turn.text}"`;
+
+      const audioUrl = `/api/telephony/audio/${selectedAccount.id}/${startIndex}`;
+      playAudioStreamUrl(audioUrl, turn.text, lang, () => {
+        if (turnBubble) turnBubble.style.outline = '';
+        sequentialPlaybackTimer = setTimeout(() => {
+          playSequentialDialogue(startIndex + 1);
+        }, 600);
+      });
+    }
+
+    async function playVoiceDemo(lang) {
+      const langKey = (lang || 'hindi').toLowerCase();
+      const statusEl = document.getElementById('audioTelemetryStatus');
+      const badge = document.getElementById('voiceLanguageBadge');
+
+      if (isPlayingAudio) {
+        stopAllAudio();
+        if (statusEl) statusEl.innerText = "Playback stopped";
+        return;
+      }
+
+      let displayLang = 'Hindi';
+      let voiceSpeaker = 'hi-IN-SwaraNeural';
+      let demoPhrase = 'नमस्ते राजेश जी, मैं सारथी हूँ, डेमो लेंडर ए की ओर से आपकी ईएमआई के संदर्भ में एआई कॉल कर रही हूँ। आपके अनुरोध पर पच्चीस सौ रुपये का अग्रिम टोकन स्वीकार कर लिया गया है, और शेष राशि के लिए शुक्रवार का ऑटो-पे मैंडेट शेड्यूल कर दिया गया है।';
+
+      if (langKey.includes('en')) {
+        displayLang = 'English';
+        voiceSpeaker = 'en-IN-NeerjaNeural';
+        demoPhrase = 'Hello Mr. Malhotra, this is Saarthi, an automated AI recovery assistant calling on behalf of Demo Lender A regarding your overdue loan repayment. As per our board-approved policy, autonomous waivers are not permitted, but we can offer an extension of up to 7 days.';
+      } else if (langKey.includes('te')) {
+        displayLang = 'Telugu';
+        voiceSpeaker = 'te-IN-ShrutiNeural';
+        demoPhrase = 'నమస్కారం కవిత గారు, నేను సారథి, డెమో లెండర్ బి తరపున మీ ఈఎంఐ చెల్లింపు కోసం మాట్లాడుతున్నాను. శుక్రవారం నాడు ముప్పై రెండు వేల రూపాయల పూర్తి చెల్లింపు కోసం మీ ప్రామిస్ టు పే నమోదు చేయబడింది. ధన్యవాదాలు.';
+      } else if (langKey.includes('mr')) {
+        displayLang = 'Marathi';
+        voiceSpeaker = 'mr-IN-AarohiNeural';
+        demoPhrase = 'नमस्कार सुनिता ताई, मी सारथी, डेमो लेंडर ए कडून बोलत आहे. आपल्या कर्जाच्या हप्त्याबाबत मी फोन केला आहे. आपल्या सोयीनुसार दहा टक्के दैनिक क्यूआर स्वाईप सुरू करता येईल, ज्यामुळे कोणताही एकरकमी ताण येणार नाही.';
+      }
+
+      if (badge) badge.innerText = `${displayLang} Voice (${voiceSpeaker})`;
+      if (statusEl) statusEl.innerText = `Streaming ${displayLang} neural voice (${voiceSpeaker})...`;
+
+      const audioUrl = `/api/voice/demo-audio/${langKey}`;
+      playAudioStreamUrl(audioUrl, demoPhrase, displayLang, () => {
+        if (statusEl) statusEl.innerText = `${displayLang} voice playback completed`;
+      });
+    }
+
+    async function togglePlayCallAudio() {
+      if (isPlayingAudio) {
+        stopAllAudio();
+        const statusEl = document.getElementById('audioTelemetryStatus');
+        if (statusEl) statusEl.innerText = "Playback paused";
+        return;
+      }
+
+      if (!selectedAccount) {
+        await playVoiceDemo('hindi');
+        return;
+      }
+
+      // If selected account has turns, start playing sequentially from beginning
+      if (selectedAccount.transcript && selectedAccount.transcript.length > 0) {
+        await playSequentialDialogue(0);
+      } else {
+        const lang = selectedAccount.language || 'Hindi';
+        await playVoiceDemo(lang.toLowerCase());
+      }
     }
 
 
@@ -2816,5 +2979,7 @@
       window.open(`/api/cases/${selectedAccount.id}/evidence-pack?workflow_id=collections`, '_blank');
     }
   </script>
+  <!-- Global Persistent Audio Stream Player -->
+  <audio id="globalAudioPlayer" preload="auto" class="hidden"></audio>
 </body>
 </html>
