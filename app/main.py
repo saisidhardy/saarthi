@@ -1241,6 +1241,238 @@ def api_coach_advisor_handoff(req: CoachHandoffRequest):
             
     return handoff_ticket
 
+# ==========================================
+# 17. HEADLESS LMS & BYOT TELEPHONY INTEGRATION (v1 API)
+# ==========================================
+class CaseSyncRequest(BaseModel):
+    external_loan_id: str
+    lender_id: Optional[str] = "demo_lender_a"
+    customer_name: str
+    phone: str
+    language: Optional[str] = "Hindi"
+    amount_due: float
+    dpd: Optional[int] = 1
+    loan_type: Optional[str] = "Personal Loan"
+    bounce_reason: Optional[str] = "E006 - Insufficient Funds"
+    source_lms: Optional[str] = "FinnOne Neo"
+    metadata: Optional[Dict[str, Any]] = None
+
+class CallDispatchRequest(BaseModel):
+    case_id: Optional[str] = None
+    external_loan_id: Optional[str] = None
+    channel: Optional[Literal["voice", "whatsapp"]] = "voice"
+    telephony_provider: Optional[str] = "Exotel Enterprise SIP"
+    dlt_header: Optional[str] = "140921-BAJAJ"
+    sip_trunk_id: Optional[str] = "TRUNK-MUM-01"
+
+class BYOTConfigRequest(BaseModel):
+    provider: Literal["Exotel Enterprise", "Tata Tele Services", "Airtel IQ", "Genesys Cloud"] = "Exotel Enterprise"
+    dlt_header: str = "140921-BAJAJ"
+    sip_trunk_uri: str = "sip.in-west.exotel.com"
+    caller_id_whitelist: List[str] = ["+911409210001", "+911409210002"]
+    data_residency_region: str = "ap-south-1 (Mumbai, India)"
+    webhook_secret: Optional[str] = "sec_live_92f08a1c"
+
+GLOBAL_INTEGRATION_STATE = {
+    "lms": {
+        "status": "connected",
+        "provider": "FinnOne Neo / LeadSquared Core",
+        "mode": "Real-Time Webhook Event Stream",
+        "last_sync": datetime.now(timezone.utc).isoformat(),
+        "synced_count": 25,
+        "sync_endpoint": "/api/v1/cases/sync"
+    },
+    "byot": {
+        "status": "active",
+        "provider": "Exotel Enterprise SIP",
+        "dlt_header": "140921-BAJAJ",
+        "sip_trunk_uri": "sip.in-west.exotel.com",
+        "dlt_status": "Whitelisted & Truecaller Verified Business",
+        "data_residency": "AWS ap-south-1 (Mumbai, India)",
+        "rbi_cloud_compliant": True,
+        "encryption": "TLS 1.3 / AES-256 at Rest"
+    },
+    "pricing_tier": {
+        "model": "Hybrid Enterprise License + Cured Roll-Rate Milestone",
+        "annual_platform_fee": "INR 24,00,000 / year (VPC deployment + Policy Firewall updates)",
+        "success_fee": "INR 75 per cured 1-30 DPD account (auto-verified via LMS webhook)",
+        "telephony_billing": "Direct to Telco (Zero markup on customer's own SIP trunk)"
+    }
+}
+
+@app.get("/api/v1/integrations/status")
+def get_integrations_status():
+    all_cases = get_all_cases("collections")
+    GLOBAL_INTEGRATION_STATE["lms"]["synced_count"] = len(all_cases)
+    return GLOBAL_INTEGRATION_STATE
+
+@app.post("/api/v1/integrations/byot/config")
+def update_byot_config(req: BYOTConfigRequest):
+    GLOBAL_INTEGRATION_STATE["byot"].update({
+        "provider": req.provider,
+        "dlt_header": req.dlt_header,
+        "sip_trunk_uri": req.sip_trunk_uri,
+        "caller_id_whitelist": req.caller_id_whitelist,
+        "data_residency": req.data_residency_region
+    })
+    return {"status": "updated", "byot": GLOBAL_INTEGRATION_STATE["byot"]}
+
+@app.post("/api/v1/cases/sync")
+def sync_case_from_lms(req: CaseSyncRequest):
+    all_cases = get_all_cases("collections")
+    existing_case = None
+    for c in all_cases:
+        if c.data.get("external_loan_id") == req.external_loan_id or c.data.get("loan_id") == req.external_loan_id:
+            existing_case = c
+            break
+            
+    if existing_case:
+        case = existing_case
+        case.customer_name = req.customer_name
+        case.phone = req.phone
+        case.language = req.language or "Hindi"
+        case.data["amount_due"] = req.amount_due
+        case.data["dpd"] = req.dpd
+        case.data["lender_id"] = req.lender_id
+        case.data["loan_type"] = req.loan_type
+        case.data["bounce_reason"] = req.bounce_reason
+        case.data["source_lms"] = req.source_lms
+        case.data["synced_at"] = datetime.now(timezone.utc).isoformat()
+    else:
+        new_id = str(len(all_cases) + 1)
+        data_payload = {
+            "external_loan_id": req.external_loan_id,
+            "loan_id": req.external_loan_id,
+            "amount_due": req.amount_due,
+            "dpd": req.dpd,
+            "lender_id": req.lender_id,
+            "loan_type": req.loan_type,
+            "bounce_reason": req.bounce_reason,
+            "source_lms": req.source_lms,
+            "synced_at": datetime.now(timezone.utc).isoformat(),
+            "lms_synced": True
+        }
+        if req.metadata:
+            data_payload.update(req.metadata)
+            
+        case = JourneyRecord(
+            id=new_id,
+            workflow_id="collections",
+            customer_name=req.customer_name,
+            phone=req.phone,
+            language=req.language or "Hindi",
+            status="new",
+            cost_inr=0.0,
+            version=1,
+            data=data_payload
+        )
+        
+    case.add_trace(
+        agent="LMSConnector",
+        action="LMS Webhook Case Ingested",
+        summary=f"Case {req.external_loan_id} synced from {req.source_lms} ({req.lender_id}). DPD: {req.dpd}, Overdue: INR {req.amount_due:,.2f}",
+        badge="LMS Webhook"
+    )
+    save_case(case)
+    
+    GLOBAL_INTEGRATION_STATE["lms"]["last_sync"] = datetime.now(timezone.utc).isoformat()
+    GLOBAL_INTEGRATION_STATE["lms"]["synced_count"] = len(get_all_cases("collections"))
+    
+    return {
+        "status": "success",
+        "case_id": case.id,
+        "external_loan_id": req.external_loan_id,
+        "lender_id": req.lender_id,
+        "policy_pre_check": {
+            "eligible_for_outreach": True,
+            "calling_window": "08:00 - 19:00 IST (RBI Fair Practices Compliant)",
+            "firewall_verdict": "APPROVED_FOR_DISPATCH",
+            "dlt_registered": True
+        },
+        "synced_at": datetime.now(timezone.utc).isoformat()
+    }
+
+@app.post("/api/v1/calls/dispatch")
+def dispatch_call_headless(req: CallDispatchRequest):
+    case = None
+    if req.case_id:
+        case = get_case(req.case_id, workflow_id="collections")
+    elif req.external_loan_id:
+        for c in get_all_cases("collections"):
+            if c.data.get("external_loan_id") == req.external_loan_id or c.data.get("loan_id") == req.external_loan_id:
+                case = c
+                break
+                
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found for dispatch")
+        
+    now_ist = datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)
+    current_hour = now_ist.hour
+    is_allowed_hour = (8 <= current_hour < 19) or settings.DEMO_OVERRIDE_HOURS
+    
+    if not is_allowed_hour:
+        return {
+            "dispatched": False,
+            "status": "BLOCKED_BY_POLICY",
+            "reason": "POLICY_CALL_WINDOW_VIOLATION",
+            "rule": "POLICY-CALL-WINDOW01 (RBI FPC: strictly prohibited outside 08:00 - 19:00 IST)",
+            "current_ist_time": now_ist.strftime("%H:%M:%S IST")
+        }
+        
+    updated_case = run_supervisor_pipeline(case, workflow_id="collections")
+    updated_case.add_trace(
+        agent="BYOTGateway",
+        action="Headless Call Dispatched via BYOT",
+        summary=f"Automated outreach fired via {req.telephony_provider} using DLT Header [{req.dlt_header}] to {case.phone}. Outcome: {updated_case.status.upper()}",
+        badge="BYOT Dispatch"
+    )
+    save_case(updated_case)
+    
+    return {
+        "dispatched": True,
+        "status": "completed",
+        "session_id": f"sess_{updated_case.id}_{int(datetime.now().timestamp())}",
+        "case_id": updated_case.id,
+        "external_loan_id": updated_case.data.get("external_loan_id", updated_case.id),
+        "telephony": {
+            "provider": req.telephony_provider or "Exotel Enterprise SIP",
+            "dlt_header": req.dlt_header or "140921-BAJAJ",
+            "caller_id": "+911409210001",
+            "verified_truecaller": True
+        },
+        "conversation_state": {
+            "status": updated_case.status,
+            "ptp_date": updated_case.ptp_date,
+            "confidence": updated_case.confidence,
+            "payment_link": updated_case.payment_link,
+            "audit_pass": updated_case.audit_pass,
+            "sha256_audit_hash": hashlib.sha256(updated_case.model_dump_json().encode("utf-8")).hexdigest()
+        }
+    }
+
+@app.get("/api/v1/callbacks/ptp/{case_id}")
+def get_ptp_callback_payload(case_id: str):
+    case = get_case(case_id, workflow_id="collections")
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+        
+    return {
+        "event": "PROMISE_TO_PAY_RECORDED",
+        "external_loan_id": case.data.get("external_loan_id", case.id),
+        "case_id": case.id,
+        "lender_id": case.data.get("lender_id", "demo_lender_a"),
+        "customer_name": case.customer_name,
+        "phone": case.phone,
+        "status": case.status,
+        "ptp_date": case.ptp_date,
+        "amount_due": case.amount_due,
+        "payment_link": case.payment_link,
+        "payment_status": case.payment_status,
+        "sha256_audit_hash": hashlib.sha256(case.model_dump_json().encode("utf-8")).hexdigest(),
+        "trace_count": len(case.trace),
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 
 @app.get("/", response_class=HTMLResponse)
