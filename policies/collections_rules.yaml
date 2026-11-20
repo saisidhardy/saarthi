@@ -1,41 +1,28 @@
 # lender-owned, board-approved policy (demo)
 policy_meta:
-  policy_version: "2026.3-LENDER-APPROVED"
+  policy_version: "2026.4-LENDER-APPROVED"
   policy_name: "Early Delinquency & Borrower Conduct Policy"
-  approved_by: "Board of Directors, Saarthi Capital Ltd. & Participating Consortium Lenders"
+  approved_by: "Board of Directors, Demo Lender A & Participating Lenders"
   effective_date: "2026-04-01"
-  regulatory_catalyst: "RBI Responsible Business Conduct Amendment Directions (issued Aug 2026, mandatory Jan 1, 2027)"
-  market_context:
-    nach_bounce_rate_india_pct: 20.0
-    msme_self_employed_bounce_rate_pct: 55.0
-    bank_bounce_fee_inr: 590.0
-    unit_economics:
-      ai_cost_per_call_inr: 1.80
-      human_telecaller_cost_inr: 52.00
-      cost_reduction_pct: 96.5
-      recovery_rate_lift:
-        baseline_pct: 34.0
-        saarthi_resolved_pct: 61.8
-        net_lift_pct: 27.8
-    wedge_strategy:
-      step_1: "S6 Audit Mode: Zero-integration audit of existing telecaller/bot transcripts in 60s"
-      step_2: "S7 T-24h Preventive Rescue: Pre-bounce liquidity capture and date shift before NACH penalty"
-      step_3: "S1-S8 Full Autonomous Recovery: Multi-lingual Indic voice with UPI AutoPay cashflow splits"
-  governance_statement: "Enforces board-approved lender recovery policies, zero fund custody, and strict RBI conduct rules."
+  governance_statement: "Enforces lender policy (demo); supports RBI conduct rules."
+  industry_benchmarks:
+    bounced_emi_fee_range: "Rs 50-150 per bounced EMI (PayU, citing CRISIL)"
+    field_visit_cost_range: "Rs 250-500 per field visit (Business Standard)"
+    source_note: "industry figures reported by other sources"
 
 opening_disclosures:
   ai_disclosure:
     mandatory: true
     rule_id: "DISC-AI-01"
-    phrase_en: "I am an AI assistant calling on behalf of Saarthi Capital"
-    phrase_hi: "मैं सारथी कैपिटल की ओर से बोल रहा एक एआई असिस्टेंट हूँ"
-    phrase_mr: "मी सारथी कॅपिटलच्या वतीने बोलणारा एक एआय असिस्टंट आहे"
+    phrase_en: "I am an AI assistant calling on behalf of Demo Lender"
+    phrase_hi: "मैं डेमो लेंडर की ओर से बोल रहा एक एआई असिस्टेंट हूँ"
+    phrase_mr: "मी डेमो लेंडरच्या वतीने बोलणारा एक एआई असिस्टंट आहे"
   recording_disclosure:
     mandatory: true
     rule_id: "DISC-REC-02"
     phrase_en: "This call is recorded for quality and regulatory compliance"
     phrase_hi: "यह कॉल गुणवत्ता और अनुपालन निगरानी के लिए रिकॉर्ड की जा रही है"
-    phrase_mr: "हा कॉल गुणवत्ता आणि नियामक सुरक्षेसाठी रेकॉर्ड केला जातोय"
+    phrase_mr: "हा कॉल गुणवत्ता आणि नियामक सुरखेसाठी रेकॉर्ड केला जातोय"
   human_opt_out:
     mandatory: true
     rule_id: "DISC-HUMAN-03"
@@ -72,10 +59,11 @@ identity_verification:
 
 sensitive_event_pause:
   rule_id: "FAIR-PRAC-SENS01"
-  policy_instruction: "Immediate stop upon bereavement, hospitalization, medical emergency, natural calamity, or wedding. Express concern, no negotiation, no payment link, set do_not_contact_until 7 days."
+  policy_instruction: "Immediate stop upon bereavement, hospitalization, medical emergency, natural calamity, or wedding. Express concern, no negotiation, no payment link, set do_not_contact_until 7 days. Create human follow-up task: check whether borrower has any insurance cover."
   do_not_contact_days: 7  # demo default 7 days, lender-configurable
   allow_negotiation: false
   allow_payment_link: false
+  human_follow_up_task: "check whether borrower has any insurance cover"
   target_desk: "Sensitive Care & Compassionate Follow-up Desk"
   triggers:
     bereavement:
@@ -144,8 +132,8 @@ contact_rules:
     start_ist: "08:00"
     end_ist: "19:00"
     demo_override: true
-    description: "Supports RBI recovery window: Outbound contacts permitted between 08:00 and 19:00 IST."
-  max_calls_per_day: 2  # demo default 2, lender-configurable; do not present as regulatory number
+    description: "Enforces lender policy (demo); supports RBI conduct rules (08:00 to 19:00 IST)."
+  max_calls_per_day: 2  # demo default 2, lender-configurable
   honour_preferred_contact_window: true
   authorized_parties_only:
     - "borrower"
@@ -163,62 +151,47 @@ negotiation:
 
 liquidity_capture_rules:
   rule_id: "POLICY-LIQ-CAPTURE01"
-  description: "Capture liquidity now: Never leave call with pure future promise. Split into immediate token UPI + locked recurring AutoPay mandate"
+  description: "Split resolution into upfront token payment and scheduled remainder."
   min_token_inr: 1000.0
   require_instant_upi_token: true
   auto_split_remainder_autopay: true
   max_mandate_installments: 3
   preferred_mandate_cadence: "WEEKLY_FRIDAY"
+  mandate_wording: "mandate request sent; becomes active only when the borrower approves it in her UPI app; she can revoke it"
 
 preventive_rules:
   rule_id: "POLICY-PREV-FEE01"
-  description: "T-24h preventive bounce intervention before eNACH/AutoPay debit"
-  bank_bounce_fee_inr: 590.0
+  description: "T-24h preventive intervention before scheduled debit"
   allow_pre_due_date_shift_days: 3
-  cibil_impact_prevented: true
-  min_liquidity_buffer_inr: 6000.0
+  bounce_charge_inr: null  # Unset by default; never imply a waiver
 
 micro_split_rules:
   rule_id: "POLICY-MICRO-SPLIT01"
-  description: "Kirana cashflow-synced weekly Friday micro-split installment schedule"
+  description: "Weekly installment schedule aligned with borrower cashflow"
   allow_cashflow_micro_split: true
   max_installments: 4
   cadence: "WEEKLY_FRIDAY"
   min_first_tranche_pct: 25.0
 
-insurance_rider_rules:
-  rule_id: "POLICY-HOSPICASH01"
-  description: "Automatic Hospicash / Credit-Shield claim packet preparation on medical calamity shock"
-  max_claim_relief_inr: 15000.0
-  cooling_pause_days: 7
-  designated_insurer: "HDFC ERGO Health Insurance / ICICI Lombard"
-
 qr_sweep_rules:
   rule_id: "POLICY-QR-SWEEP01"
-  description: "Borrower-side voice-confirmed 10% pay-as-you-sell QR auto-sweep recovery"
+  description: "Borrower-side voice-confirmed 10% daily settlement sweep"
   allow_merchant_qr_sweep: true
   default_sweep_pct: 10
-  cibil_protection_bonus_pts: 35
-  bounce_fee_waived_inr: 590.0
-
+  bounce_charge_inr: null
 
 root_cause_routing:
   rule_id: "POLICY-ROOT-ROUTE01"
   description: "Downstream deterministic routing based on conversation root cause"
   categories:
     TEMPORARY_CASHFLOW_MISMATCH:
-      description: "Short-term salary delay, client payment lag, or festival inventory mismatch"
+      description: "Short-term salary delay, client payment lag, or inventory cycle mismatch"
       permitted_actions: ["LIQUIDITY_CAPTURE_TOKEN_UPI", "AUTOPAY_FRIDAY_MANDATE_SPLIT", "PTP_7_DAYS"]
-      on_settled_full_or_mandate: "UNLOCK_CIBIL_PROTECTION_AND_50K_TOPUP"
-      cibil_protection_active: true
-      working_capital_topup_amount_inr: 50000.0
     MEDICAL_CALAMITY_SHOCK:
       description: "ICU, emergency hospitalization, bereavement, or natural disaster"
       mandatory_action: "FAIR-PRAC-SENS01"
       cooling_pause_days: 7
-      auto_draft_insurance_claim: true
-      rider_name: "Attached Hospicash / Credit-Shield Micro-Insurance Claim"
-      insurer_payment_target: "lender_escrow"
+      human_follow_up_task: "check whether borrower has any insurance cover"
     DISPUTE_OR_HARDSHIP:
       description: "Prolonged job loss, business insolvency, or prior debit dispute"
       action: "ESCALATE_TO_HUMAN_CREDIT_COUNSELLING"

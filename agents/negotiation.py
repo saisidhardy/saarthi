@@ -28,10 +28,14 @@ def extract_amount_from_speech(text: str, total_due: float, loan_id: Optional[st
     if k_match:
         return float(k_match.group(1)) * 1000.0
 
-    # 4. Extract loan digits to ignore (e.g. 1001, 1002)
+    # 4. Extract loan digits to ignore (e.g. 1001, 1002 from identity confirmation)
     loan_digits = ""
     if loan_id:
         loan_digits = re.sub(r"\D", "", str(loan_id))[-4:]
+
+    # Also detect 4-digit identity responses e.g. "1002 है", "1001 आहे"
+    id_match = re.search(r"\b(\d{4})\s*(?:है|आहे|is|hai|ahe)\b", clean)
+    id_digits = id_match.group(1) if id_match else ""
 
     # 5. Numerical search
     matches = re.finditer(r"(?:rs\.?|inr|₹)?\s*(\d{1,3}(?:,\d{3})+|\d{4,6}|\d{3})", clean)
@@ -40,8 +44,8 @@ def extract_amount_from_speech(text: str, total_due: float, loan_id: Optional[st
         raw = m.group(1).replace(",", "")
         try:
             val = float(raw)
-            # Skip loan verification digits
-            if loan_digits and raw == loan_digits:
+            # Skip loan verification digits (e.g. 1001, 1002)
+            if (loan_digits and raw == loan_digits) or (id_digits and raw == id_digits):
                 continue
             if 100 <= val <= total_due:
                 found_amounts.append(val)
@@ -52,8 +56,8 @@ def extract_amount_from_speech(text: str, total_due: float, loan_id: Optional[st
         # If there are part payment numbers (e.g. 2,500 out of 7,500 or 10,000 out of 25,000), return the part payment
         part_payments = [v for v in found_amounts if v < total_due]
         if part_payments:
-            return part_payments[0]
-        return found_amounts[0]
+            return part_payments[-1]  # Return actual payment offer (e.g. 2,500)
+        return found_amounts[-1]
 
     return None
 
@@ -209,8 +213,8 @@ def _deterministic_propose(record: JourneyRecord, text: str) -> LLMProposal:
             confidence=0.90
         )
 
-    # 6. T-24h Preventive Bounce Shift (Scenario S7)
-    if record.trigger_type == "PRE_DUE_T24H" or any(k in clean for k in ["पुढे ढकला", "shift", "postpone", "pre-due", "590 रुपये", "590", "बाउंस फी", "फी वाचेल", "बफर"]):
+    # 6. T-24h Preventive Shift (Scenario S7)
+    if record.trigger_type == "PRE_DUE_T24H" or any(k in clean for k in ["पुढे ढकला", "shift", "postpone", "pre-due", "तारीख वाढवा", "बफर"]):
         return LLMProposal(
             intent="pre_due_shift",
             offered_amount=record.amount_due,

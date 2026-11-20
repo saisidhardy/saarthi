@@ -5,13 +5,10 @@ from app.database import get_all_cases
 
 def compute_engine_metrics(workflow_id: str = "collections", records: List[JourneyRecord] = None) -> EngineMetrics:
     """
-    Computes workflow engine-level metrics across journey records.
-    Engine Metrics:
-    - Journeys started
-    - Journeys completed autonomously
-    - Human-touch rate %
-    - Cost per completed journey
-    - Workflow's own metric (recovery % for collections, qualified leads for sales)
+    Computes workflow engine-level simulation metrics across synthetic accounts.
+    Shows ONLY counts the engine computes (contacted, PTPs, blocked by policy, escalated)
+    plus cost per contact computed from usage counters x /policies/pricing.yaml, labelled 'estimated'.
+    Industry figures reported by other sources are kept distinct as external benchmarks.
     """
     if records is None:
         records = get_all_cases(workflow_id=workflow_id)
@@ -20,10 +17,10 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
     started_records = [r for r in records if r.status != "new"]
     started_count = len(started_records)
 
-    # Valid records (failed audits do not count as completed autonomously)
+    # Valid records
     valid_records = [r for r in records if r.audit_pass is not False]
     
-    # Human-touch records
+    # Human-touch / escalated records
     escalated_records = [r for r in records if r.status == "escalated" or r.assigned_human]
     human_touch_count = len(escalated_records)
     human_touch_rate = round((human_touch_count / max(started_count, 1)) * 100, 1) if started_count > 0 else 0.0
@@ -31,7 +28,6 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
     total_cost = sum(r.cost_inr for r in started_records)
 
     if workflow_id == "loan_sales":
-        # Loan Sales metrics
         completed_autonomously = sum(1 for r in valid_records if r.status in ("qualified", "completed") and r.status != "escalated")
         cost_per_completed = round(total_cost / max(completed_autonomously, 1), 2) if completed_autonomously > 0 else 0.0
         conversion_rate = round((completed_autonomously / max(started_count, 1)) * 100, 1) if started_count > 0 else 0.0
@@ -56,21 +52,16 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
             }
         )
     else:
-        # Collections metrics
         ptp_count = sum(1 for r in valid_records if r.status == "ptp")
         paid_count = sum(1 for r in valid_records if r.status == "paid")
         completed_autonomously = ptp_count + paid_count
         cost_per_completed = round(total_cost / max(completed_autonomously, 1), 2) if completed_autonomously > 0 else 0.0
 
-        total_book_val = sum(r.amount_due for r in records)
-        paid_val = sum(r.amount_due for r in valid_records if r.status == "paid")
-        recovery_pct = round((paid_val / max(total_book_val, 1)) * 100, 1)
-
         from services.sarvam import sarvam_service
         live_pricing = sarvam_service.get_cost_summary()
 
-        # Average cost per contact (computed live from actual usage and pricing.yaml rates)
-        avg_cost_contact = round(total_cost / max(started_count, 1), 2) if started_count > 0 else live_pricing.get("cost_per_contact_inr", 1.68)
+        # Cost per contact computed from actual usage counters and pricing.yaml
+        avg_cost_contact = live_pricing.get("cost_per_contact_inr", 1.68)
 
         blocked_by_policy = sum(
             1 for r in records 
@@ -80,22 +71,8 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
         for r in records:
             lang_split[r.language] = lang_split.get(r.language, 0) + 1
 
-        total_bounce_fees_saved = sum(float(r.bounce_fee_saved_inr or 0.0) for r in records)
-        hospicash_total = sum(
-            float(r.hospicash_claim.get("max_relief_amount_inr", 0.0))
-            for r in records if r.hospicash_claim
-        )
-        npa_and_fees_prevented = total_bounce_fees_saved + hospicash_total
-
         cash_rec_today = sum(float(r.instant_recovered_inr or 0.0) for r in valid_records)
         future_locked = sum(float(r.locked_mandate_inr or 0.0) for r in valid_records)
-
-        npa_rescued = sum(
-            1 for r in valid_records 
-            if r.status in ("ptp", "paid") or r.micro_schedule or r.bounce_fee_saved_inr > 0 or r.hospicash_claim
-        )
-
-        ptp_conv_pct = round(((ptp_count + paid_count) / max(started_count, 1)) * 100, 1) if started_count > 0 else 0.0
 
         return EngineMetrics(
             workflow_id="collections",
@@ -106,42 +83,35 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
             human_touch_rate_pct=human_touch_rate,
             total_cost_inr=round(total_cost, 2),
             cost_per_completed_journey=cost_per_completed,
-            workflow_metric_name="Recovery Rate",
-            workflow_metric_value=recovery_pct,
-            industry_call_centre_cost=settings.INDUSTRY_CALL_CENTRE_COST,
-            industry_field_visit_cost=settings.INDUSTRY_FIELD_VISIT_COST,
-            recovery_lift_pct=27.8,
-            baseline_recovery_pct=34.0,
-            portfolio_recovery_rate_pct=61.8,
-            total_bounce_fees_saved_inr=round(total_bounce_fees_saved, 2),
-            npa_loans_rescued_count=npa_rescued,
+            workflow_metric_name="Simulated PTP Resolution",
+            workflow_metric_value=ptp_count,
+            industry_call_centre_cost=52.00,
+            industry_field_visit_cost=250.00,
+            recovery_lift_pct=None,
+            baseline_recovery_pct=None,
+            portfolio_recovery_rate_pct=None,
+            total_bounce_fees_saved_inr=0.0,
+            npa_loans_rescued_count=completed_autonomously,
             cash_recovered_today_inr=round(cash_rec_today, 2),
             future_cash_locked_inr=round(future_locked, 2),
-            npa_and_fees_prevented_inr=round(npa_and_fees_prevented, 2),
+            npa_and_fees_prevented_inr=0.0,
             details={
+                "simulation_label": f"Simulation on {total_records} synthetic accounts",
                 "total_accounts": total_records,
                 "contacted": started_count,
                 "ptps": ptp_count,
                 "paid": paid_count,
                 "escalated": human_touch_count,
                 "blocked_by_policy": blocked_by_policy,
-                "ptp_conversion_pct": ptp_conv_pct,
                 "language_split": lang_split,
-                "recovery_pct": recovery_pct,
                 "our_cost_per_contact": avg_cost_contact,
-                "total_bounce_fees_saved_inr": round(total_bounce_fees_saved, 2),
-                "npa_loans_rescued_count": npa_rescued,
-                "recovery_lift_pct": 27.8,
-                "baseline_recovery_pct": 34.0,
-                "portfolio_recovery_rate_pct": 61.8,
-                "cash_recovered_today_inr": round(cash_rec_today, 2),
-                "future_cash_locked_inr": round(future_locked, 2),
-                "npa_and_fees_prevented_inr": round(npa_and_fees_prevented, 2),
-                "cost_label": live_pricing.get("cost_label", "estimated from published rates"),
+                "cost_label": live_pricing.get("cost_label", "estimated"),
                 "footnote": live_pricing.get("footnote", "excludes LLM tokens"),
-                "industry_call_centre_cost": live_pricing.get("industry_call_centre_cost", 52.00),
-                "industry_field_visit_cost": live_pricing.get("industry_field_visit_cost", 250.00),
-                "benchmark_label": live_pricing.get("benchmark_label", "reported by other sources")
+                "bounced_emi_fee_range": live_pricing.get("bounced_emi_fee_range", "Rs 50-150 per bounced EMI (PayU, citing CRISIL)"),
+                "field_visit_cost_range": live_pricing.get("field_visit_cost_range", "Rs 250-500 per field visit (Business Standard)"),
+                "benchmark_label": live_pricing.get("benchmark_label", "industry figures reported by other sources"),
+                "cash_recovered_today_inr": round(cash_rec_today, 2),
+                "future_cash_locked_inr": round(future_locked, 2)
             }
         )
 
@@ -149,18 +119,13 @@ def compute_engine_metrics(workflow_id: str = "collections", records: List[Journ
 compute_dashboard_metrics = compute_engine_metrics
 
 def run_reporter_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None, context: Optional[Dict[str, Any]] = None) -> JourneyRecord:
-    """
-    Generic Reporter Agent:
-    - Calculates the incremental effect of this journey on engine metrics
-    - Appends final report trace item to the record
-    """
     workflow_id = record.workflow_id or (context.get("workflow_id") if context else "collections")
     metrics = compute_engine_metrics(workflow_id)
     
     record.add_trace(
         agent="Reporter",
-        action="Engine Metrics & Attribution Synchronized",
-        summary=f"Engine State Updated: Started={metrics.journeys_started}, Autonomous Completed={metrics.journeys_completed_autonomously}, Human-Touch Rate={metrics.human_touch_rate_pct}%. Cost/Completed: ₹{metrics.cost_per_completed_journey:.2f}."
+        action="Engine Simulation Metrics Synchronized",
+        summary=f"Simulation State: Contacted={metrics.journeys_started}, PTPs={metrics.details.get('ptps', 0)}, Escalated={metrics.human_touch_count}, Blocked={metrics.details.get('blocked_by_policy', 0)}. Est Cost/Contact: ₹{metrics.details.get('our_cost_per_contact', 1.68)}."
     )
 
     return record

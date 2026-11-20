@@ -243,10 +243,10 @@
         <button onclick="launchScenario('s7')" class="p-2 rounded-xl bg-gradient-to-br from-emerald-950/80 to-slate-900 border border-emerald-500/60 hover:border-emerald-400 text-left transition transform active:scale-95 shadow-sm group">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-emerald-400 font-mono">S7 T-24H RESCUE</span>
-            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">₹590 Saved</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Buffer Rail</span>
           </div>
           <div class="text-xs font-bold text-white mt-1 group-hover:text-emerald-300 truncate">Anjali Deshmukh</div>
-          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">3d Shift · CIBIL Safe</div>
+          <div class="text-[10px] text-slate-400 leading-tight mt-0.5 truncate">3d Shift · Buffer</div>
         </button>
 
         <!-- S8: Cashflow Micro-Split -->
@@ -275,15 +275,15 @@
       <div class="flex items-center gap-4 flex-wrap">
         <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
           <span class="text-[11px] text-slate-400">Recovery Lift:</span>
-          <span class="text-slate-500 line-through text-[11px]">34.0% Base</span>
+          <span class="text-slate-500 line-through text-[11px]">Evaluated</span>
           <i class="fa-solid fa-arrow-right text-[10px] text-emerald-400"></i>
-          <span id="statRecoveryLift" class="font-bold text-emerald-400 font-mono">61.2%</span>
-          <span class="text-[10px] text-emerald-500 font-semibold">(+27.2% Lift)</span>
+          <span id="statRecoveryLift" class="font-bold text-emerald-400 font-mono">25 Accs</span>
+          <span class="text-[10px] text-emerald-500 font-semibold">(Deterministic)</span>
         </div>
         <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
           <i class="fa-solid fa-piggy-bank text-amber-400 text-xs"></i>
           <span class="text-[11px] text-slate-400">Bounce Fees Saved:</span>
-          <span id="statBounceFeesSaved" class="font-bold text-amber-300 font-mono">₹590</span>
+          <span id="statBounceFeesSaved" class="font-bold text-amber-300 font-mono">Buffer</span>
           <span class="text-[10px] text-slate-400">/ rescued loan</span>
         </div>
         <div class="flex items-center gap-1.5 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
@@ -305,10 +305,10 @@
           <i class="fa-solid fa-arrow-trend-up text-emerald-400 text-xs"></i>
         </div>
         <div class="flex items-baseline gap-1 mt-0.5">
-          <span id="statPortfolioRecoveryRate" class="text-xl font-extrabold text-emerald-400 font-mono">61.8%</span>
-          <span class="text-[10px] text-emerald-500 font-bold">(+27.8% Lift)</span>
+          <span id="statPortfolioRecoveryRate" class="text-xl font-extrabold text-emerald-400 font-mono">18 PTPs</span>
+          <span class="text-[10px] text-emerald-500 font-bold">(Simulation)</span>
         </div>
-        <div class="text-[9.5px] text-slate-400">Baseline 34.0% &rarr; Saarthi 61.8%</div>
+        <div class="text-[9.5px] text-slate-400">Baseline 34.0% &rarr; Saarthi 18 PTPs</div>
       </div>
 
       <!-- 2. Cash Recovered Today (Instant UPI) -->
@@ -344,7 +344,7 @@
         <div class="text-xl font-extrabold text-amber-300 font-mono mt-0.5">
           ₹<span id="statNpaFeesPrevented">0</span>
         </div>
-        <div class="text-[9.5px] text-slate-400">Hospicash Relief + ₹590 Bank Fees</div>
+        <div class="text-[9.5px] text-slate-400">Hospicash Relief + Buffer Bank Fees</div>
       </div>
 
       <!-- 5. Cost Per Contact (Live Model Pricing) -->
@@ -358,7 +358,7 @@
         </div>
         <div class="text-[9px] text-slate-400 flex items-center justify-between">
           <span>vs ₹52 call center</span>
-          <span class="text-emerald-400 font-semibold">96.8% Save</span>
+          <span class="text-emerald-400 font-semibold">estimated</span>
         </div>
       </div>
 
@@ -474,8 +474,8 @@
           <button onclick="sendQuickReply('मला live human agent शी बोलायचं आहे')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-slate-500 transition shadow-sm active:scale-95" title="Live human transfer opt-out">
             "Live Agent" (Human Opt-Out)
           </button>
-          <button onclick="sendQuickReply('590 रुपये बाउंस फी वाचवण्यासाठी कृपया 3 दिवस पुढे ढकला')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-emerald-500 transition shadow-sm active:scale-95" title="T-24h Preventive Rescue: Shift 3 days & save ₹590 fee (S7)">
-            "3 दिवस पुढे ढकला (₹590 वाचवा)"
+          <button onclick="sendQuickReply('कृपया 3 दिवस पुढे ढकला')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-emerald-500 transition shadow-sm active:scale-95" title="T-24h Preventive Rescue: Shift 3 days & save Buffer fee (S7)">
+            "3 दिवस पुढे ढकला (Buffer वाचवा)"
           </button>
           <button onclick="sendQuickReply('दर शुक्रवारी 10-10 हजार करून 4 आठवड्यांत भरू का?')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-purple-300 text-[10.5px] rounded-lg border border-slate-700 hover:border-purple-500 transition shadow-sm active:scale-95" title="4-week Kirana Cashflow Friday micro-split (S8)">
             "दर शुक्रवारी 10k x 4 आठवडे"
@@ -686,7 +686,7 @@
         </div>
         <div id="feeSavedBanner" class="hidden mt-2 p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10.5px] flex items-center gap-1.5 font-mono">
           <i class="fa-solid fa-piggy-bank text-amber-400"></i>
-          <span>T-24h Preventive Rescue: Bank bounce fee of <strong>₹590.00</strong> completely saved!</span>
+          <span>T-24h Preventive Rescue: Bank bounce fee of <strong>Buffer.00</strong> completely saved!</span>
         </div>
       </div>
 
@@ -705,7 +705,7 @@
               <i class="fa-solid fa-xmark text-rose-400"></i> Standard Bot Outcome (₹0 Baseline)
             </div>
             <p id="whyOldBotOutcome" class="text-rose-200/90 text-[10.5px] mt-1 leading-relaxed">
-              Demanded full lump sum or took verbal promise -> ₹0 collected on call -> 68% slippage -> NPA default.
+              Demanded full lump sum or took verbal promise -> ₹0 collected on call -> unsecured commitments -> NPA default.
             </p>
           </div>
           <!-- Saarthi Outcome Path -->
@@ -739,11 +739,11 @@
           </div>
           <div class="flex items-center justify-between">
             <span class="text-slate-400">CIBIL Score Shield:</span>
-            <span class="text-emerald-400 font-bold font-mono">680 &rarr; 715 (PROTECTED +35 pts)</span>
+            <span class="text-emerald-400 font-bold font-mono">Mandate Locked per Policy</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-slate-400">Bounce Fee Waived:</span>
-            <span class="text-emerald-400 font-bold font-mono">&plus;₹590.00 Saved</span>
+            <span class="text-emerald-400 font-bold font-mono">&plus;Buffer.00 Saved</span>
           </div>
         </div>
         <div class="text-[10px] text-amber-300/80 mt-1.5 flex items-center justify-between">
@@ -856,7 +856,7 @@
           <div class="flex items-center justify-between p-3 rounded-xl border bg-slate-950/80" id="auditVerdictBox">
             <div>
               <span class="text-[10px] text-slate-400 uppercase font-mono">Audit Verdict</span>
-              <div id="auditVerdictTitle" class="text-base font-bold text-white mt-0.5">PASSED (100% COMPLIANT)</div>
+              <div id="auditVerdictTitle" class="text-base font-bold text-white mt-0.5">PASSED (Enforces lender policy (demo); supports RBI conduct rules)</div>
             </div>
             <div id="auditVerdictBadge" class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
               PASS
@@ -1222,7 +1222,7 @@
       rRes.innerHTML = '<span class="text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>PASS</span>';
 
       badge.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
-      badge.innerText = "100% COMPLIANT";
+      badge.innerText = "Enforces lender policy (demo); supports RBI conduct rules";
       return true;
     }
 
@@ -2028,7 +2028,7 @@
 
       if (isPass) {
         vBox.className = "flex items-center justify-between p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/20";
-        vTitle.innerText = `AUDIT VERDICT: 100% COMPLIANT (Score: ${res.compliance_score_pct || 100}%)`;
+        vTitle.innerText = `AUDIT VERDICT: Enforces lender policy (demo); supports RBI conduct rules (Score: ${res.compliance_score_pct || 100}%)`;
         vTitle.className = "text-base font-bold text-emerald-300 mt-0.5";
         vBadge.className = "text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
         vBadge.innerText = "PASSED";

@@ -480,9 +480,9 @@ class EngineMetrics(BaseModel):
     workflow_metric_value: float
     industry_call_centre_cost: float = 52.00
     industry_field_visit_cost: float = 250.00
-    recovery_lift_pct: float = 61.2
-    baseline_recovery_pct: float = 34.0
-    portfolio_recovery_rate_pct: float = 61.8
+    recovery_lift_pct: Optional[float] = None
+    baseline_recovery_pct: Optional[float] = None
+    portfolio_recovery_rate_pct: Optional[float] = None
     total_bounce_fees_saved_inr: float = 0.0
     npa_loans_rescued_count: int = 0
     cash_recovered_today_inr: float = 0.0

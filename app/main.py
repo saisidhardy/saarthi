@@ -29,7 +29,10 @@ from agents.supervisor import (
 from agents.compliance import run_compliance_agent, audit_raw_transcript
 from agents.reporter import compute_engine_metrics
 from services.telephony_bridge import telephony_bridge
-from services.sarvam import FALLBACK_MP3_B64
+from services.sarvam import FALLBACK_MP3_B64, sarvam_service, LANGUAGE_SPEAKER_MAP, verify_sarvam_speakers_live
+from services.call_plan import generate_call_plan_from_csv, export_call_plan_csv
+from services.batch_audit import audit_batch_transcripts_csv, export_batch_audit_csv
+from services.outcomes import analyze_outcomes_csv
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -67,7 +70,7 @@ class ApprovalRequest(BaseModel):
 class EMIBouncedEvent(BaseModel):
     account_id: Optional[str] = "1"
     amount: Optional[float] = None
-    bank_code: Optional[str] = "HDFC0001"
+    bank_code: Optional[str] = "DEMOB0001"
     bounce_reason: Optional[str] = "E006 - Insufficient Funds"
     workflow_id: Optional[str] = "collections"
 
@@ -170,11 +173,60 @@ def load_sample_book(workflow_id: str = Query(default="collections")):
 
     return {"status": "success", "workflow_id": workflow_id, "loaded_accounts": loaded_count}
 
-# 3. Get Cases for Workflow
+# Multi-Lender Tenant Agency Catalog
+LENDER_TENANTS_CATALOG = {
+    "all": {
+        "id": "all",
+        "name": "All Lenders (Agency View)",
+        "short_name": "Agency View",
+        "description": "Consolidated portfolio across all client money lenders (25 accounts)",
+        "badge": "Multi-Tenant Agency",
+        "bank": "Multi-Escrow Routing",
+        "vpa": ""
+    },
+    "demo_lender_a": {
+        "id": "demo_lender_a",
+        "name": "Demo Lender A (Retail NBFC)",
+        "short_name": "Demo Lender A",
+        "description": "Retail consumer durable & personal loan book (10 accounts)",
+        "badge": "Retail NBFC",
+        "bank": "Demo Bank Ltd.",
+        "vpa": ""
+    },
+    "demo_lender_b": {
+        "id": "demo_lender_b",
+        "name": "Demo Lender B (MSME & Working Capital)",
+        "short_name": "Demo Lender B",
+        "description": "Kirana & merchant working capital book (9 accounts)",
+        "badge": "MSME Lender",
+        "bank": "Demo Bank Ltd.",
+        "vpa": ""
+    },
+    "demo_lender_c": {
+        "id": "demo_lender_c",
+        "name": "Demo Lender C (Microfinance & Rural)",
+        "short_name": "Demo Lender C",
+        "description": "Joint liability & rural livelihood loan book (6 accounts)",
+        "badge": "Microfinance",
+        "bank": "Demo Bank Ltd.",
+        "vpa": ""
+    }
+}
+
+# 3. Get Cases for Workflow (with Multi-Lender Tenant filtering)
 @app.get("/api/cases")
-def list_cases(workflow_id: str = Query(default="collections")):
+def list_cases(
+    workflow_id: str = Query(default="collections"),
+    lender_id: Optional[str] = Query(default=None)
+):
     cases = get_all_cases(workflow_id=workflow_id)
+    if lender_id and lender_id != "all":
+        cases = [c for c in cases if c.data.get("lender_id") == lender_id]
     return cases
+
+@app.get("/api/lenders")
+def get_lenders_catalog():
+    return LENDER_TENANTS_CATALOG
 
 @app.get("/api/cases/{case_id}")
 def get_single_case(case_id: str, workflow_id: str = Query(default="collections")):
@@ -227,13 +279,10 @@ def handle_pre_due_risk_event(event: PreDueRiskEvent):
     case.trigger_type = "PRE_DUE_T24H"
     case.data["trigger_type"] = "PRE_DUE_T24H"
     case.data["pre_due_balance_inr"] = event.balance_inr
-    case.data["cibil_protected"] = True
-    case.bounce_fee_saved_inr = 590.0
-    case.data["bounce_fee_saved_inr"] = 590.0
     case.add_trace(
         agent="Supervisor",
         action="Pre-Due Low-Balance Risk Ingested (T-24h)",
-        summary=f"T-24h Risk Signal: Account balance (₹{event.balance_inr:,.2f}) insufficient for scheduled EMI (₹{case.amount_due:,.2f}). Proactive rescue initiated to save ₹590 bounce fee and protect CIBIL.",
+        summary=f"T-24h Risk Signal: Account balance (₹{event.balance_inr:,.2f}) insufficient for scheduled EMI (₹{case.amount_due:,.2f}). Proactive rescue initiated: collected buffer payment today and rescheduled remainder by 3 days per policy.",
         badge="Event Trigger"
     )
     save_case(case)
@@ -263,16 +312,10 @@ def activate_borrower_qr_sweep(req: QRSweepActivateRequest):
     # Enforce POLICY-QR-SWEEP01
     case.repayment_rail = f"MERCHANT_QR_SWEEP_{req.sweep_pct}PCT"
     case.data["repayment_rail"] = f"MERCHANT_QR_SWEEP_{req.sweep_pct}PCT"
-    case.cibil_protected = True
-    case.data["cibil_protected"] = True
     case.locked_mandate_inr = float(case.amount_due)
     case.data["locked_mandate_inr"] = float(case.amount_due)
-    case.bounce_fee_saved_inr = 590.0
-    case.data["bounce_fee_saved_inr"] = 590.0
     case.data["qr_sweep_active"] = True
     case.data["qr_sweep_pct"] = req.sweep_pct
-    case.data["cibil_score_lift"] = 35
-    case.data["cibil_score_display"] = "680 → 715 (PROTECTED ✅)"
 
     if case.status not in ("paid",):
         case.status = "ptp"
@@ -288,15 +331,15 @@ def activate_borrower_qr_sweep(req: QRSweepActivateRequest):
     pct_str = "१०" if req.sweep_pct == 10 else str(req.sweep_pct)
 
     if case.language == "Marathi" or "sunita" in case.customer_name.lower() or "सुनीता" in case.customer_name:
-        agent_reply = f"धन्यवाद {first_name} ताई! तुमचा {pct_str}% दैनिक QR ऑटो-स्वीप सुरू झाला आहे आणि तुमचा CIBIL स्कोअर सुरक्षित आहे."
+        agent_reply = f"धन्यवाद {first_name} ताई! तुमचा {pct_str}% दैनिक QR ऑटो-स्वीप सुरू झाला आहे. थकबाकी टप्प्याटप्प्याने भरली जाईल."
     elif case.language == "Telugu":
-        agent_reply = f"ధన్యవాదాలు {first_name} గారు! మీ {req.sweep_pct}% రోజువారీ QR ఆటో-స్వీప్ ప్రారంభించబడింది మరియు మీ CIBIL స్కోర్ రక్షించబడింది."
+        agent_reply = f"ధన్యవాదాలు {first_name} గారు! మీ {req.sweep_pct}% రోజువారీ QR ఆటో-స్వీప్ ప్రారంభించబడింది."
     elif case.language == "Tamil":
-        agent_reply = f"நன்றி {first_name} அவர்களே! உங்கள் {req.sweep_pct}% தினசரி QR ஆட்டோ-ஸ்வீப் தொடங்கப்பட்டது மற்றும் உங்கள் CIBIL பாதுகாக்கப்பட்டுள்ளது."
+        agent_reply = f"நன்றி {first_name} அவர்களே! உங்கள் {req.sweep_pct}% தினசரி QR ஆட்டோ-ஸ்வீப் தொடங்கப்பட்டது."
     elif case.language == "Kannada":
-        agent_reply = f"ಧನ್ಯವಾದಗಳು {first_name} ಅವರೇ! ನಿಮ್ಮ {req.sweep_pct}% ದೈನಂದಿನ QR ಆಟೋ-ಸ್ವೀಪ್ ಸಕ್ರಿಯವಾಗಿದೆ ಮತ್ತು ನಿಮ್ಮ CIBIL ಸ್ಕೋರ್ ಸುರಕ್ಷಿತವಾಗಿದೆ."
+        agent_reply = f"ಧನ್ಯವಾದಗಳು {first_name} ಅವರೇ! ನಿಮ್ಮ {req.sweep_pct}% ದೈನಂದಿನ QR ಆಟೋ-ಸ್ವೀಪ್ ಸಕ್ರಿಯವಾಗಿದೆ."
     else:
-        agent_reply = f"धन्यवाद {first_name} जी! आपका {req.sweep_pct}% दैनिक QR ऑटो-स्वीप शुरू हो गया है और आपका CIBIL स्कोर सुरक्षित है।"
+        agent_reply = f"धन्यवाद {first_name} जी! आपका {req.sweep_pct}% दैनिक QR ऑटो-स्वीप शुरू हो गया है। बक़ाया राशि दैनिक बिक्री से चुकता होगी।"
 
     case.add_transcript(speaker="agent", text=agent_reply)
 
@@ -304,7 +347,7 @@ def activate_borrower_qr_sweep(req: QRSweepActivateRequest):
     case.add_trace(
         agent="BorrowerKhataPortal",
         action="Voice QR Auto-Sweep Activation",
-        summary=f"Borrower voice-confirmed {req.sweep_pct}% Pay-As-You-Sell QR auto-sweep ('{voice_text}'). CIBIL score boosted +35 pts (680 -> 715 Protected). ₹590 bounce fee waived. Locked mandate ₹{case.amount_due:,.2f} under POLICY-QR-SWEEP01.",
+        summary=f"Borrower voice-confirmed {req.sweep_pct}% Pay-As-You-Sell QR auto-sweep ('{voice_text}'). Locked mandate ₹{case.amount_due:,.2f} under POLICY-QR-SWEEP01.",
         badge="Voice Khata Sweep"
     )
 
@@ -319,11 +362,8 @@ def activate_borrower_qr_sweep(req: QRSweepActivateRequest):
         "rule_id": "POLICY-QR-SWEEP01",
         "journey_id": case.id,
         "repayment_rail": case.data.get("repayment_rail"),
-        "cibil_protected": True,
-        "cibil_score_lift": 35,
-        "cibil_score_display": "680 → 715 (PROTECTED ✅)",
         "locked_mandate_inr": case.amount_due,
-        "bounce_fee_waived_inr": 590.0,
+        "mandate_wording": "mandate request sent; becomes active only when the borrower approves it in her UPI app; she can revoke it",
         "voice_response": agent_reply,
         "kpis": updated_kpis.model_dump(),
         "case": case.model_dump()
@@ -385,7 +425,7 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
             "attempts_count": case.data.get("attempts_count", 1),
             "retention_until": retention_until,
             "policy_version": "2026.3-LENDER-APPROVED",
-            "approved_by": case.data.get("approved_by") or "Board of Directors, Saarthi Capital Ltd. (Demo)"
+            "approved_by": case.data.get("approved_by") or "Demo Lender A (Board of Directors)"
         },
         "disclosures_played": {
             "ai_assistant_identity": case.ai_disclosure_played or case.consent_played,
@@ -429,9 +469,9 @@ def get_evidence_pack(case_id: str, workflow_id: str = Query(default="collection
             "payment_status": case.payment_status,
             "repayment_rail": case.data.get("repayment_rail") or ("MERCHANT_QR_SWEEP_10PCT" if case.data.get("qr_sweep_active") else "UPI_DIRECT_OR_AUTOPAY"),
             "qr_sweep_active": bool(case.data.get("qr_sweep_active", False)),
-            "cibil_protected": bool(case.data.get("cibil_protected", False)),
-            "lender_vpa": "repayments.saarthi@yesbank",
-            "repayment_direct_label": "Pays directly to Saarthi Capital Ltd.'s account (demo)",
+            "lender_vpa": "",
+            "mandate_notice": "mandate request sent; becomes active only when the borrower approves it in her UPI app; she can revoke it",
+            "repayment_direct_label": "Pays directly to Demo Lender A designated escrow account (demo)",
             "whatsapp_message": case.data.get("whatsapp_message")
         },
         "compliance_audit": {
@@ -485,7 +525,7 @@ def post_borrower_message(case_id: str, req: MessageRequest, workflow_id: str = 
     updated_case = run_supervisor_pipeline(case, workflow_id=workflow_id, custom_borrower_reply=req.message)
     return updated_case
 
-# 6. Simulate Payment (Collections)
+# 6. Simulate Payment (Collections) - Plain Payment Simulation Screen
 @app.post("/api/cases/{case_id}/simulate-payment")
 def simulate_payment(case_id: str, workflow_id: str = Query(default="collections")):
     case = get_case(case_id, workflow_id=workflow_id)
@@ -497,16 +537,10 @@ def simulate_payment(case_id: str, workflow_id: str = Query(default="collections
     case.instant_recovered_inr = case.amount_due
     case.locked_mandate_inr = 0.0
 
-    # Phase 2.1: If TEMPORARY_CASHFLOW_MISMATCH resolves to PAID -> unlock CIBIL Score Protection Active + ₹50,000 Working-Capital Top-Up Pre-Qualified
-    case.data["cibil_protection_active"] = True
-    case.data["working_capital_topup_unlocked"] = True
-    case.data["topup_amount_inr"] = 50000.0
-    case.data["downstream_status"] = "CIBIL Score Protection Active + ₹50,000 Working-Capital Top-Up Pre-Qualified"
-
     case.add_trace(
         agent="Action",
-        action="UPI Instant Settlement Confirmation",
-        summary=f"Received ₹{case.amount_due:,.2f} via UPI settlement rail (UTR: YESB{int(case.id):06d}981). Loan marked PAID. CIBIL Score Protection Active + ₹50,000 Working-Capital Top-Up Pre-Qualified."
+        action="Simulated Payment Confirmation",
+        summary=f"Simulated payment received for ₹{case.amount_due:,.2f}. Account balance cleared (simulated payment test rail)."
     )
     save_case(case)
     return case
@@ -539,7 +573,7 @@ SAMPLE_AUDIT_TRANSCRIPTS = {
         "title": "1. Compliant Call (Disclosures + Respectful PTP)",
         "language": "Marathi",
         "description": "Compliant agent: upfront AI disclosure, recording notice, identity challenge, polite PTP negotiation, grievance officer closing.",
-        "transcript": """Agent: नमस्कार रमेशजी, मी सारथी कॅपिटलच्या वतीने बोलणारा एक एआय असिस्टंट आहे. हा कॉल गुणवत्तेसाठी रेकॉर्ड केला जातोय. व्यक्तीशी बोलण्यासाठी आपण कधीही 'इंसान' किंवा 'अधिकारी' बोलू शकता. आपल्या लोनचे शेवटचे ४ अंक सांगाल का?
+        "transcript": """Agent: नमस्कार रमेशजी, मी डेमो लेंडर ए च्या वतीने बोलणारा एक एआय असिस्टंट आहे. हा कॉल गुणवत्तेसाठी रेकॉर्ड केला जातोय. व्यक्तीशी बोलण्यासाठी आपण कधीही 'इंसान' किंवा 'अधिकारी' बोलू शकता. आपल्या लोनचे शेवटचे ४ अंक सांगाल का?
 Borrower: हो, 1010 आहे.
 Agent: धन्यवाद रमेशजी, ओळखीची पुष्टी झाली आहे. आपल्या खात्यावर ₹15,000 थकीत आहेत. आपण कधी भरणा करू शकाल?
 Borrower: मी या शुक्रवारी ऑनलाईन पूर्ण भरणा करतो.
@@ -640,9 +674,10 @@ def trigger_scenario(scenario_id: str):
         "s1": "1",   # Hero Sunita Patil (Marathi)
         "s2": "2",   # Code-mixed part payment Rajesh Sharma (Hindi)
         "s3": "4",   # Adversarial Vikram Malhotra (English)
-        "s4": "3",   # Sensitive Event Hospital Suresh Patil + Hospicash claim (Marathi)
+        "s4": "3",   # Sensitive Event Hospital Suresh Patil (7-day pause & human follow-up) (Marathi)
         "s5": "5",   # Bad transcript Manoj Kumar (Compliance fail) (Hindi)
-        "s7": "21",  # T-24h Preventive Rescue Anjali Deshmukh (₹590 saved) (Marathi)
+        "s6": "5",   # Pilot wedge audit mode Manoj Kumar (Hindi)
+        "s7": "21",  # T-24h Preventive Rescue Anjali Deshmukh (Reschedule debit & buffer) (Marathi)
         "s8": "22",  # 4x Kirana Cashflow Micro-Split Sunita Patil (Marathi)
         "s9": "23",  # Telugu Hero PTP Kavitha Reddy (Telugu)
         "s10": "24", # Tamil Part Payment & Mandate Senthil Kumar (Tamil)
@@ -891,6 +926,159 @@ def telephony_status_callback(
         "call_sid": CallSid,
         "call_status": CallStatus,
         "duration_seconds": DialCallDuration
+    }
+
+# ==================== PART 2: CALL PLAN, BATCH AUDIT & OUTCOME IMPORT ====================
+
+# Global in-memory cache for export downloads
+LATEST_CALL_PLAN_DATA: Optional[Dict[str, Any]] = None
+LATEST_BATCH_AUDIT_DATA: Optional[Dict[str, Any]] = None
+
+class CSVInputRequest(BaseModel):
+    csv_content: Optional[str] = None
+
+DEFAULT_SAMPLE_CALL_PLAN_CSV = """account_id,name,phone_masked,amount_due,dpd,language,preferred_time,prior_broken_ptps,sensitive_event,paid_today
+ACC-101,Sunita Patil,+91 98XXX X1001,15000,5,Marathi,11:00 AM,0,n,n
+ACC-102,Rajesh Sharma,+91 98XXX X1002,32000,14,Hindi,15:30 IST,1,n,n
+ACC-103,Suresh Patil,+91 98XXX X1003,28000,22,Marathi,10:00 AM,0,y,n
+ACC-104,Vikram Malhotra,+91 98XXX X1004,75000,29,English,17:00 IST,2,n,n
+ACC-105,Manoj Kumar,+91 98XXX X1005,12000,3,Hindi,12:00 PM,0,n,y
+ACC-106,Kavitha Reddy,+91 98XXX X1006,45000,18,Telugu,14:00 IST,1,n,n
+ACC-107,Senthil Kumar,+91 98XXX X1007,20000,8,Tamil,10:30 AM,0,n,n
+ACC-108,Manjunath Gowda,+91 98XXX X1008,18000,12,Kannada,16:00 IST,3,n,n
+"""
+
+DEFAULT_SAMPLE_BATCH_AUDIT_CSV = """call_id,agent_id,start_time,transcript
+CALL-001,Agent-Ramesh,2026-11-20 10:15:00,"Agent: नमस्कार, मी डेमो लेंडर ए च्या वतीने बोलणारा एक एआय असिस्टंट आहे. हा कॉल गुणवत्तेसाठी रेकॉर्ड केला जातोय. आपल्या लोनचे शेवटचे ४ अंक सांगाल का? Borrower: हो, 1001 आहे. Agent: धन्यवाद. आपल्या खात्यावर ₹15,000 थकीत आहेत. आपण कधी भरणा करू शकाल? Borrower: मी शुक्रवारी ऑनलाईन पूर्ण भरणा करतो. Agent: आम्ही नोंद केली आहे, धन्यवाद."
+CALL-002,Agent-Suresh,2026-11-20 07:30:00,"Agent: अरे भाई, मैं तो 2 दिन पहले ही पूरे पैसे भर चुका हूँ! मेरे खाते से कट गए हैं, दोबारा फोन क्यों कर रहे हो? Agent: पैसे नहीं भरे तो जेल में सड़ा देंगे, पुलिस भेजेंगे तेरे घर!"
+CALL-003,Agent-Pooja,2026-11-20 14:00:00,"Agent: Hello, calling from Demo Lender. You have an overdue EMI of Rs 25,000. Borrower: I want to lodge a complaint against previous abusive calls. Agent: Please note our Principal Nodal Officer Mr. Alok Verma at 022-68994400 or email nodal.officer@demolender.example."
+CALL-004,Agent-Vikas,2026-11-20 20:45:00,"Agent: नमस्ते, पैसे कब दे रहे हो? Borrower: अभी काम में हूँ कल बात करना."
+"""
+
+DEFAULT_SAMPLE_OUTCOMES_CSV = """account_id,group,paid,paid_amount,paid_date,ptp_date,dpd,language
+ACC-001,saarthi,y,15000,2026-11-15,2026-11-15,5,Marathi
+ACC-002,saarthi,y,10000,2026-11-16,2026-11-16,14,Hindi
+ACC-003,saarthi,n,0,,2026-11-18,22,Marathi
+ACC-004,saarthi,y,25000,2026-11-14,2026-11-14,29,English
+ACC-005,saarthi,y,12000,2026-11-17,2026-11-17,3,Hindi
+ACC-006,saarthi,y,18000,2026-11-18,2026-11-18,8,Telugu
+ACC-007,baseline,y,15000,2026-11-15,2026-11-15,5,Marathi
+ACC-008,baseline,n,0,,2026-11-16,14,Hindi
+ACC-009,baseline,n,0,,2026-11-18,22,Marathi
+ACC-010,baseline,n,0,,2026-11-14,29,English
+"""
+
+@app.post("/api/call-plan/generate")
+async def api_generate_call_plan(request: Request):
+    global LATEST_CALL_PLAN_DATA
+    csv_text = ""
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            csv_text = body.get("csv_content", "")
+        except Exception:
+            pass
+    elif "multipart/form-data" in content_type:
+        try:
+            form = await request.form()
+            if "file" in form and hasattr(form["file"], "read"):
+                raw_bytes = await form["file"].read()
+                csv_text = raw_bytes.decode("utf-8", errors="replace")
+        except Exception:
+            pass
+            
+    if not csv_text or not csv_text.strip():
+        csv_text = DEFAULT_SAMPLE_CALL_PLAN_CSV
+        
+    result = generate_call_plan_from_csv(csv_text)
+    LATEST_CALL_PLAN_DATA = result
+    return result
+
+@app.get("/api/call-plan/export")
+def api_export_call_plan():
+    global LATEST_CALL_PLAN_DATA
+    if not LATEST_CALL_PLAN_DATA:
+        LATEST_CALL_PLAN_DATA = generate_call_plan_from_csv(DEFAULT_SAMPLE_CALL_PLAN_CSV)
+    csv_str = export_call_plan_csv(LATEST_CALL_PLAN_DATA)
+    return Response(
+        content=csv_str,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=saarthi_today_call_plan.csv"}
+    )
+
+@app.post("/api/audit/batch")
+async def api_audit_batch(request: Request):
+    global LATEST_BATCH_AUDIT_DATA
+    csv_text = ""
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            csv_text = body.get("csv_content", "")
+        except Exception:
+            pass
+    elif "multipart/form-data" in content_type:
+        try:
+            form = await request.form()
+            if "file" in form and hasattr(form["file"], "read"):
+                raw_bytes = await form["file"].read()
+                csv_text = raw_bytes.decode("utf-8", errors="replace")
+        except Exception:
+            pass
+            
+    if not csv_text or not csv_text.strip():
+        csv_text = DEFAULT_SAMPLE_BATCH_AUDIT_CSV
+        
+    result = audit_batch_transcripts_csv(csv_text)
+    LATEST_BATCH_AUDIT_DATA = result
+    return result
+
+@app.get("/api/audit/export")
+def api_export_batch_audit():
+    global LATEST_BATCH_AUDIT_DATA
+    if not LATEST_BATCH_AUDIT_DATA:
+        LATEST_BATCH_AUDIT_DATA = audit_batch_transcripts_csv(DEFAULT_SAMPLE_BATCH_AUDIT_CSV)
+    csv_str = export_batch_audit_csv(LATEST_BATCH_AUDIT_DATA)
+    return Response(
+        content=csv_str,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=saarthi_batch_audit_violations.csv"}
+    )
+
+@app.post("/api/outcomes/import")
+async def api_import_outcomes(request: Request):
+    csv_text = ""
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        try:
+            body = await request.json()
+            csv_text = body.get("csv_content", "")
+        except Exception:
+            pass
+    elif "multipart/form-data" in content_type:
+        try:
+            form = await request.form()
+            if "file" in form and hasattr(form["file"], "read"):
+                raw_bytes = await form["file"].read()
+                csv_text = raw_bytes.decode("utf-8", errors="replace")
+        except Exception:
+            pass
+            
+    if not csv_text or not csv_text.strip():
+        csv_text = DEFAULT_SAMPLE_OUTCOMES_CSV
+        
+    result = analyze_outcomes_csv(csv_text)
+    return result
+
+@app.get("/api/sarvam/live-status")
+def api_sarvam_live_status():
+    status = verify_sarvam_speakers_live()
+    cost_summary = sarvam_service.get_cost_summary()
+    return {
+        "status": status,
+        "usage_and_costs": cost_summary,
+        "speakers_mapping": LANGUAGE_SPEAKER_MAP
     }
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")

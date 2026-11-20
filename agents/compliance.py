@@ -136,7 +136,7 @@ def audit_raw_transcript(transcript_text: str, rules_override: Optional[Dict[str
     scorecard: List[Dict[str, Any]] = []
 
     # Rule 1: AI Assistant Disclosure
-    ai_phrases = ["ai assistant", "ai", "एआई", "आर्टिफिशियल", "सारथी"]
+    ai_phrases = ["ai assistant", "ai", "एआई", "एआय", "असिस्टंट", "assistant", "आर्टिफिशियल", "सारथी", "automated"]
     has_ai_disc = any(p in full_text for p in ai_phrases)
     scorecard.append({
         "rule_id": "DISC-AI-01",

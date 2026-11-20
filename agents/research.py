@@ -8,7 +8,7 @@ def run_research_agent(
 ) -> JourneyRecord:
     """
     Research Agent:
-    - Queries Credit Bureau (CIBIL/Experian) and account history
+    - Queries Credit Bureau (Bureau Score/Experian) and account history
     - Assesses debt-to-income ratio and prime tiering
     - Computes maximum pre-approved loan limit
     """
@@ -30,6 +30,6 @@ def run_research_agent(
     record.add_trace(
         agent="Research",
         action="Credit Bureau Assessment Completed",
-        summary=f"CIBIL Score: {score} ({tier}). Income multiplier: {multiplier}. Sanction capacity verified at ₹{pre_amt:,.2f}."
+        summary=f"Bureau Score: {score} ({tier}). Income multiplier: {multiplier}. Sanction capacity verified at ₹{pre_amt:,.2f}."
     )
     return record

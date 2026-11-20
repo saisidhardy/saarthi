@@ -3,9 +3,9 @@ rates:
   tts_cost_per_1000_chars: 1.00
   llm_token_rate: null
 footnotes:
-  cost_label: "estimated from published rates"
+  cost_label: "estimated"
   llm_footnote: "excludes LLM tokens"
 benchmarks:
-  industry_call_centre_cost: 52.00
-  industry_field_visit_cost: 250.00
-  benchmark_label: "reported by other sources"
+  bounced_emi_fee_range: "Rs 50-150 per bounced EMI (PayU, citing CRISIL)"
+  field_visit_cost_range: "Rs 250-500 per field visit (Business Standard)"
+  benchmark_label: "industry figures reported by other sources"

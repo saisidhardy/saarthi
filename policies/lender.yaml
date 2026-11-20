@@ -1,15 +1,15 @@
 # lender-owned, board-approved policy (demo)
 lender_info:
-  lender_name: "Saarthi Capital Ltd."
+  lender_name: "Demo Lender A (Retail NBFC)"
   cin: "U65923MH2021PLC362145"
-  rbi_registration_no: "N-13.02341"
-  registered_office: "Saarthi Capital Towers, BKC, Bandra East, Mumbai, Maharashtra 400051"
-  website: "https://saarthicapital.demo"
+  registration_no: "N-13.02341"
+  registered_office: "Demo Financial Centre, BKC, Bandra East, Mumbai, Maharashtra 400051"
+  website: "https://demolender.example"
 
 repayment_routing:
-  lender_vpa: "repayments.saarthi@yesbank"
-  display_name: "Saarthi Capital Repayments"
-  bank_name: "YES Bank Ltd."
+  lender_vpa: ""  # Intentionally unset until configured; disables live upi:// link and shows labelled Simulate Payment button
+  display_name: "Demo Lender Repayments"
+  bank_name: "Demo Bank Ltd."
   account_type: "Designated Escrow Repayment Account"
   regulatory_disclaimer: "Saarthi operates solely as a technology automation teammate. Saarthi never receives, holds, pools, or routes borrower funds. 100% of repayments resolve directly into the regulated lender's escrow account."
 
@@ -17,9 +17,9 @@ grievance_redressal:
   principal_nodal_officer:
     name: "Mr. Alok Verma"
     designation: "Senior Vice President & Principal Nodal Officer"
-    email: "nodal.officer@saarthicapital.demo"
+    email: "nodal.officer@demolender.example"
     phone: "+91-22-6899-4400"
     toll_free: "1800-209-4400"
-    address: "Customer Care & Grievance Department, Saarthi Capital Towers, BKC, Mumbai 400051"
+    address: "Customer Care & Grievance Department, Demo Financial Centre, BKC, Mumbai 400051"
     working_hours: "09:30 - 18:00 IST (Monday to Friday, excluding bank holidays)"
     escalation_window: "Grievances unresolved within 30 days may be escalated to the RBI Ombudsman under the Reserve Bank - Integrated Ombudsman Scheme."

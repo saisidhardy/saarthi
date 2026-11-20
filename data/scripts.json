@@ -758,26 +758,26 @@
       {
         "turn": 3,
         "speaker": "agent",
-        "text": "धन्यवाद अंजलीजी, ओळखीची पुष्टी झाली आहे. उद्या आपल्या खात्यातून ₹18,000 चा ईएमआय ऑटो-डेबिट होणार आहे, परंतु खात्यात केवळ ₹6,200 शिल्लक दिसत आहेत. ₹590 बाउंस फी आणि सिबिल स्कोअर वाचवण्यासाठी आम्ही डेबिट तारीख 3 दिवस पुढे ढकलू शकतो किंवा ₹6,000 चा लिक्विडिटी बफर देऊ शकतो.",
-        "translation": "Thank you Anjaliji, identity confirmed. Tomorrow an EMI of ₹18,000 is scheduled for auto-debit, but account balance shows only ₹6,200. To prevent a ₹590 bounce fee and protect your CIBIL score, we can shift the debit date by 3 days or provide a ₹6,000 liquidity buffer."
+        "text": "धन्यवाद अंजलीजी, ओळखीची पुष्टी झाली आहे. उद्या आपल्या खात्यातून ₹18,000 चा ईएमआय ऑटो-डेबिट होणार आहे, परंतु खात्यात केवळ ₹6,200 शिल्लक दिसत आहेत. ईएमआय बाउंस फी आणि सिबिल स्कोअर वाचवण्यासाठी आम्ही डेबिट तारीख 3 दिवस पुढे ढकलू शकतो किंवा ₹6,000 चा लिक्विडिटी बफर देऊ शकतो.",
+        "translation": "Thank you Anjaliji, identity confirmed. Tomorrow an EMI of ₹18,000 is scheduled for auto-debit, but account balance shows only ₹6,200. To prevent a ईएमआय bounce fee and protect your CIBIL score, we can shift the debit date by 3 days or provide a ₹6,000 liquidity buffer."
       },
       {
         "turn": 4,
         "speaker": "borrower",
-        "text": "हो, 1021 आहे. नागपूरच्या बुटीकचे कलेक्शन परवा येणार आहे, कृपया 3 दिवस पुढे ढकला. 590 रुपये बाउंस फी वाचेल हे चांगलं झालं.",
-        "translation": "Yes, 1021. My Nagpur boutique collections will arrive day after tomorrow, please shift by 3 days. Glad that the ₹590 bounce fee is saved."
+        "text": "हो, 1021 आहे. नागपूरच्या बुटीकचे कलेक्शन परवा येणार आहे, कृपया 3 दिवस पुढे ढकला.  रुपये बाउंस फी वाचेल हे चांगलं झालं.",
+        "translation": "Yes, 1021. My Nagpur boutique collections will arrive day after tomorrow, please shift by 3 days. Glad that the ईएमआय bounce fee is saved."
       },
       {
         "turn": 5,
         "speaker": "agent",
-        "text": "उत्तम अंजलीजी! पॉलिसीनुसार आम्ही ईएमआय डेबिट तारीख 3 दिवस पुढे ढकलली आहे आणि ₹590 बँक बाउंस फी वाचवली आहे. आपला सिबिल स्कोअर पूर्णपणे सुरक्षित राहील. धन्यवाद!",
-        "translation": "Great Anjaliji! As per policy, we have shifted the debit date by 3 days and saved your ₹590 bank bounce fee. Your CIBIL score remains fully protected. Thank you!"
+        "text": "उत्तम अंजलीजी! पॉलिसीनुसार आम्ही ईएमआय डेबिट तारीख 3 दिवस पुढे ढकलली आहे. आपला सिबिल स्कोअर पूर्णपणे सुरक्षित राहील. धन्यवाद!",
+        "translation": "Great Anjaliji! As per policy, we have shifted the debit date by 3 days and saved your ईएमआय bank bounce fee. Your CIBIL score remains fully protected. Thank you!"
       }
     ],
-    "borrower_script": "हो, 1021 आहे. नागपूरच्या बुटीकचे कलेक्शन परवा येणार आहे, कृपया 3 दिवस पुढे ढकला. 590 रुपये बाउंस फी वाचेल हे चांगलं झालं.",
-    "borrower_script_en": "Yes, it's 1021. My Nagpur boutique collections will arrive day after tomorrow, please shift by 3 days. Glad that the ₹590 bounce fee is saved.",
-    "agent_script": "अंजलीजी, ओळखीची पुष्टी झाली. आम्ही ऑटो-डेबिट 3 दिवस पुढे ढकलले आहे आणि ₹590 बाउंस फी वाचवली आहे. धन्यवाद.",
-    "agent_script_en": "Anjaliji, identity confirmed. We shifted the auto-debit by 3 days and saved the ₹590 bounce fee. Thank you."
+    "borrower_script": "हो, 1021 आहे. नागपूरच्या बुटीकचे कलेक्शन परवा येणार आहे, कृपया 3 दिवस पुढे ढकला.  रुपये बाउंस फी वाचेल हे चांगलं झालं.",
+    "borrower_script_en": "Yes, it's 1021. My Nagpur boutique collections will arrive day after tomorrow, please shift by 3 days. Glad that the ईएमआय bounce fee is saved.",
+    "agent_script": "अंजलीजी, ओळखीची पुष्टी झाली. आम्ही ऑटो-डेबिट 3 दिवस पुढे ढकलले आहे आणि ईएमआय बाउंस फी वाचवली आहे. धन्यवाद.",
+    "agent_script_en": "Anjaliji, identity confirmed. We shifted the auto-debit by 3 days and saved the ईएमआय bounce fee. Thank you."
   },
   "22": {
     "account_id": "22",

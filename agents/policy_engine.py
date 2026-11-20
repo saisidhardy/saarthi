@@ -1,10 +1,28 @@
 import os
 import re
 from datetime import datetime, timedelta, timezone, date
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+import yaml
 from app.models import JourneyRecord, WorkflowStep, PolicyDecision, LLMProposal
 
 COLLECTIONS_RULES_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "policies", "collections_rules.yaml")
+LENDER_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "policies", "lender.yaml")
+
+def get_configured_lender_vpa() -> Optional[str]:
+    """
+    Never emit a upi:// link containing a made-up VPA.
+    lender.yaml holds a VPA provided by the lender; until it is set, returns None.
+    """
+    if os.path.exists(LENDER_FILE_PATH):
+        try:
+            with open(LENDER_FILE_PATH, "r", encoding="utf-8") as f:
+                cfg = yaml.safe_load(f)
+                vpa = cfg.get("repayment_routing", {}).get("lender_vpa", "")
+                if vpa and vpa.strip():
+                    return vpa.strip()
+        except Exception:
+            pass
+    return None
 
 def resolve_date_phrase(phrase: str, reference_date: Optional[date] = None) -> date:
     """
@@ -75,22 +93,22 @@ def resolve_date_phrase(phrase: str, reference_date: Optional[date] = None) -> d
 
 def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None, context: Optional[Dict[str, Any]] = None) -> JourneyRecord:
     """
-    POLICY ENGINE (The Core):
+    POLICY ENGINE (Deterministic Python Code):
     - Plain Python state machine (CODE, never LLM).
     - Validates, clamps, or blocks LLM proposals strictly against /policies/collections_rules.yaml.
     - Generates a signed PolicyDecision object. Action agent accepts ONLY this decision object.
     - Emits Policy Firewall telemetry for the UI showing:
       LLM PROPOSED vs ENGINE DECIDED (APPROVED / CLAMPED / BLOCKED) with Rule ID and YAML Line.
+    - Enforces lender policy (demo); supports RBI conduct rules.
     """
     workflow_id = record.workflow_id or (context.get("workflow_id") if context else "collections")
     if workflow_id == "loan_sales":
-        # Pass-through for loan sales
         return record
 
     today = (datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)).date()
     max_policy_ptp_date = today + timedelta(days=7)
+    configured_vpa = get_configured_lender_vpa()
     
-    # Retrieve proposal from Negotiation agent or record data
     proposal_data = record.data.get("llm_proposal", {})
     intent = proposal_data.get("intent", record.intent or "ptp")
     offered_amt = proposal_data.get("offered_amount")
@@ -117,39 +135,12 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
         record.do_not_contact_until = pause_until
         record.root_cause = "MEDICAL_CALAMITY_SHOCK"
 
-        # Check for Hospicash Insurance Rider
-        has_rider = bool(record.has_hospicash_rider or record.data.get("has_hospicash_rider"))
-        claim_packet = None
-        engine_summary = "SENSITIVE PAUSE: 7-day cooling period set, zero payment link [FAIR-PRAC-SENS01, Line 57]"
-        reason_txt = "Sensitive life event detected (bereavement, medical emergency/hospitalization, calamity, or wedding). Recovery paused for 7 days per lender policy. Zero negotiation or payment links allowed."
-        instant_rec = 0.0
-        why_rec = None
-
-        if has_rider:
-            policy_no = record.policy_number or record.data.get("policy_number") or "HC-99281-PN"
-            claim_amount = min(record.amount_due, 15000.0)
-            claim_packet = {
-                "claim_id": f"CLM-HC-{record.id.zfill(4)}-99281",
-                "policy_number": policy_no,
-                "rider_name": "Saarthi Credit-Shield Hospicash Benefit",
-                "insured_member": record.customer_name,
-                "max_relief_amount_inr": claim_amount,
-                "cooling_period_days": 7,
-                "designated_insurer": "HDFC ERGO Health Insurance / ICICI Lombard",
-                "claim_status": "DRAFTED_FOR_INSURER",
-                "benefit_summary": f"Emergency hospitalization cash benefit of ₹{claim_amount:,.2f} auto-applied against overdue EMI.",
-                "claim_instructions": "Claim packet submitted to insurer underwriting desk; borrower recovery suspended during medical emergency."
-            }
-            record.hospicash_claim = claim_packet
-            record.data["hospicash_claim"] = claim_packet
-            instant_rec = claim_amount  # Covered directly by insurer to lender!
-            engine_summary = f"SENSITIVE PAUSE + HOSPICASH CLAIM: 7-day cooling + ₹{claim_amount:,.0f} claim drafted [FAIR-PRAC-SENS01, Line 57]"
-            reason_txt = f"Sensitive medical emergency detected. Recovery paused for 7 days. Hospicash Rider ({policy_no}) detected: auto-drafted ₹{claim_amount:,.2f} claim packet to insurer."
-            why_rec = {
-                "old_bot_outcome": "₹0 collected (Borrower in ICU -> call center bullies or halts -> 100% write-off / NPA)",
-                "saarthi_outcome": f"₹{claim_amount:,.0f} recovered directly from HDFC ERGO / ICICI Lombard Insurance Rider + 7-day compassionate pause (Zero Default)",
-                "recovery_mechanism": "Hospicash Credit-Shield Claim Auto-Filing (POLICY-HOSPICASH01)"
-            }
+        # Sensitive-event path: 7-day pause + human follow-up task
+        human_follow_up = "check whether borrower has any insurance cover"
+        engine_summary = "SENSITIVE PAUSE: 7-day cooling period set; human follow-up task created [FAIR-PRAC-SENS01, Line 57]"
+        reason_txt = "Sensitive life event detected (bereavement, medical emergency/hospitalization, calamity, or wedding). Recovery paused for 7 days per lender policy. Human follow-up task created: check whether borrower has any insurance cover."
+        
+        record.data["human_follow_up_task"] = human_follow_up
 
         decision = PolicyDecision(
             status="SENSITIVE_PAUSE",
@@ -165,11 +156,14 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             action_permitted=False,
             llm_proposed_summary="Borrower reported medical emergency / hospitalisation",
             engine_decision_summary=engine_summary,
-            hospicash_claim=claim_packet,
+            hospicash_claim=None,
             root_cause="MEDICAL_CALAMITY_SHOCK",
-            instant_recovered_inr=instant_rec,
+            instant_recovered_inr=0.0,
             locked_mandate_inr=0.0,
-            why_recovery_increased=why_rec
+            why_recovery_increased={
+                "mechanism": "Sensitive Care Pause (7-Day Hold)",
+                "action": "Immediate outreach halt and assigned human review: check whether borrower has any insurance cover"
+            }
         )
         return _apply_policy_decision(record, decision)
 
@@ -287,39 +281,30 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
         )
         return _apply_policy_decision(record, decision)
 
-    # 6b. RULE: Avoidance / Refusal
+    # 6b. Avoidance / Refusal
     if intent == "avoidance" or any(k in full_dialogue for k in ["मीटिंग", "meeting", "busy", "बाद में", "फोन काटो", "काट दिया", "disconnect", "काम में हूँ"]):
         record.root_cause = "INTENTIONAL_EVASION"
 
-    # 7a. RULE: POLICY-PREV-FEE01 (T-24h Preventive Bounce Rescue)
-    is_preventive = (record.trigger_type == "PRE_DUE_T24H" or intent == "pre_due_shift" or "s7" in str(record.data.get("scenario", "")).lower() or any(k in full_dialogue for k in ["590", "पुढे ढकला", "बाउंस फी", "फी वाचेल", "बफर"]))
+    # 7a. RULE: POLICY-PREV-FEE01 (T-24h Preventive Intervention)
+    is_preventive = (record.trigger_type == "PRE_DUE_T24H" or intent == "pre_due_shift" or "s7" in str(record.data.get("scenario", "")).lower() or any(k in full_dialogue for k in ["पुढे ढकला", "तारीख वाढवा", "बफर"]))
     if is_preventive:
         shifted_dt = today + timedelta(days=3)
         shifted_dt_str = shifted_dt.strftime("%Y-%m-%d")
         record.root_cause = "TEMPORARY_CASHFLOW_MISMATCH"
-        record.bounce_fee_saved_inr = 590.0
-        record.data["bounce_fee_saved_inr"] = 590.0
 
         instant_amt = 6000.0 if record.amount_due >= 6000.0 else record.amount_due
         locked_amt = round(record.amount_due - instant_amt, 2)
 
         why_s7 = {
-            "mechanism": "T-24h Preventive Liquidity Capture & Bounce Rescue (POLICY-PREV-FEE01)",
-            "old_bot_outcome": "Waited for eNACH debit to fail -> ₹590 penalty billed to borrower -> ₹0 recovered on Day 0 -> CIBIL default marked.",
-            "saarthi_outcome": f"Captured ₹{instant_amt:,.2f} token payment today via UPI, shifted remaining ₹{locked_amt:,.2f} into AutoPay mandate in 3 days, saved ₹590 bank bounce fee for borrower.",
+            "mechanism": "T-24h Preventive Intervention (POLICY-PREV-FEE01)",
+            "action": f"Captured ₹{instant_amt:,.2f} token payment today; scheduled remaining ₹{locked_amt:,.2f} in 3 days.",
             "cash_secured_today_inr": instant_amt,
-            "mandate_locked_inr": locked_amt,
-            "fee_saved_inr": 590.0,
-            "recovery_lift_factor": "100% Resolved (₹6,000 immediate + ₹12,000 AutoPay + ₹590 saved)"
+            "mandate_scheduled_inr": locked_amt
         }
 
         downstream = {
-            "cibil_protection_status": "PROTECTED (Zero Default Reported)",
-            "cibil_score_saved": "+45 to +60 pts negative impact prevented",
-            "preapproved_topup_eligible": True,
-            "preapproved_topup_amount": 50000.0,
-            "topup_unlock_condition": "Maintains 3 clean on-time debit cycles",
-            "bounce_fee_saved_inr": 590.0
+            "preventive_intervention_active": True,
+            "scheduled_remainder_days": 3
         }
         record.downstream_action = downstream
         record.data["downstream_action"] = downstream
@@ -331,12 +316,12 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             yaml_file="policies/collections_rules.yaml",
             effective_amount=instant_amt,
             effective_date=shifted_dt_str,
-            reason=f"T-24h Preventive Intervention approved: ₹{instant_amt:,.2f} token captured today, remaining ₹{locked_amt:,.2f} AutoPay debit shifted by 3 days. Bank bounce fee of ₹590 saved and CIBIL score protected.",
+            reason=f"T-24h Preventive Intervention approved: ₹{instant_amt:,.2f} token payment today, remaining ₹{locked_amt:,.2f} scheduled in 3 days.",
             needs_human=False,
             action_permitted=True,
-            llm_proposed_summary="Borrower requested 3-day debit shift to avoid bounce fee",
-            engine_decision_summary=f"APPROVED: Shifted debit to {shifted_dt_str}, captured ₹{instant_amt:,.0f} today, saved ₹590 fee [POLICY-PREV-FEE01, Line 148]",
-            bounce_fee_saved_inr=590.0,
+            llm_proposed_summary="Borrower requested 3-day debit shift",
+            engine_decision_summary=f"APPROVED: Shifted debit to {shifted_dt_str}, token ₹{instant_amt:,.0f} today [POLICY-PREV-FEE01, Line 148]",
+            bounce_fee_saved_inr=0.0,
             instant_recovered_inr=instant_amt,
             locked_mandate_inr=locked_amt,
             why_recovery_increased=why_s7,
@@ -361,7 +346,6 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             tranche_amt = min_first_tranche
         
         fridays = [first_friday + timedelta(weeks=i) for i in range(4)]
-        lender_vpa = "repayments.saarthi@yesbank"
         
         micro_sched = []
         for idx, fri in enumerate(fridays):
@@ -369,7 +353,12 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             is_first = (tr_num == 1)
             fri_str = fri.strftime("%Y-%m-%d")
             rail = "UPI_NOW" if is_first else "UPI_AUTOPAY"
-            link = f"upi://pay?pa={lender_vpa}&pn=Saarthi+Capital+Repayments&am={tranche_amt:.2f}&cu=INR" if is_first else f"upi://mandate?pa={lender_vpa}&pn=Saarthi+AutoPay&am={tranche_amt:.2f}&recurrence=WEEKLY&cu=INR"
+            
+            # Only construct real upi link if a verified VPA is configured in lender.yaml
+            link = None
+            if configured_vpa:
+                link = f"upi://pay?pa={configured_vpa}&pn=Demo+Lender+Repayments&am={tranche_amt:.2f}&cu=INR" if is_first else f"upi://mandate?pa={configured_vpa}&pn=Demo+Lender+AutoPay&am={tranche_amt:.2f}&recurrence=WEEKLY&cu=INR"
+            
             micro_sched.append({
                 "tranche_number": tr_num,
                 "due_date": fri_str,
@@ -377,31 +366,25 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
                 "amount_inr": tranche_amt,
                 "rail": rail,
                 "payment_link": link,
-                "status": "SCHEDULED" if not is_first else "LINK_GENERATED"
+                "mandate_notice": "mandate request sent; becomes active only when the borrower approves it in her UPI app; she can revoke it",
+                "status": "SCHEDULED" if not is_first else "READY"
             })
         
         record.micro_schedule = micro_sched
         record.data["micro_schedule"] = micro_sched
         
         downstream = {
-            "cibil_protection_status": "PROTECTED (Restructured Micro-Plan Active)",
-            "cibil_score_saved": "+45 pts impact prevented via weekly AutoPay",
-            "preapproved_topup_eligible": True,
-            "preapproved_topup_amount": 50000.0,
-            "topup_unlock_condition": "Unlocks on successful completion of 4th Friday mandate",
-            "bounce_fee_saved_inr": 0.0
+            "micro_schedule_active": True,
+            "installments_count": 4
         }
         record.downstream_action = downstream
         record.data["downstream_action"] = downstream
         
         why_s8 = {
-            "mechanism": "Weekly Friday Kirana Micro-Split (POLICY-MICRO-SPLIT01)",
-            "old_bot_outcome": "Demanded full ₹40,000 lump-sum -> Kirana owner cash-flow mismatched -> Call hung up -> ₹0 recovered -> NPA bucket escalation.",
-            "saarthi_outcome": f"Captured ₹{tranche_amt:,.2f} today via Tranche 1 UPI, locked remaining ₹{record.amount_due - tranche_amt:,.2f} into 3 weekly Friday AutoPay mandates.",
+            "mechanism": "Weekly Friday Micro-Split (POLICY-MICRO-SPLIT01)",
+            "action": f"Upfront tranche of ₹{tranche_amt:,.2f} scheduled, remaining balance divided into 3 weekly Friday installments (mandate request sent; becomes active only when borrower approves in UPI app).",
             "cash_secured_today_inr": tranche_amt,
-            "mandate_locked_inr": round(record.amount_due - tranche_amt, 2),
-            "fee_saved_inr": 0.0,
-            "recovery_lift_factor": "100% Resolved across weekly cashflow cycle"
+            "mandate_scheduled_inr": round(record.amount_due - tranche_amt, 2)
         }
         
         decision = PolicyDecision(
@@ -414,14 +397,14 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             micro_schedule=micro_sched,
             root_cause="TEMPORARY_CASHFLOW_MISMATCH",
             downstream_action=downstream,
-            reason=f"Approved 4-part Kirana cashflow weekly Friday split of ₹{tranche_amt:,.2f}/week (>=25% min first tranche). Tranche 1 immediate UPI link, Tranches 2-4 UPI AutoPay mandate.",
+            reason=f"Approved 4-part weekly Friday split of ₹{tranche_amt:,.2f}/week (>=25% min first tranche). Mandate request sent; becomes active only when approved in UPI app.",
             needs_human=False,
             action_permitted=True,
             instant_recovered_inr=tranche_amt,
             locked_mandate_inr=round(record.amount_due - tranche_amt, 2),
             why_recovery_increased=why_s8,
             llm_proposed_summary=f"Borrower proposed 4-week Friday split of ₹{tranche_amt:,.2f}",
-            engine_decision_summary=f"APPROVED: 4x Friday AutoPay schedule (1st: {fridays[0].strftime('%Y-%m-%d')}) [POLICY-MICRO-SPLIT01, Line 156]"
+            engine_decision_summary=f"APPROVED: 4x Friday schedule (1st: {fridays[0].strftime('%Y-%m-%d')}) [POLICY-MICRO-SPLIT01, Line 156]"
         )
         return _apply_policy_decision(record, decision)
 
@@ -433,7 +416,6 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
     clamped_date = resolved_dt
     date_decision_status = "APPROVED"
     if raw_days_ahead > 7 or (requested_days and requested_days > 7):
-        # Clamped to policy maximum of 7 days
         clamped_date = max_policy_ptp_date
         date_decision_status = "CLAMPED"
 
@@ -468,10 +450,10 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             record.data["root_cause"] = "TEMPORARY_CASHFLOW_MISMATCH"
             record.data["root_cause_rule"] = "POLICY-ROOT-ROUTE01"
 
-            # POLICY-LIQ-CAPTURE01: Split into immediate token UPI + locked recurring AutoPay mandate
-            lender_vpa = "repayments.saarthi@yesbank"
             token_amt = float(offered_amt)
-            instant_token_upi = f"upi://pay?pa={lender_vpa}&pn=Saarthi+Capital+Repayments&am={token_amt:.2f}&cu=INR"
+            instant_token_upi = None
+            if configured_vpa:
+                instant_token_upi = f"upi://pay?pa={configured_vpa}&pn=Demo+Lender+Repayments&am={token_amt:.2f}&cu=INR"
             record.data["instant_token_upi"] = instant_token_upi
             
             curr_w = today.weekday()
@@ -484,36 +466,33 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
             locked_autopay_schedule = []
             for i in range(num_mandate_splits):
                 fri_date = today + timedelta(days=days_to_fri + (i * 7))
+                mandate_link = None
+                if configured_vpa:
+                    mandate_link = f"upi://mandate?pa={configured_vpa}&pn=Demo+Lender+AutoPay&am={split_amount:.2f}&recurrence=WEEKLY&cu=INR"
                 locked_autopay_schedule.append({
                     "installment": i + 1,
                     "due_date": fri_date.strftime("%Y-%m-%d"),
                     "weekday": "Friday",
                     "amount_inr": split_amount,
-                    "mandate_link": f"upi://mandate?pa={lender_vpa}&pn=Saarthi+AutoPay&am={split_amount:.2f}&recurrence=WEEKLY&cu=INR"
+                    "mandate_link": mandate_link,
+                    "mandate_wording": "mandate request sent; becomes active only when the borrower approves it in her UPI app; she can revoke it"
                 })
             record.data["locked_autopay_schedule"] = locked_autopay_schedule
             record.data["rule_id_liq"] = "POLICY-LIQ-CAPTURE01"
             record.data["policy_liq_capture_rule"] = "POLICY-LIQ-CAPTURE01"
 
             downstream = {
-                "cibil_protection_status": "PROTECTED (Part-Payment Structured)",
-                "cibil_score_saved": "+45 pts impact prevented",
-                "preapproved_topup_eligible": True,
-                "preapproved_topup_amount": 50000.0,
-                "topup_unlock_condition": "Unlocks after remaining balance cleared within 7 days",
-                "bounce_fee_saved_inr": 0.0
+                "part_payment_structured": True,
+                "remainder_mandate_scheduled": True
             }
             record.downstream_action = downstream
             record.data["downstream_action"] = downstream
 
             why_part = {
-                "mechanism": "Capture Liquidity Now + Balance AutoPay Locking (POLICY-LIQ-CAPTURE01)",
-                "old_bot_outcome": "Accepted verbal promise or demanded full amount -> ₹0 collected on call -> 68% broken promise rate.",
-                "saarthi_outcome": f"Instant UPI token link dispatched for ₹{offered_amt:,.2f} today, remaining ₹{shortfall:,.2f} locked into AutoPay mandate on {effective_date_str}.",
+                "mechanism": "Upfront Token + Balance Mandate Request (POLICY-LIQ-CAPTURE01)",
+                "action": f"Upfront token ₹{offered_amt:,.2f} scheduled, remaining balance ₹{shortfall:,.2f} structured into recurring mandate (mandate request sent; becomes active only when borrower approves in UPI app).",
                 "cash_secured_today_inr": offered_amt,
-                "mandate_locked_inr": shortfall,
-                "fee_saved_inr": 0.0,
-                "recovery_lift_factor": f"100% Resolved (₹{offered_amt:,.0f} today + ₹{shortfall:,.0f} AutoPay)"
+                "mandate_scheduled_inr": shortfall
             }
 
             rule_id = "POLICY-PTP-MAX01" if date_decision_status == "CLAMPED" else "POLICY-PART-MIN01"
@@ -542,24 +521,17 @@ def run_policy_engine(record: JourneyRecord, step: Optional[WorkflowStep] = None
     # 10. Full EMI Commitment
     record.root_cause = "TEMPORARY_CASHFLOW_MISMATCH"
     downstream = {
-        "cibil_protection_status": "PROTECTED (PTP Recorded Within Policy Window)",
-        "cibil_score_saved": "+50 pts negative mark prevented",
-        "preapproved_topup_eligible": True,
-        "preapproved_topup_amount": 50000.0,
-        "topup_unlock_condition": "Unlocks after 3 consecutive on-time settlements",
-        "bounce_fee_saved_inr": 0.0
+        "ptp_recorded": True,
+        "due_date": effective_date_str
     }
     record.downstream_action = downstream
     record.data["downstream_action"] = downstream
 
     why_full = {
-        "mechanism": "Enforceable PTP with Pre-Approved AutoPay Lock",
-        "old_bot_outcome": "Unverified date promise -> high slippage (>40%) without payment rail binding.",
-        "saarthi_outcome": f"Locked full commitment of ₹{record.amount_due:,.2f} for {effective_date_str} backed by pre-scheduled payment rail link & CIBIL bureau safeguard.",
+        "mechanism": "PTP Schedule Commitment",
+        "action": f"Full payment commitment of ₹{record.amount_due:,.2f} recorded for {effective_date_str} within policy window.",
         "cash_secured_today_inr": 0.0,
-        "mandate_locked_inr": record.amount_due,
-        "fee_saved_inr": 0.0,
-        "recovery_lift_factor": f"₹{record.amount_due:,.0f} scheduled with automated reminder rail"
+        "mandate_scheduled_inr": record.amount_due
     }
 
     rule_id = "POLICY-PTP-MAX01" if date_decision_status == "CLAMPED" else "POLICY-PTP-OK01"
@@ -600,12 +572,6 @@ def _apply_policy_decision(record: JourneyRecord, decision: PolicyDecision) -> J
     if decision.micro_schedule:
         record.micro_schedule = decision.micro_schedule
         record.data["micro_schedule"] = decision.micro_schedule
-    if decision.bounce_fee_saved_inr:
-        record.bounce_fee_saved_inr = decision.bounce_fee_saved_inr
-        record.data["bounce_fee_saved_inr"] = decision.bounce_fee_saved_inr
-    if decision.hospicash_claim:
-        record.hospicash_claim = decision.hospicash_claim
-        record.data["hospicash_claim"] = decision.hospicash_claim
     if decision.root_cause:
         record.root_cause = decision.root_cause
         record.data["root_cause"] = decision.root_cause

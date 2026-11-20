@@ -28,7 +28,7 @@ def run_intake_agent(record: JourneyRecord, step: Optional[WorkflowStep] = None,
             window = "10:00 - 12:30 IST"
         elif record.dpd <= 15:
             risk_level = "Moderate Risk (T+15 Stage)"
-            tone = "Firm but polite, emphasize credit bureau (CIBIL) impact"
+            tone = "Firm but polite, emphasize credit bureau impact"
             window = "11:00 - 15:00 IST"
         else:
             risk_level = "High Risk (Approaching 30 DPD NPA boundary)"

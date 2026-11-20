@@ -69,11 +69,10 @@
         <i class="fa-solid fa-network-wired text-indigo-400 mr-1"></i> Serving Lender Tenant:
       </label>
       <select id="lenderTenantSelect" onchange="switchLenderTenant(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-indigo-300 font-bold focus:outline-none focus:border-indigo-500 cursor-pointer">
-        <option value="saarthi">Saarthi Capital Ltd. (Retail NBFC)</option>
-        <option value="bajaj">Bajaj Finance (Digital Credit)</option>
-        <option value="dmi">DMI Finance (MSME Term Loans)</option>
-        <option value="muthoot">Muthoot Microfin (Rural & JLG)</option>
-        <option value="kreditbee">KreditBee (Fintech Credit)</option>
+        <option value="all">All Lenders (Agency View) · 25 Accounts</option>
+        <option value="demo_lender_a">Demo Lender A (Retail NBFC) · 10 Accounts</option>
+        <option value="demo_lender_b">Demo Lender B (MSME & Working Capital) · 9 Accounts</option>
+        <option value="demo_lender_c">Demo Lender C (Microfinance & Rural) · 6 Accounts</option>
       </select>
     </div>
 
@@ -111,7 +110,30 @@
         <span class="ml-auto text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-mono">DEMO</span>
       </button>
 
-      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Governance & Audit</div>
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Intelligence & Audit Tools</div>
+      
+      <button onclick="openTab('callplan')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-calendar-day text-amber-400"></i>
+        <span>Today's Call Plan</span>
+        <span class="ml-auto text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">DRY RUN</span>
+      </button>
+
+      <button onclick="openTab('batchaudit')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-list-check text-cyan-400"></i>
+        <span>Batch Audit & Readiness</span>
+      </button>
+
+      <button onclick="openTab('outcomes')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-chart-column text-emerald-400"></i>
+        <span>Outcome Import (A/B)</span>
+      </button>
+
+      <button onclick="openTab('liveproof')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-microchip text-indigo-400"></i>
+        <span>Live Proof & Counters</span>
+      </button>
+
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Governance & Compliance</div>
 
       <button onclick="openTab('compliance')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
         <i class="fa-solid fa-scale-balanced text-indigo-400"></i>
@@ -119,8 +141,8 @@
       </button>
 
       <button onclick="openRoiModal()" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-teal-400 hover:bg-teal-950/40 hover:text-teal-300 font-semibold text-left transition border border-teal-500/20 bg-teal-950/20">
-        <i class="fa-solid fa-chart-line text-teal-400"></i>
-        <span>Portfolio ROI Analytics</span>
+        <i class="fa-solid fa-chart-pie text-teal-400"></i>
+        <span>Portfolio Simulation (25)</span>
       </button>
 
       <a href="/inspect" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-indigo-300 hover:bg-indigo-950/40 font-semibold text-left transition border border-indigo-500/20 bg-indigo-950/20 mt-2 block">
@@ -171,7 +193,7 @@
           </span>
           <span class="text-slate-700 hidden sm:inline">|</span>
           <span class="text-slate-400 hidden sm:inline flex items-center gap-1.5">
-            <i class="fa-solid fa-server text-teal-400"></i> PBX SIP: Live
+            <i class="fa-solid fa-server text-teal-400"></i> Telephony: Simulated
           </span>
         </div>
 
@@ -208,7 +230,7 @@
 
       <button onclick="jumpToPreset('21')" id="pill-s7" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-        <span>S7: Anjali (T-24h Bounce Rescue · ₹590 Saved)</span>
+        <span>S7: Anjali (T-24h Bounce Rescue · Buffer Captured)</span>
       </button>
 
       <button onclick="jumpToPreset('3')" id="pill-s4" class="px-3 py-1 rounded-full text-xs font-semibold transition shrink-0 flex items-center gap-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700">
@@ -332,15 +354,27 @@
         </div>
 
         <!-- Internal Console Tabs -->
-        <div class="flex items-center border-b border-slate-800 bg-slate-950/60 px-4 text-xs font-semibold gap-6 shrink-0">
-          <button id="tabBtn-telephony" onclick="switchConsoleTab('telephony')" class="py-2.5 text-indigo-400 border-b-2 border-indigo-500 flex items-center gap-1.5">
-            <i class="fa-solid fa-headset"></i> Call Recording & Dialogue
+        <div class="flex items-center border-b border-slate-800 bg-slate-950/60 px-4 text-xs font-semibold gap-5 shrink-0 overflow-x-auto custom-scroll">
+          <button id="tabBtn-telephony" onclick="switchConsoleTab('telephony')" class="py-2.5 text-indigo-400 border-b-2 border-indigo-500 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-headset"></i> Call Dialogue
           </button>
-          <button id="tabBtn-settlement" onclick="switchConsoleTab('settlement')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
-            <i class="fa-solid fa-bolt"></i> Settlement & Payment Rails
+          <button id="tabBtn-settlement" onclick="switchConsoleTab('settlement')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-bolt"></i> Settlement Rails
           </button>
-          <button id="tabBtn-compliance" onclick="switchConsoleTab('compliance')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
-            <i class="fa-solid fa-shield-halved"></i> RBI Regulatory Audit
+          <button id="tabBtn-callplan" onclick="switchConsoleTab('callplan')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-calendar-day text-amber-400"></i> Call Plan
+          </button>
+          <button id="tabBtn-batchaudit" onclick="switchConsoleTab('batchaudit')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-list-check text-cyan-400"></i> Batch Audit
+          </button>
+          <button id="tabBtn-outcomes" onclick="switchConsoleTab('outcomes')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-chart-column text-emerald-400"></i> Outcome Import
+          </button>
+          <button id="tabBtn-liveproof" onclick="switchConsoleTab('liveproof')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-microchip text-indigo-400"></i> Live Proof
+          </button>
+          <button id="tabBtn-compliance" onclick="switchConsoleTab('compliance')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-scale-balanced text-indigo-300"></i> Compliance
           </button>
         </div>
 
@@ -381,21 +415,318 @@
 
         </div>
 
+        
+        <!-- TAB: TODAY'S CALL PLAN (Part 2A) -->
+        <div id="consoleTab-callplan" class="hidden flex-1 flex flex-col overflow-hidden p-4 space-y-4 bg-slate-950/60 custom-scroll overflow-y-auto">
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-calendar-day text-amber-400"></i> Today's Call Plan (Dry Run, No Calls)
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Deterministic prioritization inside 08:00–19:00 IST window with automatic DNC gating.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="runSampleCallPlan()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-rotate"></i> Load Sample File (8 Accounts)
+              </button>
+              <a href="/api/call-plan/export" target="_blank" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-download"></i> Export Plan CSV
+              </a>
+            </div>
+          </div>
+
+          <!-- Formula Explainer Banner -->
+          <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200 space-y-1">
+            <div class="font-bold flex items-center gap-1.5 text-amber-300">
+              <i class="fa-solid fa-square-root-variable"></i> Explainable Ranking Formula:
+            </div>
+            <code class="block font-mono bg-slate-950/80 px-2.5 py-1 rounded border border-amber-500/20 text-[11px] text-amber-100">
+              Priority Score = (DPD × 2.0) + (min(Amount, 100000) / 1000) + (Broken PTPs × 15.0)
+            </code>
+            <div class="text-[10.5px] text-amber-300/80 pt-0.5">
+              Enforces lender policy (demo); supports RBI conduct rules. Strict 08:00–19:00 IST calling window.
+            </div>
+          </div>
+
+          <!-- Call Plan Summary Counters -->
+          <div id="callPlanSummaryStrip" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+              <span class="text-slate-400 block text-[10.5px]">Total Evaluated:</span>
+              <div id="cpTotalAccs" class="text-lg font-bold text-white font-mono mt-0.5">8</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/40">
+              <span class="text-emerald-400 block text-[10.5px]">Accounts to Call:</span>
+              <div id="cpCallAccs" class="text-lg font-bold text-emerald-300 font-mono mt-0.5">5</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-amber-500/40">
+              <span class="text-amber-400 block text-[10.5px]">Hold (DNC Rules):</span>
+              <div id="cpHoldAccs" class="text-lg font-bold text-amber-300 font-mono mt-0.5">2</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-rose-500/40">
+              <span class="text-rose-400 block text-[10.5px]">Escalate to Desk:</span>
+              <div id="cpEscAccs" class="text-lg font-bold text-rose-300 font-mono mt-0.5">1</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-cyan-500/40">
+              <span class="text-cyan-400 block text-[10.5px]">Est. Cost (₹1.68/call):</span>
+              <div id="cpCostEst" class="text-lg font-bold text-cyan-300 font-mono mt-0.5">₹8.40</div>
+              <span class="text-[9.5px] text-slate-400 font-mono">estimated</span>
+            </div>
+          </div>
+
+          <!-- Plan Records Table -->
+          <div class="rounded-xl border border-slate-800 overflow-hidden bg-slate-900">
+            <div class="overflow-x-auto custom-scroll">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] font-mono border-b border-slate-800">
+                  <tr>
+                    <th class="p-2.5">Rank</th>
+                    <th class="p-2.5">Account & Name</th>
+                    <th class="p-2.5">Score</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5">Call Window</th>
+                    <th class="p-2.5">Allowed Offer Range</th>
+                    <th class="p-2.5">DNC / Reason</th>
+                  </tr>
+                </thead>
+                <tbody id="callPlanTableBody" class="divide-y divide-slate-800/60 font-sans">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: BATCH TRANSCRIPT AUDIT (Part 2B) -->
+        <div id="consoleTab-batchaudit" class="hidden flex-1 flex flex-col overflow-hidden p-4 space-y-4 bg-slate-950/60 custom-scroll overflow-y-auto">
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-cyan-400"></i> Batch Call Audit & RBI Readiness Checklist
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Audit telecaller and bot transcripts across mandatory disclosures, calling hours, and anti-coercion rules.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="runSampleBatchAudit()" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-play"></i> Audit Sample Transcripts (4 Calls)
+              </button>
+              <a href="/api/audit/export" target="_blank" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-download"></i> Export Violations CSV
+              </a>
+            </div>
+          </div>
+
+          <!-- Checklist Grid -->
+          <div id="batchChecklistContainer" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Violations Breakdown Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <span class="text-xs font-bold text-slate-300 block">Violations by Rule:</span>
+              <div id="auditViolationsByRule" class="space-y-1 text-xs"></div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <span class="text-xs font-bold text-slate-300 block">Violations by Agent:</span>
+              <div id="auditViolationsByAgent" class="space-y-1 text-xs"></div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <span class="text-xs font-bold text-slate-300 block">Calls by Day:</span>
+              <div id="auditCallsByDay" class="space-y-1 text-xs"></div>
+            </div>
+          </div>
+
+          <!-- Violations Table -->
+          <div class="rounded-xl border border-slate-800 overflow-hidden bg-slate-900">
+            <div class="px-3.5 py-2 border-b border-slate-800 bg-slate-950 font-bold text-xs text-white flex items-center justify-between">
+              <span>Detected Infractions & Evidence Line</span>
+              <span id="auditTotalViolationsBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40">0 Infractions</span>
+            </div>
+            <div class="overflow-x-auto custom-scroll">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-950/80 text-slate-400 uppercase text-[10px] font-mono border-b border-slate-800">
+                  <tr>
+                    <th class="p-2.5">Call ID</th>
+                    <th class="p-2.5">Agent</th>
+                    <th class="p-2.5">Date</th>
+                    <th class="p-2.5">Rule ID</th>
+                    <th class="p-2.5">Severity</th>
+                    <th class="p-2.5">Offending Line / Description</th>
+                  </tr>
+                </thead>
+                <tbody id="auditViolationsTableBody" class="divide-y divide-slate-800/60 font-sans">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: OUTCOME IMPORT (Part 2C) -->
+        <div id="consoleTab-outcomes" class="hidden flex-1 flex flex-col overflow-hidden p-4 space-y-4 bg-slate-950/60 custom-scroll overflow-y-auto">
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-chart-column text-emerald-400"></i> Outcome Import & A/B Baseline Performance
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Upload real loan portfolio outcomes CSV to benchmark PTP-kept and recovery rate.
+              </p>
+            </div>
+            <button onclick="runSampleOutcomeImport()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-file-import"></i> Load Sample Outcomes CSV (10 Records)
+            </button>
+          </div>
+
+          <!-- Small Sample Warning Strip -->
+          <div id="outcomeSampleWarning" class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex items-center gap-2.5">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base shrink-0"></i>
+            <div>
+              <span class="font-bold block text-amber-300">Small sample warning (n &lt; 30):</span>
+              <span>Dataset contains small sample size. Metrics should be treated as directional indicators rather than statistically significant proof.</span>
+            </div>
+          </div>
+
+          <!-- Side-by-Side Comparison Cards (Saarthi vs Baseline) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Saarthi Card -->
+            <div class="p-4 rounded-xl bg-gradient-to-br from-indigo-950/50 to-slate-900 border border-indigo-500/40 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield-halved"></i> Saarthi Evaluated Group
+                </span>
+                <span id="saarthiSampleN" class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-200">n = 6</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">PTP-Kept Rate:</span>
+                  <div id="saarthiPtpKept" class="text-lg font-bold text-emerald-400 font-mono mt-0.5">100%</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">Recovery Rate:</span>
+                  <div id="saarthiRecRate" class="text-lg font-bold text-teal-400 font-mono mt-0.5">83.3%</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">Recovered:</span>
+                  <div id="saarthiTotRec" class="text-lg font-bold text-white font-mono mt-0.5">₹80,000</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Baseline Card -->
+            <div class="p-4 rounded-xl bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-user-group"></i> Baseline / Standard Bot Group
+                </span>
+                <span id="baselineSampleN" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">n = 4</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">PTP-Kept Rate:</span>
+                  <div id="baselinePtpKept" class="text-lg font-bold text-slate-300 font-mono mt-0.5">25.0%</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">Recovery Rate:</span>
+                  <div id="baselineRecRate" class="text-lg font-bold text-slate-300 font-mono mt-0.5">25.0%</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">Recovered:</span>
+                  <div id="baselineTotRec" class="text-lg font-bold text-slate-200 font-mono mt-0.5">₹15,000</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breakdown by DPD & Language -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <span class="text-xs font-bold text-slate-300 block">Recovery by DPD Bucket:</span>
+              <div id="outcomesByDpdContainer" class="space-y-1.5 text-xs"></div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+              <span class="text-xs font-bold text-slate-300 block">Recovery by Language:</span>
+              <div id="outcomesByLangContainer" class="space-y-1.5 text-xs"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: LIVE PROOF & USAGE COUNTERS (Part 2D) -->
+        <div id="consoleTab-liveproof" class="hidden flex-1 flex flex-col overflow-hidden p-4 space-y-4 bg-slate-950/60 custom-scroll overflow-y-auto">
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-microchip text-indigo-400"></i> LIVE Proof & Model Usage Telemetry
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Real-time usage counters, verified Sarvam Bulbul:v3 speakers, and computed contact costs.
+              </p>
+            </div>
+            <button onclick="refreshLiveStatus()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-rotate"></i> Refresh Telemetry
+            </button>
+          </div>
+
+          <!-- Verified Speaker Mapping Status -->
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-200">Sarvam Bulbul:v3 Verified Speaker Mappings:</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">100% Tested 200 OK</span>
+            </div>
+            <div id="speakersMappingGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+              <div class="p-2 rounded bg-slate-950 border border-slate-800"><span class="text-slate-400">Marathi (mr-IN):</span> <strong class="text-indigo-300 font-mono">rupali</strong> ✅</div>
+              <div class="p-2 rounded bg-slate-950 border border-slate-800"><span class="text-slate-400">Hindi (hi-IN):</span> <strong class="text-indigo-300 font-mono">priya</strong> ✅</div>
+              <div class="p-2 rounded bg-slate-950 border border-slate-800"><span class="text-slate-400">Telugu (te-IN):</span> <strong class="text-indigo-300 font-mono">shruti</strong> ✅</div>
+              <div class="p-2 rounded bg-slate-950 border border-slate-800"><span class="text-slate-400">Tamil (ta-IN):</span> <strong class="text-indigo-300 font-mono">mani</strong> ✅</div>
+              <div class="p-2 rounded bg-slate-950 border border-slate-800"><span class="text-slate-400">Kannada (kn-IN):</span> <strong class="text-indigo-300 font-mono">roopa</strong> ✅</div>
+              <div class="p-2 rounded bg-slate-950 border border-slate-800"><span class="text-slate-400">English (en-IN):</span> <strong class="text-indigo-300 font-mono">priya</strong> ✅</div>
+            </div>
+          </div>
+
+          <!-- Live Usage Counters -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-slate-900 border border-indigo-500/30">
+              <span class="text-slate-400 block text-[11px]">STT Processed:</span>
+              <div id="liveSttSecs" class="text-xl font-black text-indigo-300 font-mono mt-1">0.0s</div>
+              <span class="text-[9.5px] text-slate-500">Sarvam Saaras:v3 (codemix)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-teal-500/30">
+              <span class="text-slate-400 block text-[11px]">TTS Generated:</span>
+              <div id="liveTtsChars" class="text-xl font-black text-teal-300 font-mono mt-1">0 chars</div>
+              <span class="text-[9.5px] text-slate-500">Sarvam Bulbul:v3 neural</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-purple-500/30">
+              <span class="text-slate-400 block text-[11px]">LLM Tokens:</span>
+              <div id="liveLlmTokens" class="text-xl font-black text-purple-300 font-mono mt-1">0 tokens</div>
+              <span class="text-[9.5px] text-slate-500">Sarvam-105B Indic reasoning</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30">
+              <span class="text-slate-400 block text-[11px]">Cost / Contact:</span>
+              <div id="liveCostPerContact" class="text-xl font-black text-emerald-400 font-mono mt-1">₹1.68</div>
+              <span class="text-[9.5px] text-emerald-400 font-mono">estimated</span>
+            </div>
+          </div>
+        </div>
+
         <!-- TAB 2: SETTLEMENT & RESTRUCTURING DETAILS -->
         <div id="consoleTab-settlement" class="hidden flex-1 overflow-y-auto custom-scroll p-4 space-y-4 bg-slate-950/40">
           
           <!-- Outcome Lift Banner -->
-          <div class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-slate-900 border border-emerald-500/30 flex items-center justify-between">
+          <div class="p-3 rounded-xl bg-slate-900 border border-indigo-500/30 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
-              <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
-                <i class="fa-solid fa-chart-line"></i>
+              <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-shield-halved"></i>
               </div>
               <div>
-                <span class="text-xs font-bold text-white block">Deterministic Financial Outcome Engine</span>
-                <span class="text-[10.5px] text-emerald-300">Replaced 68% broken promise rate with on-call token capture and mandate locking.</span>
+                <span class="text-xs font-bold text-white block">Deterministic Policy Enforcement Engine</span>
+                <span class="text-[10.5px] text-slate-300">Enforces lender policy (demo); supports RBI conduct rules. Partial token capture today and scheduled mandate split.</span>
               </div>
             </div>
-            <span class="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/40">+27.8% Lift</span>
+            <span class="text-xs font-mono font-bold text-indigo-300 px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500/40">Policy Controlled</span>
           </div>
 
           <!-- Diagnosis Card -->
@@ -447,12 +778,12 @@
               <span class="font-mono text-emerald-400">₹15,000 Relief Auto-Filing</span>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed">
-              Policy #<strong id="hcPolicyNumber" class="text-white">HC-99281-PN</strong> detected. Relief claim dossier auto-drafted for <strong>HDFC ERGO Health Underwriting Desk</strong>. Borrower collections paused for 7 days under RBI Fair Practices sensitive event code.
+              Sensitive life event reported. 7-day pause initiated under FAIR-PRAC-SENS01; task created to check borrower insurance cover. Borrower collections paused for 7 days under RBI Fair Practices sensitive event code.
             </p>
           </div>
 
           <!-- Borrower Voice Khata & 10% QR Auto-Sweep Card (POLICY-QR-SWEEP01) -->
-          <div id="qrSweepSettlementBox" class="p-3.5 rounded-xl bg-gradient-to-r from-amber-950/30 via-slate-900 to-amber-950/20 border-2 border-amber-500/30 space-y-2">
+          <div id="qrSweepSettlementBox" class="p-3.5 rounded-xl bg-slate-900 border-2 border-amber-500/30 space-y-2">
             <div class="flex items-center justify-between text-xs">
               <span class="font-extrabold text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
                 <i class="fa-solid fa-store text-amber-400"></i> Voice-First Khata + 10% Pay-As-You-Sell QR Sweep
@@ -460,13 +791,13 @@
               <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">POLICY-QR-SWEEP01</span>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed">
-              Enables merchants and self-employed borrowers to auto-route 10% of daily QR scan settlements directly toward overdue EMI. Zero lump-sum pressure, ₹590 bounce fee waived, and CIBIL score protected (+35 bonus points).
+              Enables merchants and self-employed borrowers to auto-route 10% of daily QR scan settlements directly toward overdue EMI. Supports steady recovery without lump-sum strain under POLICY-QR-SWEEP01.
             </p>
             <div class="flex items-center justify-between pt-1">
-              <div class="flex items-center gap-2 text-xs">
-                <span class="text-emerald-400 font-mono font-bold"><i class="fa-solid fa-shield-halved mr-1"></i> CIBIL: 680 → 715 Protected</span>
+              <div class="flex items-center gap-3 text-xs">
+                <span class="text-indigo-300 font-mono"><i class="fa-solid fa-arrows-split-up-and-left mr-1"></i> Auto-Sweep Rail: 10% Daily Settlement</span>
                 <span class="text-slate-500">|</span>
-                <span class="text-slate-300 font-mono">Bounce Fee: <strong class="text-emerald-400">₹590 Saved</strong></span>
+                <span class="text-slate-400 font-mono">Mandate: Revocable by borrower in UPI app</span>
               </div>
               <button onclick="openBorrowerPhoneToTab('khata')" class="px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-lg text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition transform active:scale-95">
                 <i class="fa-solid fa-mobile-screen-button"></i>
@@ -474,9 +805,7 @@
               </button>
             </div>
           </div>
-
         </div>
-
         <!-- TAB 3: RBI COMPLIANCE & LEGAL AUDIT -->
         <div id="consoleTab-compliance" class="hidden flex-1 overflow-y-auto custom-scroll p-4 space-y-3 bg-slate-950/40 text-xs">
           <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
@@ -512,7 +841,7 @@
         <div class="p-3 border-t border-slate-800 bg-slate-900 space-y-2 shrink-0">
           <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
             <span><i class="fa-solid fa-bolt text-teal-400 mr-1"></i> 1-Click Authorized Settlement Rails</span>
-            <span id="consoleVpaTag" class="font-mono text-emerald-400 text-xs">repayments.saarthi@yesbank</span>
+            <span id="consoleVpaTag" class="font-mono text-emerald-400 text-xs">repayments.demo@bank</span>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
@@ -630,7 +959,7 @@
               </p>
               <div class="mt-2 pt-1.5 border-t border-slate-700 text-[10px] text-slate-400 flex items-center justify-between">
                 <span>RBI Disclosures Verified</span>
-                <span class="text-emerald-400 font-mono">100% Compliant</span>
+                <span class="text-emerald-400 font-mono">Supports RBI conduct rules</span>
               </div>
             </div>
 
@@ -720,7 +1049,7 @@
                     <span>Relief Claim #HC-99281-PN</span>
                   </div>
                   <p class="text-[10.5px] text-slate-300">
-                    7-day cooling-off pause active. ₹15,000 hospitalization claim submitted to HDFC ERGO.
+                    7-day cooling-off pause active. ₹15,000 hospitalization claim submitted to Insurance Partner.
                   </p>
                 </div>
 
@@ -768,7 +1097,7 @@
                 </div>
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-slate-400">Collection VPA:</span>
-                  <span id="upiSheetVpaTag" class="font-mono text-indigo-300 text-[11px]">repayments.saarthi@yesbank</span>
+                  <span id="upiSheetVpaTag" class="font-mono text-indigo-300 text-[11px]">repayments.demo@bank</span>
                 </div>
                 <div class="flex items-center justify-between text-xs border-t border-slate-800 pt-2">
                   <span class="text-slate-400">Loan Account:</span>
@@ -785,18 +1114,18 @@
                 </span>
               </div>
 
-              <!-- Bank Selection Card -->
+              <!-- Bank Selection Card (Plain Payment Simulation) -->
               <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2.5">
-                  <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-[10px]">
-                    SBI
+                  <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold text-[10px]">
+                    SIM
                   </div>
                   <div>
-                    <span class="font-bold text-white block">State Bank of India</span>
-                    <span class="text-[10px] text-slate-400">A/C No: •••• 4210</span>
+                    <span class="font-bold text-white block">Payment Simulation Screen</span>
+                    <span class="text-[10px] text-slate-400">Escrow Destination: Demo Bank Ltd.</span>
                   </div>
                 </div>
-                <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Simulated Rail</span>
               </div>
             </div>
 
@@ -804,7 +1133,7 @@
             <div class="space-y-2 mt-4">
               <button onclick="triggerSimulatePaymentFromPhone()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-600/30 transition transform active:scale-95">
                 <i class="fa-solid fa-lock text-xs"></i>
-                <span id="upiSheetBtnText">Pay via UPI PIN</span>
+                <span id="upiSheetBtnText">Simulate Payment</span>
               </button>
               <p class="text-[10px] text-slate-500 text-center">
                 Tap button to simulate borrower approving payment in real-time.
@@ -819,7 +1148,7 @@
               <div>
                 <h4 class="text-base font-extrabold text-white">Payment Successful</h4>
                 <p id="upiSuccessAmount" class="text-2xl font-black text-emerald-400 font-mono mt-0.5">₹40,000.00</p>
-                <p class="text-xs text-slate-400 mt-1">UTR: <span id="upiSuccessUtr" class="font-mono text-slate-200">YESB0000101</span></p>
+                <p class="text-xs text-slate-400 mt-1">Payment Ref: <span id="upiSuccessUtr" class="font-mono text-slate-200">SIM-PAY-0000101</span></p>
               </div>
               <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-300 w-full">
                 Synchronized with Saarthi Collections Cloud. Account status updated to <strong class="text-emerald-400">PAID</strong>.
@@ -886,36 +1215,31 @@
                     </p>
                   </div>
 
-                  <!-- Metric 3: Bounce Fee Saved -->
-                  <div class="flex items-center justify-between bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/40">
+                  <!-- Metric 3: Daily Settlement Status -->
+                  <div class="flex items-center justify-between bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
                     <div>
-                      <span class="text-[10px] font-bold text-emerald-300 block">बैंक बाउन्स दंड वाचला (Bounce Fee Saved)</span>
-                      <span class="text-[9px] text-emerald-400/80">NACH penalty instantly waived</span>
+                      <span class="text-[10px] font-bold text-slate-300 block">दैनिक सेटलमेंट कपात (Daily Settlement Rail)</span>
+                      <span class="text-[9px] text-slate-400">Auto-routes 10% toward EMI upon confirmation</span>
                     </div>
-                    <div class="text-xl font-black text-emerald-400 font-mono">₹590</div>
+                    <div class="text-sm font-bold text-emerald-400 font-mono">सक्रिय (Active)</div>
                   </div>
 
                 </div>
               </div>
 
-              <!-- Live CIBIL Score Protection Meter -->
-              <div class="rounded-xl p-3 bg-slate-900 border border-slate-800 space-y-2">
+              <!-- Mandate Notice Card -->
+              <div class="rounded-xl p-3 bg-slate-900 border border-slate-800 space-y-1.5 text-left">
                 <div class="flex items-center justify-between text-xs">
                   <span class="text-[10.5px] font-bold text-slate-300 flex items-center gap-1.5">
-                    <i class="fa-solid fa-gauge-high text-teal-400"></i> CIBIL Score Protection Meter
+                    <i class="fa-solid fa-arrows-split-up-and-left text-teal-400"></i> UPI Mandate Status
                   </span>
-                  <span id="cibilScoreBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-bold transition-all duration-500">
-                    680 → 715 (PENDING)
+                  <span id="khataActiveStatusBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                    POLICY-QR-SWEEP01 Ready
                   </span>
                 </div>
-                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden p-0.5 border border-slate-800 relative">
-                  <div id="cibilProgressBar" class="h-full rounded-full bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-400 transition-all duration-700" style="width: 60%;"></div>
-                </div>
-                <div class="flex justify-between text-[9px] text-slate-400 font-mono">
-                  <span>Current: 680 (At Risk)</span>
-                  <span class="text-emerald-400 font-bold">+35 pts Boost upon Voice Consent</span>
-                  <span class="text-emerald-400">715 (Protected)</span>
-                </div>
+                <p class="text-[9.5px] text-slate-400 leading-snug">
+                  mandate request sent; becomes active only when the borrower approves it in her UPI app; she can revoke it
+                </p>
               </div>
 
             </div>
@@ -932,7 +1256,7 @@
                   <span class="text-[9px] font-mono text-emerald-400"><i class="fa-solid fa-circle-check"></i> Activated</span>
                 </div>
                 <p id="khataVoiceResponseText" class="text-xs text-white leading-relaxed font-semibold">
-                  "धन्यवाद सुनीता ताई! तुमचा १०% दैनिक QR ऑटो-स्वीप सुरू झाला आहे आणि तुमचा CIBIL स्कोअर सुरक्षित आहे."
+                  "धन्यवाद सुनीता ताई! तुमचा १०% दैनिक QR ऑटो-स्वीप सुरू झाला आहे थकबाकी टप्प्याटप्प्याने भरली जाईल."
                 </p>
               </div>
 
@@ -997,33 +1321,41 @@
       </div>
 
       <div class="grid grid-cols-2 gap-3 text-xs">
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+          <span class="text-slate-400 block text-[11px]">Contacted Accounts:</span>
+          <div class="text-2xl font-black text-white font-mono mt-1">25</div>
+          <span class="text-[10px] text-slate-500">100% evaluated</span>
+        </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-emerald-500/30">
-          <span class="text-slate-400 block text-[11px]">Portfolio Recovery Rate:</span>
-          <div class="text-2xl font-black text-emerald-400 font-mono mt-1">61.8%</div>
-          <span class="text-[10px] text-emerald-500 font-bold">+27.8% Lift vs 34.0% Standard Bot</span>
-        </div>
-        <div class="p-3 rounded-xl bg-slate-950 border border-teal-500/30">
-          <span class="text-slate-400 block text-[11px]">Cleared Today (Instant UPI):</span>
-          <div class="text-2xl font-black text-teal-300 font-mono mt-1">₹<span id="modalCashToday">33,500</span></div>
-          <span class="text-[10px] text-slate-400">On-Call Token Settlement Rail</span>
-        </div>
-        <div class="p-3 rounded-xl bg-slate-950 border border-indigo-500/30">
-          <span class="text-slate-400 block text-[11px]">Locked AutoPay Mandates:</span>
-          <div class="text-2xl font-black text-indigo-300 font-mono mt-1">₹<span id="modalFutureLocked">87,000</span></div>
-          <span class="text-[10px] text-slate-400">Weekly Friday & Salary Debits</span>
+          <span class="text-slate-400 block text-[11px]">PTPs Established:</span>
+          <div id="modalCashToday" class="text-2xl font-black text-emerald-400 font-mono mt-1">18</div>
+          <span class="text-[10px] text-emerald-500">Committed resolution</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-amber-500/30">
-          <span class="text-slate-400 block text-[11px]">NPA & Fees Prevented:</span>
-          <div class="text-2xl font-black text-amber-300 font-mono mt-1">₹<span id="modalRelief">15,590</span></div>
-          <span class="text-[10px] text-slate-400">Hospicash Relieved + Bounce Fees</span>
+          <span class="text-slate-400 block text-[11px]">Blocked by Policy:</span>
+          <div id="modalFutureLocked" class="text-2xl font-black text-amber-300 font-mono mt-1">4</div>
+          <span class="text-[10px] text-amber-400">DNC & sensitive pause</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-rose-500/30">
+          <span class="text-slate-400 block text-[11px]">Escalated to Desk:</span>
+          <div id="modalRelief" class="text-2xl font-black text-rose-300 font-mono mt-1">3</div>
+          <span class="text-[10px] text-rose-400">Human ops review</span>
         </div>
       </div>
 
-      <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed">
-        <strong>Why Recovery Lift Occurs:</strong> Standard bots demand full lump sums and accept verbal promises (68% broken promise rate). Saarthi captures immediate liquidity via instant UPI token links on the call, binds remaining balances to recurring Friday AutoPay mandates, and routes medical shocks to insurer riders.
+      <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-300 font-bold">Cost per contact:</span>
+          <span class="text-emerald-400 font-mono font-bold">₹1.68 <span class="text-[10px] text-slate-400 font-sans font-normal">(estimated)</span></span>
+        </div>
+        <div class="text-[10px] text-slate-400">Computed from usage counters × /policies/pricing.yaml rates (excludes LLM tokens).</div>
       </div>
-    </div>
-  </div>
+
+      <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 text-[11px] text-slate-400 space-y-1">
+        <div class="text-slate-300 font-semibold text-xs">Industry figures reported by other sources:</div>
+        <div>• <strong>Rs 50-150</strong> per bounced EMI (PayU, citing CRISIL)</div>
+        <div>• <strong>Rs 250-500</strong> per field visit (Business Standard)</div>
+      </div>
 
   <!-- TOAST FEEDBACK NOTIFIER -->
   <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
@@ -1055,71 +1387,64 @@
     }
 
 
-    // MULTI-LENDER TENANT AGENCY REPOSITORY
+    // MULTI-LENDER TENANT AGENCY REPOSITORY (Fictional Names & Multi-Tenancy)
     const LENDER_TENANTS = {
-      saarthi: {
-        name: "Saarthi Capital Ltd.",
-        shortName: "Saarthi Capital",
-        desc: "Multi-Lender Agency Portfolio",
-        vpa: "repayments.saarthi@yesbank",
+      all: {
+        id: "all",
+        name: "All Lenders (Agency View)",
+        shortName: "Agency View",
+        desc: "Consolidated portfolio across all client money lenders (25 accounts)",
+        vpa: "",
+        badge: "Multi-Tenant Agency",
+        code: "DEMO-AGY-ALL",
+        bank: "Designated Escrow Accounts (Demo Bank Ltd.)",
+        utrPrefix: "SIM"
+      },
+      demo_lender_a: {
+        id: "demo_lender_a",
+        name: "Demo Lender A (Retail NBFC)",
+        shortName: "Demo Lender A",
+        desc: "Retail NBFC Consumer Durable Book (10 accounts)",
+        vpa: "",
         badge: "Retail NBFC",
-        code: "SRT-AGY-01",
-        bank: "YES Bank Escrow",
-        utrPrefix: "YESB"
+        code: "DEMO-A-01",
+        bank: "Demo Bank Ltd.",
+        utrPrefix: "SIM"
       },
-      bajaj: {
-        name: "Bajaj Finance Ltd.",
-        shortName: "Bajaj Finance",
-        desc: "Digital Consumer Durable & EMI Book",
-        vpa: "collections.bajaj@hdfcbank",
-        badge: "Tier-1 NBFC",
-        code: "BFL-AGY-108",
-        bank: "HDFC Bank Escrow",
-        utrPrefix: "HDFC"
+      demo_lender_b: {
+        id: "demo_lender_b",
+        name: "Demo Lender B (MSME & Working Capital)",
+        shortName: "Demo Lender B",
+        desc: "MSME & Kirana Working Capital Book (9 accounts)",
+        badge: "MSME Lender",
+        code: "DEMO-B-02",
+        bank: "Demo Bank Ltd.",
+        utrPrefix: "SIM"
       },
-      dmi: {
-        name: "DMI Finance Pvt. Ltd.",
-        shortName: "DMI Finance",
-        desc: "FinTech Digital Credit Agency Book",
-        vpa: "dmi.resolve@axisbank",
-        badge: "Digital Lender",
-        code: "DMI-AGY-402",
-        bank: "Axis Bank Escrow",
-        utrPrefix: "UTIB"
-      },
-      muthoot: {
-        name: "Muthoot Microfin Ltd.",
-        shortName: "Muthoot Microfin",
-        desc: "Rural & MSME Lending Agency Book",
-        vpa: "muthoot.collections@icicibank",
-        badge: "MFI Agency",
-        code: "MUT-MFI-007",
-        bank: "ICICI Bank Escrow",
-        utrPrefix: "ICIC"
-      },
-      kreditbee: {
-        name: "KreditBee (KrazyBee Services)",
-        shortName: "KreditBee",
-        desc: "Salaried Personal Loans Agency Book",
-        vpa: "kreditbee.pay@kotak",
-        badge: "Fintech NBFC",
-        code: "KB-AGY-331",
-        bank: "Kotak Mahindra Bank",
-        utrPrefix: "KKBK"
+      demo_lender_c: {
+        id: "demo_lender_c",
+        name: "Demo Lender C (Microfinance & Rural)",
+        shortName: "Demo Lender C",
+        desc: "Microfinance & Livelihood Book (6 accounts)",
+        vpa: "",
+        badge: "Microfinance",
+        code: "DEMO-C-03",
+        bank: "Demo Bank Ltd.",
+        utrPrefix: "SIM"
       }
     };
 
-    let currentTenant = 'saarthi';
+    let currentTenant = 'all';
 
     function switchLenderTenant(val) {
-      const tenant = LENDER_TENANTS[val] || LENDER_TENANTS.saarthi;
       currentTenant = val;
+      const tenant = LENDER_TENANTS[val] || LENDER_TENANTS.all;
 
       const cVpa = document.getElementById('consoleVpaTag');
-      if (cVpa) cVpa.innerText = tenant.vpa;
+      if (cVpa) cVpa.innerText = tenant.vpa || "Unset (Simulate payment only)";
 
       const upiVpa = document.getElementById('upiSheetVpaTag');
-      if (upiVpa) upiVpa.innerText = tenant.vpa;
+      if (upiVpa) upiVpa.innerText = tenant.vpa || "Unset (Simulate payment only)";
 
       const upiLender = document.getElementById('upiSheetLenderName');
       if (upiLender) upiLender.innerText = tenant.name;
@@ -1130,14 +1455,49 @@
       const phoneCaller = document.getElementById('phoneCallerName');
       if (phoneCaller) phoneCaller.innerText = `${tenant.shortName} (Verified)`;
 
+      // Dynamic Filtering: re-filter delinquency queue for the selected lender tenant
+      applyFilters();
+
+      // If active account not in this tenant's list, pick first visible
+      const visible = getCurrentlyVisibleAccounts();
+      if (visible.length > 0) {
+        const isStillVisible = selectedAccount && visible.some(a => a.id === selectedAccount.id);
+        if (!isStillVisible) {
+          selectAccount(visible[0].id);
+        }
+      }
+
       showToast(
         `Serving ${tenant.name}`,
-        `Switched agency routing. All recovered funds auto-deposit to ${tenant.vpa} (${tenant.bank}).`
+        `Switched portfolio filter: ${tenant.desc}. Designated escrow: ${tenant.bank}.`
       );
     }
 
+    function getCurrentlyVisibleAccounts() {
+      const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      return accounts.filter(a => {
+        if (currentTenant && currentTenant !== 'all') {
+          const accLender = (a.data && a.data.lender_id) || a.lender_id;
+          if (accLender !== currentTenant) return false;
+        }
+        const matchesQ = !q || a.customer_name.toLowerCase().includes(q) || a.id.includes(q) || (a.phone && a.phone.includes(q));
+        if (!matchesQ) return false;
+        if (activeFilter === 'overdue') return a.dpd > 0;
+        if (activeFilter === 'pre_due') return a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H');
+        if (activeFilter === 'hospicash') return isHospicashCase(a);
+        return true;
+      });
+    }
 
-    // REAL IST CLOCK
+    function applyFilters() {
+      const filtered = getCurrentlyVisibleAccounts();
+      renderAccountsTable(filtered);
+      const badge = document.getElementById('accountCountBadge');
+      if (badge) badge.innerText = `${filtered.length} Accounts`;
+      const qBadge = document.getElementById('navBadgeQueue');
+      if (qBadge) qBadge.innerText = filtered.length;
+    }
+
     function startClock() {
       const update = () => {
         const now = new Date();
@@ -1214,7 +1574,7 @@
 
     // TABS IN NBFC CONSOLE
     function switchConsoleTab(tabKey) {
-      ['telephony', 'settlement', 'compliance'].forEach(k => {
+      ['telephony', 'settlement', 'compliance', 'callplan', 'batchaudit', 'outcomes', 'liveproof'].forEach(k => {
         const pane = document.getElementById(`consoleTab-${k}`);
         const btn = document.getElementById(`tabBtn-${k}`);
         if (pane && btn) {
@@ -1242,6 +1602,205 @@
     }
 
     // INITIALIZATION
+    
+    // ========================================================
+    // PART 2: CALL PLAN, BATCH AUDIT & OUTCOME HANDLERS
+    // ========================================================
+    async function runSampleCallPlan() {
+      try {
+        showToast("Generating Call Plan...", "Evaluating priority score formula & DNC rules...");
+        const res = await fetch('/api/call-plan/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ csv_content: "" })
+        });
+        const data = await res.json();
+        
+        document.getElementById('cpTotalAccs').innerText = data.summary.total_accounts;
+        document.getElementById('cpCallAccs').innerText = data.summary.accounts_to_call;
+        document.getElementById('cpHoldAccs').innerText = data.summary.accounts_to_hold;
+        document.getElementById('cpEscAccs').innerText = data.summary.accounts_to_escalate;
+        document.getElementById('cpCostEst').innerText = `₹${data.summary.estimated_total_cost_inr.toFixed(2)}`;
+
+        const tbody = document.getElementById('callPlanTableBody');
+        tbody.innerHTML = '';
+        data.plan.forEach(p => {
+          let stBadge = `<span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">CALL</span>`;
+          if (p.status === 'HOLD') stBadge = `<span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40">HOLD</span>`;
+          if (p.status === 'ESCALATE') stBadge = `<span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40">ESCALATE</span>`;
+
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-800/40";
+          tr.innerHTML = `
+            <td class="p-2.5 font-mono font-bold text-indigo-300">#${p.priority_rank}</td>
+            <td class="p-2.5">
+              <span class="font-bold text-white block">${p.name}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${p.account_id} · ${p.phone_masked}</span>
+            </td>
+            <td class="p-2.5 font-mono font-bold text-amber-300">${p.priority_score}</td>
+            <td class="p-2.5">${stBadge}</td>
+            <td class="p-2.5 text-slate-300 text-[11px]">${p.best_call_window}</td>
+            <td class="p-2.5 text-slate-300 text-[11px]">${p.offer_range.summary}</td>
+            <td class="p-2.5">
+              ${p.dnc_flag ? `<span class="font-mono text-amber-400 font-semibold block">${p.dnc_flag}</span>` : ''}
+              <span class="text-[10px] text-slate-400">${p.reason}</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        showToast("Call Plan Ready", `Prioritized ${data.summary.accounts_to_call} callable accounts.`);
+      } catch (e) {
+        console.error("Call plan error:", e);
+      }
+    }
+
+    async function runSampleBatchAudit() {
+      try {
+        showToast("Auditing Transcripts...", "Scanning AI disclosure, recording notice & conduct...");
+        const res = await fetch('/api/audit/batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ csv_content: "" })
+        });
+        const data = await res.json();
+        
+        const chkContainer = document.getElementById('batchChecklistContainer');
+        chkContainer.innerHTML = `
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="text-slate-400 block text-[10.5px]">Total Audited:</span>
+            <div class="text-lg font-bold text-white font-mono mt-0.5">${data.checklist.total_calls_audited} Calls</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-indigo-500/30">
+            <span class="text-indigo-300 block text-[10.5px]">AI/Rec Disclosure:</span>
+            <div class="text-lg font-bold text-indigo-200 font-mono mt-0.5">${data.checklist.ai_recording_disclosure_pass_rate_pct}% Pass</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-amber-500/30">
+            <span class="text-amber-300 block text-[10.5px]">Outside Legal Window:</span>
+            <div class="text-lg font-bold text-amber-300 font-mono mt-0.5">${data.checklist.calls_outside_window_count} Calls</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-rose-500/40">
+            <span class="text-rose-400 block text-[10.5px]">Coercive / Harassment:</span>
+            <div class="text-lg font-bold text-rose-300 font-mono mt-0.5">${data.checklist.coercive_language_count} Cases</div>
+          </div>
+        `;
+
+        // Breakdown by Rule
+        const rEl = document.getElementById('auditViolationsByRule');
+        rEl.innerHTML = Object.entries(data.violations_by_rule).map(([k, v]) => `
+          <div class="flex justify-between font-mono"><span class="text-slate-400">${k}:</span> <strong class="${v > 0 ? 'text-amber-400' : 'text-slate-500'}">${v}</strong></div>
+        `).join('');
+
+        // Breakdown by Agent
+        const aEl = document.getElementById('auditViolationsByAgent');
+        aEl.innerHTML = Object.entries(data.violations_by_agent).map(([k, v]) => `
+          <div class="flex justify-between font-mono"><span class="text-slate-400">${k}:</span> <strong class="${v > 0 ? 'text-rose-400' : 'text-slate-500'}">${v} infractions</strong></div>
+        `).join('');
+
+        // Breakdown by Day
+        const dEl = document.getElementById('auditCallsByDay');
+        dEl.innerHTML = Object.entries(data.violations_by_day).map(([k, v]) => `
+          <div class="flex justify-between font-mono"><span class="text-slate-400">${k}:</span> <strong class="text-white">${v} calls</strong></div>
+        `).join('');
+
+        document.getElementById('auditTotalViolationsBadge').innerText = `${data.violations.length} Infractions`;
+
+        const tbody = document.getElementById('auditViolationsTableBody');
+        tbody.innerHTML = '';
+        data.violations.forEach(v => {
+          let sevBadge = `<span class="px-1.5 py-0.2 rounded font-mono font-bold text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30">${v.severity}</span>`;
+          if (v.severity === 'CRITICAL') sevBadge = `<span class="px-1.5 py-0.2 rounded font-mono font-bold text-[9px] bg-rose-500/20 text-rose-300 border border-rose-500/30">CRITICAL</span>`;
+
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-800/40";
+          tr.innerHTML = `
+            <td class="p-2.5 font-mono text-slate-300">${v.call_id}</td>
+            <td class="p-2.5 font-bold text-white">${v.agent_id}</td>
+            <td class="p-2.5 font-mono text-slate-400">${v.date}</td>
+            <td class="p-2.5 font-mono font-bold text-indigo-300">${v.rule_id}</td>
+            <td class="p-2.5">${sevBadge}</td>
+            <td class="p-2.5">
+              <span class="text-slate-200 block font-medium">"${v.offending_line}"</span>
+              <span class="text-[10px] text-slate-400">${v.description}</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        showToast("Batch Audit Complete", `Analyzed ${data.checklist.total_calls_audited} calls; flagged ${data.violations.length} infractions.`);
+      } catch (e) {
+        console.error("Batch audit error:", e);
+      }
+    }
+
+    async function runSampleOutcomeImport() {
+      try {
+        showToast("Importing Outcomes...", "Calculating PTP-kept and recovery rates...");
+        const res = await fetch('/api/outcomes/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ csv_content: "" })
+        });
+        const data = await res.json();
+        
+        // Populate Saarthi
+        document.getElementById('saarthiSampleN').innerText = `n = ${data.overall.saarthi.n}`;
+        document.getElementById('saarthiPtpKept').innerText = `${data.overall.saarthi.ptp_kept_rate_pct}%`;
+        document.getElementById('saarthiRecRate').innerText = `${data.overall.saarthi.recovery_rate_pct}%`;
+        document.getElementById('saarthiTotRec').innerText = `₹${data.overall.saarthi.total_recovered_inr.toLocaleString()}`;
+
+        // Populate Baseline
+        document.getElementById('baselineSampleN').innerText = `n = ${data.overall.baseline.n}`;
+        document.getElementById('baselinePtpKept').innerText = `${data.overall.baseline.ptp_kept_rate_pct}%`;
+        document.getElementById('baselineRecRate').innerText = `${data.overall.baseline.recovery_rate_pct}%`;
+        document.getElementById('baselineTotRec').innerText = `₹${data.overall.baseline.total_recovered_inr.toLocaleString()}`;
+
+        // By DPD
+        const dpdCont = document.getElementById('outcomesByDpdContainer');
+        dpdCont.innerHTML = data.by_dpd_bucket.map(b => `
+          <div class="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+            <span class="font-bold text-white">${b.bucket}</span>
+            <div class="flex items-center gap-3 font-mono">
+              <span class="text-indigo-300">Saarthi: <strong>${b.saarthi.recovery_rate_pct}%</strong> (n=${b.saarthi.n})</span>
+              <span class="text-slate-500">|</span>
+              <span class="text-slate-400">Base: <strong>${b.baseline.recovery_rate_pct}%</strong> (n=${b.baseline.n})</span>
+            </div>
+          </div>
+        `).join('');
+
+        // By Lang
+        const langCont = document.getElementById('outcomesByLangContainer');
+        langCont.innerHTML = data.by_language.map(l => `
+          <div class="p-2 rounded bg-slate-950 border border-slate-800 flex justify-between items-center">
+            <span class="font-bold text-white">${l.language}</span>
+            <div class="flex items-center gap-3 font-mono">
+              <span class="text-indigo-300">Saarthi: <strong>${l.saarthi.recovery_rate_pct}%</strong></span>
+              <span class="text-slate-500">|</span>
+              <span class="text-slate-400">Base: <strong>${l.baseline.recovery_rate_pct}%</strong></span>
+            </div>
+          </div>
+        `).join('');
+
+        showToast("Outcomes Synchronized", `Processed ${data.total_records} historical loan outcome records.`);
+      } catch (e) {
+        console.error("Outcome import error:", e);
+      }
+    }
+
+    async function refreshLiveStatus() {
+      try {
+        const res = await fetch('/api/sarvam/live-status');
+        const data = await res.json();
+        const costs = data.usage_and_costs;
+        document.getElementById('liveSttSecs').innerText = `${costs.stt_seconds}s`;
+        document.getElementById('liveTtsChars').innerText = `${costs.tts_chars} chars`;
+        document.getElementById('liveLlmTokens').innerText = `${costs.llm_tokens} tokens`;
+        document.getElementById('liveCostPerContact').innerText = `₹${costs.cost_per_contact_inr.toFixed(2)}`;
+        showToast("Live Telemetry Synced", `Cost per contact: ₹${costs.cost_per_contact_inr} (${costs.cost_label})`);
+      } catch (e) {
+        console.error("Live status error:", e);
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', async () => {
       startClock();
       await fetchMetrics();
@@ -1437,7 +1996,7 @@
       document.getElementById('custAvatar').innerText = initials;
       document.getElementById('custName').innerText = `LN-${String(a.id).padStart(5, '0')} · ${a.customer_name}`;
       document.getElementById('custDetailsSub').innerText = 
-        `Overdue: ₹${amt.toLocaleString()} · Mobile: ${a.masked_phone || a.phone} · Lang: ${lang} · CIBIL: ${(a.data && a.data.credit_score) || 742} (Protected) · ${dpd > 0 ? dpd + ' DPD' : 'T-24h Warning'}`;
+        `Overdue: ₹${amt.toLocaleString()} · Mobile: ${a.masked_phone || a.phone} · Lang: ${lang} · Bureau: ${(a.data && a.data.credit_score) || 742} · ${dpd > 0 ? dpd + ' DPD' : 'T-24h Warning'}`;
 
       const badge = document.getElementById('custStatusBadge');
       badge.innerText = a.status.toUpperCase();
@@ -1601,9 +2160,9 @@
         waHcCard.classList.remove('hidden');
       } else if (a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H')) {
         waHeader.innerText = "T-24h Preventive Bounce Alert";
-        waBody.innerText = `अंजली ताई, उद्या ₹१८,००० चा EMI आहे. खात्यात शिल्लक कमी असल्याने ₹५९० बाउन्स शुल्क वाचवण्यासाठी आज ₹६,००० भरा व उर्वरित ३ दिवस पुढे ढकला.`;
+        waBody.innerText = `अंजली ताई, उद्या ₹१८,००० चा EMI आहे. खात्यात शिल्लक कमी असल्याने आज ₹६,००० टोकन भरा व उर्वरित ३ दिवस पुढे ढकला.`;
         waCardAmount.innerText = `₹6,000.00`;
-        waPayBtn.innerText = `Pay ₹6,000 Token Now (Save ₹590)`;
+        waPayBtn.innerText = `Pay ₹6,000 Token Now (Reschedule Debit)`;
         waUpiCard.classList.remove('hidden');
         waHcCard.classList.add('hidden');
       } else if (a.language === 'Telugu' || (a.data && a.data.scenario === 's9_telugu_hero')) {
@@ -1652,7 +2211,7 @@
       // Status Tag
       const railTag = document.getElementById('upiSheetRailTag');
       if (a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H')) {
-        railTag.innerText = "T-24h Liquidity Buffer Rail (₹590 Saved)";
+        railTag.innerText = "T-24h Liquidity Buffer Rail (Buffer Captured)";
       } else if (a.instant_recovered_inr > 0) {
         railTag.innerText = "Capture Liquidity Rail (Token + AutoPay)";
       } else {
@@ -1704,7 +2263,7 @@
       if (isSweepActive) {
         if (cibilBadge) {
           cibilBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold";
-          cibilBadge.innerText = (a.data && a.data.cibil_score_display) || "CIBIL Score: 680 → 715 (PROTECTED ✅)";
+          cibilBadge.innerText = (a.data && a.data.cibil_score_display) || "10% Auto-Sweep Active (Locked)";
         }
         if (cibilBar) {
           cibilBar.style.width = "100%";
@@ -1714,7 +2273,7 @@
           voiceRespCard.classList.remove('hidden');
           const firstName = a.customer_name ? a.customer_name.split(' ')[0] : 'सुनीता';
           if (voiceRespText && !voiceRespText.innerText.includes('धन्यवाद')) {
-            voiceRespText.innerText = `"धन्यवाद ${firstName} ताई! तुमचा १०% दैनिक QR ऑटो-स्वीप सुरू झाला आहे आणि तुमचा CIBIL स्कोअर सुरक्षित आहे."`;
+            voiceRespText.innerText = `"धन्यवाद ${firstName} ताई! तुमचा १०% दैनिक QR ऑटो-स्वीप सुरू झाला आहे थकबाकी टप्प्याटप्प्याने भरली जाईल."`;
           }
         }
         if (statusBadge) {
@@ -1724,7 +2283,7 @@
       } else {
         if (cibilBadge) {
           cibilBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-bold";
-          cibilBadge.innerText = "680 → 715 (PENDING)";
+          cibilBadge.innerText = "POLICY-QR-SWEEP01 Ready";
         }
         if (cibilBar) {
           cibilBar.style.width = "60%";
@@ -1795,7 +2354,7 @@
         const cibilBar = document.getElementById('cibilProgressBar');
         if (cibilBadge) {
           cibilBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold transition-all duration-500";
-          cibilBadge.innerText = data.cibil_score_display || "CIBIL Score: 680 → 715 (PROTECTED ✅)";
+          cibilBadge.innerText = data.cibil_score_display || "10% Auto-Sweep Active (Locked)";
         }
         if (cibilBar) {
           cibilBar.style.width = "100%";
@@ -1853,7 +2412,7 @@
         // 6. Refresh UI components
         renderDialogueStream();
         renderAccountsTable(accounts);
-        showToast("Merchant QR Auto-Sweep Activated!", `CIBIL Protected (715). ₹${Number(data.locked_mandate_inr).toLocaleString()} locked into settlement sweep.`);
+        showToast("Merchant QR Auto-Sweep Activated!", `Auto-Sweep Active. ₹${Number(data.locked_mandate_inr).toLocaleString()} locked into settlement sweep.`);
 
       } catch (err) {
         showToast("Error", err.message);
@@ -1885,7 +2444,7 @@
         await loadAllAccounts();
         await fetchMetrics();
         renderConsoleDetails();
-        showToast("Settlement Received", `Payment captured on YesBank VPA! NBFC case status updated to PAID.`);
+        showToast("Settlement Received", `Simulated payment captured into designated escrow account. NBFC case status updated to PAID.`);
       } catch (err) {
         alert("Payment error: " + err);
       }
@@ -1993,7 +2552,7 @@
         alert("Borrower account does not have an attached Hospicash Rider.");
         return;
       }
-      showToast("Hospicash Claim Submitted", "Claim packet CLM-HC-99281 auto-dispatched to HDFC ERGO Underwriting Desk.");
+      showToast("Hospicash Claim Submitted", "Claim packet CLM-HC-99281 auto-dispatched to Insurance Partner Underwriting Desk.");
       openBorrowerPhoneToTab('whatsapp');
     }
 

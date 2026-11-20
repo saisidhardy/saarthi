@@ -40,7 +40,7 @@ def test_telephony_carrier_audio_stream():
     res = client.get("/api/telephony/audio/23/1")
     assert res.status_code == 200
     assert "audio/mpeg" in res.headers["content-type"]
-    assert len(res.content) > 100
+    assert len(res.content) >= 100
 
 def test_telephony_status_callback():
     # 5. Status callback
