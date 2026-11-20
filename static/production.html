@@ -575,11 +575,6 @@
         <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-500/30 text-teal-200 font-mono">API v1</span>
       </button>
 
-      <button onclick="openPitchModal()" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-white font-semibold text-left transition mt-1.5" style="background-color: var(--indigo); border: 1px solid rgba(255, 255, 255, 0.25);">
-        <span class="flex items-center gap-2.5"><i class="fa-solid fa-microphone text-amber-300"></i> 3-Min Executive Pitch</span>
-        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-400/30 text-amber-200 font-mono">DECK</span>
-      </button>
-
       <a href="/inspect" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-indigo-300 hover:bg-indigo-950/40 font-semibold text-left transition border border-indigo-500/20 bg-indigo-950/20 mt-2 block">
         <i class="fa-solid fa-code-compare text-indigo-400"></i>
         <span>Firewall Inspection</span>
@@ -650,12 +645,6 @@
         <button onclick="openIntegrationsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/30 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition" title="LMS Webhooks & BYOT Telephony Connectors">
           <i class="fa-solid fa-plug-circle-bolt text-teal-400"></i>
           <span class="hidden lg:inline">Connectors</span>
-        </button>
-
-        <!-- 3-MIN EXECUTIVE PITCH BUTTON -->
-        <button onclick="openPitchModal()" class="px-3 py-1.5 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-md" style="background-color: var(--indigo); border: 1px solid rgba(255, 255, 255, 0.25);" title="3-Minute Executive Pitch Deck">
-          <i class="fa-solid fa-microphone text-amber-300"></i>
-          <span class="hidden sm:inline">3-Min Pitch</span>
         </button>
 
         <!-- TOGGLE USER SIDEBAR BUTTON (Prominent, High-Contrast) -->
@@ -3472,140 +3461,6 @@
         if (btn) btn.disabled = false;
       }
     }
-
-    // ========================================================
-    // 3-MINUTE EXECUTIVE PRESENTATION PITCH DECK
-    // ========================================================
-    let pitchSlideIndex = 0;
-    let pitchSeconds = 180;
-    let pitchInterval = null;
-    let pitchRunning = false;
-
-    const pitchSlides = [
-      {
-        badge: "MINUTE 0:00 – 0:45 · THE REGULATORY TRAP",
-        title: "The Collections Crisis in Indian Retail Credit",
-        bullet1: "<strong>Massive Early Delinquency:</strong> Indian retail lending is over ₹40 Lakh Crore. Over 4 million loans roll into 1–30 DPD each quarter.",
-        bullet2: "<strong>The Regulatory Squeeze:</strong> RBI's Fair Practices Code (FPC) and Digital Lending Guidelines have turned rogue recovery agencies into catastrophic legal liabilities.",
-        bullet3: "<strong>The Truecaller Abyss:</strong> Traditional tele-callers suffer 50% monthly attrition, while their numbers get Truecaller spam-blocked within 48 hours—dropping connect rates below 15%.",
-        quote: "Lenders do not have a collections problem; they have an agency compliance, cost, and contactability failure."
-      },
-      {
-        badge: "MINUTE 0:45 – 1:30 · INVISIBLE HEADLESS ARCHITECTURE",
-        title: "Headless AI Intelligence That Sits Inside Your Stack",
-        bullet1: "<strong>Zero CRM Replacement:</strong> Saarthi is NOT another portal tele-callers must log into. It sits headlessly behind FinnOne Neo and LeadSquared via event webhooks.",
-        bullet2: "<strong>BYOT (Bring Your Own Telephony):</strong> Plugs into the lender's existing Exotel or Tata SIP trunks. Calls go out using the lender's official 140-series DLT headers.",
-        bullet3: "<strong>Human-Grade Indic Voice:</strong> Speaks fluent, natural Hindi, Marathi, Telugu, Tamil, and English with sub-500ms latency, handling complex objections with dignity.",
-        quote: "Borrowers never realize they are speaking to software; compliance officers know every word is audited."
-      },
-      {
-        badge: "MINUTE 1:30 – 2:15 · THE COMPLIANCE SHIELD & EVIDENCE PACK",
-        title: "Deterministic Guardrails: Zero Hallucination Risk",
-        bullet1: "<strong>Propose-vs-Decide Loop:</strong> Generative AI only proposes options; our hardcoded, board-approved Policy Firewall decides and enforces rules.",
-        bullet2: "<strong>Zero Autonomous Waivers:</strong> Unauthorized interest waivers are mathematically blocked at the yaml policy layer. Extensions are clamped strictly to ≤7 days.",
-        bullet3: "<strong>Cryptographic Evidence Packs:</strong> Every call produces an exportable SHA-256 tamper-evident JSON & PDF pack with audio recordings, ready for RBI ombudsman audits.",
-        quote: "No rogue tele-callers. No abusive language. 100% auditable proof for every borrower touchpoint."
-      },
-      {
-        badge: "MINUTE 2:15 – 3:00 · THE BUSINESS CASE & ROI",
-        title: "Slashing Roll Rates with Superior Unit Economics",
-        bullet1: "<strong>220 bps Roll-Rate Reduction:</strong> Resolves early delinquencies before they roll into 30+ DPD write-offs, saving ₹42.5 Lakhs per 10,000 delinquent accounts.",
-        bullet2: "<strong>60% Cost Reduction vs BPOs:</strong> Replaces low-productivity human agency seats at a fraction of the cost, operating round-the-clock within legal 08:00–19:00 hours.",
-        bullet3: "<strong>Predictable Enterprise Pricing:</strong> ₹24L annual private VPC license + ₹75 per cured account. Zero telephony markup on customer's own SIP trunk.",
-        quote: "Saarthi turns collections from a high-risk operational cost center into a compliant, automated recovery engine."
-      }
-    ];
-
-    function openPitchModal() {
-      const modal = document.getElementById('pitchModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        renderPitchSlide(0);
-      }
-    }
-
-    function closePitchModal() {
-      const modal = document.getElementById('pitchModal');
-      if (modal) modal.classList.add('hidden');
-      pausePitchTimer();
-    }
-
-    function renderPitchSlide(idx) {
-      pitchSlideIndex = idx;
-      const s = pitchSlides[idx];
-      document.getElementById('pitchSlideBadge').innerText = s.badge;
-      document.getElementById('pitchSlideTitle').innerText = s.title;
-      document.getElementById('pitchSlideBullet1').innerHTML = s.bullet1;
-      document.getElementById('pitchSlideBullet2').innerHTML = s.bullet2;
-      document.getElementById('pitchSlideBullet3').innerHTML = s.bullet3;
-      document.getElementById('pitchSlideQuote').innerText = `"${s.quote}"`;
-
-      for (let i = 0; i < 4; i++) {
-        const dot = document.getElementById(`pitchDot-${i}`);
-        if (dot) {
-          if (i === idx) dot.className = "w-8 h-2 rounded-full transition-all bg-indigo-600";
-          else dot.className = "w-2.5 h-2 rounded-full transition-all bg-slate-300 hover:bg-slate-400 cursor-pointer";
-        }
-      }
-    }
-
-    function nextPitchSlide() {
-      if (pitchSlideIndex < 3) renderPitchSlide(pitchSlideIndex + 1);
-    }
-
-    function prevPitchSlide() {
-      if (pitchSlideIndex > 0) renderPitchSlide(pitchSlideIndex - 1);
-    }
-
-    function togglePitchTimer() {
-      if (pitchRunning) {
-        pausePitchTimer();
-      } else {
-        startPitchTimer();
-      }
-    }
-
-    function startPitchTimer() {
-      pitchRunning = true;
-      const btn = document.getElementById('pitchTimerToggleBtn');
-      if (btn) btn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
-
-      pitchInterval = setInterval(() => {
-        if (pitchSeconds > 0) {
-          pitchSeconds--;
-          updatePitchTimerDisplay();
-          // Auto-advance slides at 45-second intervals
-          const elapsed = 180 - pitchSeconds;
-          const targetSlide = Math.min(3, Math.floor(elapsed / 45));
-          if (targetSlide !== pitchSlideIndex) {
-            renderPitchSlide(targetSlide);
-          }
-        } else {
-          pausePitchTimer();
-        }
-      }, 1000);
-    }
-
-    function pausePitchTimer() {
-      pitchRunning = false;
-      clearInterval(pitchInterval);
-      const btn = document.getElementById('pitchTimerToggleBtn');
-      if (btn) btn.innerHTML = `<i class="fa-solid fa-play"></i> Start`;
-    }
-
-    function resetPitchTimer() {
-      pausePitchTimer();
-      pitchSeconds = 180;
-      updatePitchTimerDisplay();
-      renderPitchSlide(0);
-    }
-
-    function updatePitchTimerDisplay() {
-      const mins = Math.floor(pitchSeconds / 60);
-      const secs = pitchSeconds % 60;
-      const el = document.getElementById('pitchTimerDisplay');
-      if (el) el.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
   </script>
 
   <!-- ======================================================== -->
@@ -3799,97 +3654,6 @@
         <button onclick="closeIntegrationsModal()" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-200 hover:bg-slate-300 transition">
           Close
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- 3-MINUTE EXECUTIVE PRESENTATION PITCH DECK MODAL -->
-  <!-- ======================================================== -->
-  <div id="pitchModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="rounded-2xl w-full max-w-3xl flex flex-col shadow-2xl overflow-hidden" style="background-color: var(--card); color: var(--ink); border: 1px solid var(--line);">
-      <!-- Pitch Header with 3:00 Timer -->
-      <div class="px-6 py-4 border-b flex items-center justify-between" style="border-color: var(--line); background-color: var(--cream);">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style="background-color: var(--indigo);">
-            <i class="fa-solid fa-microphone text-lg"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="text-base font-bold" style="color: var(--indigo);">Saarthi: 3-Minute Executive Presentation</h3>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">EXECUTIVE PITCH</span>
-            </div>
-            <p class="text-xs" style="color: var(--muted);">Structured 4-beat presentation script tailored for CROs, Collections Heads, and Investors</p>
-          </div>
-        </div>
-
-        <!-- Timer Controls -->
-        <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-300 shadow-sm">
-          <i class="fa-regular fa-clock text-amber-600"></i>
-          <span id="pitchTimerDisplay" class="font-mono font-bold text-sm text-slate-800">03:00</span>
-          <button id="pitchTimerToggleBtn" onclick="togglePitchTimer()" class="px-2.5 py-1 text-[11px] font-bold rounded bg-indigo-700 text-white hover:bg-indigo-800 transition">
-            <i class="fa-solid fa-play"></i> Start
-          </button>
-          <button onclick="resetPitchTimer()" class="p-1 text-slate-400 hover:text-slate-600 transition" title="Reset Timer">
-            <i class="fa-solid fa-rotate-right text-xs"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Slide Body -->
-      <div class="p-8 space-y-6">
-        <div class="space-y-2">
-          <span id="pitchSlideBadge" class="text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded" style="background-color: var(--purple-tint); color: var(--purple-text);">
-            MINUTE 0:00 – 0:45 · THE REGULATORY TRAP
-          </span>
-          <h2 id="pitchSlideTitle" class="text-2xl font-bold tracking-tight" style="color: var(--indigo);">
-            The Collections Crisis in Indian Retail Credit
-          </h2>
-        </div>
-
-        <!-- Slide Bullets -->
-        <div class="space-y-3.5 text-sm leading-relaxed" style="color: var(--ink);">
-          <div class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50">
-            <i class="fa-solid fa-circle-dot text-indigo-600 mt-1"></i>
-            <p id="pitchSlideBullet1"></p>
-          </div>
-          <div class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50">
-            <i class="fa-solid fa-circle-dot text-indigo-600 mt-1"></i>
-            <p id="pitchSlideBullet2"></p>
-          </div>
-          <div class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50">
-            <i class="fa-solid fa-circle-dot text-indigo-600 mt-1"></i>
-            <p id="pitchSlideBullet3"></p>
-          </div>
-        </div>
-
-        <!-- Speaker's Key Cue/Takeaway -->
-        <div class="p-4 rounded-xl border" style="background-color: var(--teal-tint); border-color: var(--teal); color: var(--teal-text);">
-          <div class="text-[10px] font-black uppercase tracking-wider mb-1 opacity-80">Presenter Takeaway Cue:</div>
-          <p id="pitchSlideQuote" class="font-medium text-xs italic"></p>
-        </div>
-      </div>
-
-      <!-- Pitch Navigation Footer -->
-      <div class="px-6 py-4 border-t flex items-center justify-between" style="border-color: var(--line); background-color: var(--cream);">
-        <div class="flex items-center gap-2">
-          <span id="pitchDot-0" onclick="renderPitchSlide(0)" class="w-8 h-2 rounded-full transition-all bg-indigo-600"></span>
-          <span id="pitchDot-1" onclick="renderPitchSlide(1)" class="w-2.5 h-2 rounded-full transition-all bg-slate-300 hover:bg-slate-400 cursor-pointer"></span>
-          <span id="pitchDot-2" onclick="renderPitchSlide(2)" class="w-2.5 h-2 rounded-full transition-all bg-slate-300 hover:bg-slate-400 cursor-pointer"></span>
-          <span id="pitchDot-3" onclick="renderPitchSlide(3)" class="w-2.5 h-2 rounded-full transition-all bg-slate-300 hover:bg-slate-400 cursor-pointer"></span>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button onclick="prevPitchSlide()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-200 hover:bg-slate-300 transition">
-            <i class="fa-solid fa-chevron-left mr-1"></i> Prev
-          </button>
-          <button onclick="nextPitchSlide()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white transition" style="background-color: var(--indigo);">
-            Next <i class="fa-solid fa-chevron-right ml-1"></i>
-          </button>
-          <button onclick="closePitchModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition ml-2">
-            Done
-          </button>
-        </div>
       </div>
     </div>
   </div>

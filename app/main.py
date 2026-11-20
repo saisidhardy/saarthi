@@ -1241,6 +1241,50 @@ def api_coach_advisor_handoff(req: CoachHandoffRequest):
             
     return handoff_ticket
 
+class CoachIncentiveMessageRequest(BaseModel):
+    persona_id: str
+    channel: Optional[Literal["whatsapp", "sms"]] = "whatsapp"
+    language: Optional[str] = "en"
+    custom_note: Optional[str] = ""
+
+@app.post("/api/coach/send-incentive-message")
+def send_coach_incentive_message(req: CoachIncentiveMessageRequest):
+    analysis = run_full_cashflow_coach(req.persona_id)
+    if analysis.get("consent_required"):
+        raise HTTPException(status_code=403, detail="Borrower consent required before sending cash-flow insights.")
+        
+    gains = analysis.get("borrower_repayment_gains", {})
+    msg_key = f"whatsapp_message_{req.language}"
+    msg_text = gains.get(msg_key) or gains.get("whatsapp_message_en", "")
+    
+    persona_case_map = {"kirana_owner": "1", "salaried_household": "2", "agri_trader": "25"}
+    case_id = persona_case_map.get(req.persona_id)
+    if case_id:
+        case = get_case(case_id, workflow_id="collections")
+        if case:
+            case.add_trace(
+                agent="CashFlowCoach",
+                action="Borrower Repayment Incentive Dispatched",
+                summary=f"Sent positive-gain notification to {case.customer_name} via {req.channel.upper()}. Savings highlighted: ₹{gains.get('immediate_fee_saved_inr', 0):,.0f} fee avoidance, ₹{gains.get('accelerated_interest_saved_inr', 0):,.0f} interest saved.",
+                badge="Incentive Insight"
+            )
+            case.data["last_incentive_message"] = msg_text
+            case.data["whatsapp_message"] = msg_text
+            save_case(case)
+            
+    return {
+        "status": "success",
+        "persona_id": req.persona_id,
+        "channel": req.channel,
+        "language": req.language,
+        "message": msg_text,
+        "immediate_saved_inr": gains.get("immediate_fee_saved_inr"),
+        "accelerated_interest_saved_inr": gains.get("accelerated_interest_saved_inr"),
+        "tenure_months_saved": gains.get("tenure_months_saved"),
+        "projected_cibil": gains.get("projected_cibil_score"),
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
 # ==========================================
 # 17. HEADLESS LMS & BYOT TELEPHONY INTEGRATION (v1 API)
 # ==========================================
