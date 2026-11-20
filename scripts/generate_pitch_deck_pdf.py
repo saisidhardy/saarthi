@@ -1,0 +1,570 @@
+import os, subprocess
+
+html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Saarthi Executive Pitch Deck (3-Minute Presentation)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+  @page {
+    size: 16in 9in;
+    margin: 0;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #FFF9F0;
+    color: #2B2438;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 16in;
+    height: 9in;
+    padding: 0.65in 0.8in;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #FFF9F0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Header Box */
+  .slide-header {
+    background: #FFFFFF;
+    border: 1.5px solid #F0E6D2;
+    border-radius: 16px;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-titles h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #2A2F8F;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-titles p {
+    font-size: 13px;
+    color: #7A6F8A;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .badge-timer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #EFE8FD;
+    color: #5B21B6;
+    border: 1px solid #DDD6FE;
+  }
+  .slide-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2A2F8F;
+    background: #FFF9F0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #F0E6D2;
+  }
+
+  /* Content area */
+  .slide-content {
+    flex: 1;
+    margin: 20px 0;
+    display: flex;
+    gap: 24px;
+  }
+
+  /* Cards */
+  .card {
+    background: #FFFFFF;
+    border: 1.5px solid #F0E6D2;
+    border-radius: 18px;
+    padding: 24px 28px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .card.highlight-teal {
+    border-color: #0F9D8A;
+  }
+  .card.highlight-indigo {
+    border-color: #2A2F8F;
+  }
+  .card-tag {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .tag-red { color: #E2574C; }
+  .tag-teal { color: #0F9D8A; }
+  .tag-purple { color: #8B5CF6; }
+  .tag-saffron { color: #D97706; }
+  .tag-indigo { color: #2A2F8F; }
+
+  .card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #2A2F8F;
+    margin-bottom: 14px;
+    letter-spacing: -0.3px;
+  }
+  .card ul {
+    list-style: none;
+    space-y: 12px;
+  }
+  .card li {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #2B2438;
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 18px;
+  }
+  .card li::before {
+    content: "•";
+    color: #2A2F8F;
+    font-weight: bold;
+    font-size: 18px;
+    position: absolute;
+    left: 0;
+    top: -2px;
+  }
+  .card li strong {
+    color: #1E1B4B;
+  }
+
+  /* Footer */
+  .slide-footer {
+    background: #FFFFFF;
+    border: 1.5px solid #F0E6D2;
+    border-radius: 12px;
+    padding: 10px 24px;
+    font-size: 11.5px;
+    color: #7A6F8A;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .slide-footer strong {
+    font-style: normal;
+    color: #2B2438;
+  }
+
+  /* Metric cards */
+  .metric-val {
+    font-size: 32px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -1px;
+    margin-bottom: 4px;
+  }
+  .metric-label {
+    font-size: 12px;
+    color: #7A6F8A;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* Presenter Voiceover Box */
+  .voiceover-box {
+    background: #FAF7F0;
+    border: 1px dashed #DED6C4;
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-top: 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #4A4458;
+  }
+  .voiceover-box strong {
+    color: #2A2F8F;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 1: TITLE & EXECUTIVE SUMMARY -->
+  <!-- ========================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-titles">
+        <h2>
+          <span>SAARTHI</span>
+          <span style="font-weight: 400; color: #7A6F8A;">|</span>
+          <span style="color: #0F9D8A;">Multi-Lender AI Recovery Cloud</span>
+        </h2>
+        <p>The Auditable AI Collections Teammate & Headless Recovery Engine for Indian Regulated Lenders</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="badge-timer">0:00 – 0:30 · INTRO</span>
+        <span class="slide-num">1 / 6</span>
+      </div>
+    </div>
+
+    <div class="slide-content" style="flex-direction: column; gap: 18px;">
+      <div class="card highlight-indigo" style="padding: 28px 32px;">
+        <span class="card-tag tag-teal">Executive Thesis</span>
+        <h3 style="font-size: 26px; margin-bottom: 12px;">Automating Early Delinquency (1–30 DPD) with Zero Regulatory & Hallucination Risk</h3>
+        <p style="font-size: 14.5px; line-height: 1.7; color: #4A4458; margin-bottom: 16px;">
+          Saarthi operates as an <strong>invisible headless intelligence middleware</strong> sitting directly behind core loan management systems (<strong>FinnOne Neo</strong>, <strong>Pennant</strong>, <strong>LeadSquared</strong>). Outreach originates via direct <strong>BYOT SIP trunking</strong> (Exotel/Tata) on the lender's official 140-series registered DLT header with <strong>Truecaller Verified Business</strong> status—conducted in <strong>8 Indic languages</strong> at sub-500ms latency.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 8px;">
+          <div style="background: #FFF9F0; padding: 14px 18px; border-radius: 12px; border: 1px solid #F0E6D2;">
+            <div class="metric-val" style="color: #2A2F8F;">₹40+ LAKH CR</div>
+            <div class="metric-label">Retail Credit TAM</div>
+          </div>
+          <div style="background: #FFF9F0; padding: 14px 18px; border-radius: 12px; border: 1px solid #F0E6D2;">
+            <div class="metric-val" style="color: #0F9D8A;">220 BPS</div>
+            <div class="metric-label">Roll-Rate Reduction</div>
+          </div>
+          <div style="background: #FFF9F0; padding: 14px 18px; border-radius: 12px; border: 1px solid #F0E6D2;">
+            <div class="metric-val" style="color: #D97706;">60% SAVINGS</div>
+            <div class="metric-label">vs. Agency Call Centers</div>
+          </div>
+          <div style="background: #FFF9F0; padding: 14px 18px; border-radius: 12px; border: 1px solid #F0E6D2;">
+            <div class="metric-val" style="color: #8B5CF6;">100% AUDIT</div>
+            <div class="metric-label">SHA-256 Defensibility</div>
+          </div>
+        </div>
+
+        <div class="voiceover-box">
+          <strong>Presenter Cue (0:00 – 0:30):</strong> "Good morning. Indian retail credit has crossed ₹40 Lakh Crore, but early delinquency recovery is broken. Over 4 million borrowers roll into 1–30 DPD each quarter. Saarthi is the autonomous AI collections teammate built specifically for regulated Indian credit, sitting headlessly behind core LMS systems to cut roll rates by 220 basis points."
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <strong>Source & Legal Basis:</strong> RBI Report on Trend and Progress of Banking in India (2024–25); CRIF High Mark Retail Lending Pulse; TransUnion CIBIL Indian Retail Credit Health Index.
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 2: THE COLLECTIONS CRISIS -->
+  <!-- ========================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-titles">
+        <h2>The Collections Crisis & The Regulatory Squeeze</h2>
+        <p>Why outsourced human recovery agencies have become the Chief Risk Officer's greatest liability</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="badge-timer">0:00 – 0:30 · PROBLEM</span>
+        <span class="slide-num">2 / 6</span>
+      </div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card">
+        <span class="card-tag tag-red">Operational Collapse</span>
+        <h3>Agency Turnover & Costs</h3>
+        <ul>
+          <li><strong>50% Monthly Agent Attrition:</strong> Recovery BPOs suffer constant agent churn, creating undertrained callers and zero institutional memory.</li>
+          <li><strong>₹18,000–₹22,000 Seat Cost:</strong> High human overhead with low recovery efficiency and heavy management reconciliation burdens.</li>
+          <li><strong>Disputed PTP Tracking:</strong> Manual call logging creates massive friction in verifying borrower promises and agent attribution.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="card-tag tag-saffron">Contactability Abyss</span>
+        <h3>Truecaller Spam Blocking</h3>
+        <ul>
+          <li><strong>Spam Tagging in 48 Hours:</strong> Dialler numbers used by third-party agencies get reported and flagged as "Spam / Recovery" rapidly.</li>
+          <li><strong>Pick-Up Rates &lt;15%:</strong> Borrowers in 1–30 DPD actively screen and evade unknown or red-badged calls, letting loans roll into default.</li>
+          <li><strong>Wasted Dialler Cycles:</strong> Telephony dial attempts burn carrier cost with zero conversational connect or engagement.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="card-tag tag-red">Regulatory Threat</span>
+        <h3>RBI Fair Practices Penalties</h3>
+        <ul>
+          <li><strong>Zero Harassment Tolerance:</strong> RBI Fair Practices Code & Digital Lending Guidelines penalize unrecorded coercion or abusive language.</li>
+          <li><strong>Strict 08:00–19:00 Window:</strong> Outreach outside permitted daylight hours triggers severe supervisory actions and multi-crore fines.</li>
+          <li><strong>License Freezes:</strong> Non-compliant recovery practices expose banks to regulatory halts on digital loan onboarding.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="voiceover-box" style="margin-bottom: 12px;">
+      <strong>Presenter Cue (Voiceover):</strong> "Lenders don't have a borrower willingness-to-pay problem; they have an agency contactability and compliance crisis. 50% agent turnover, 15% pickup rates from Truecaller spam blocking, and strict RBI regulations make traditional agencies a high-cost regulatory trap."
+    </div>
+
+    <div class="slide-footer">
+      <strong>Source & Legal Basis:</strong> RBI Fair Practices Code for NBFCs (Master Direction DNBR.PD.008); TRAI Telecom Commercial Communications Customer Preference Regulations (TCCCPR); CRIF High Mark.
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 3: THE SOLUTION – HEADLESS LMS & INDIC VOICE -->
+  <!-- ========================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-titles">
+        <h2>The Headless Solution: Invisible Middleware & Indic Voice</h2>
+        <p>Plugs directly behind FinnOne & LeadSquared while originating calls via BYOT registered SIP trunks</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="badge-timer">0:30 – 1:05 · ARCHITECTURE</span>
+        <span class="slide-num">3 / 6</span>
+      </div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card highlight-teal">
+        <span class="card-tag tag-teal">Zero Portal Friction</span>
+        <h3>Headless LMS Integration & BYOT</h3>
+        <ul>
+          <li><strong>Webhook Event Ingestion (<code>/api/v1/cases/sync</code>):</strong> Ingests bounced accounts in real-time from FinnOne Neo, Pennant, or LeadSquared without manual file uploads.</li>
+          <li><strong>BYOT (Bring Your Own Telephony):</strong> Direct SIP trunking via Exotel, Tata Tele, or Airtel IQ. Eliminates 60% of telephony COGS with zero reseller markup.</li>
+          <li><strong>140-Series DLT Header (<code>140921-BAJAJ</code>):</strong> Originates from the bank's registered corporate sender ID with <strong>Truecaller Verified Business</strong> status—doubling call connect rates.</li>
+          <li><strong>AWS Mumbai (<code>ap-south-1</code>) VPC:</strong> Runs inside the lender's private cloud perimeter. Zero borrower PII leaves India, fully satisfying the DPDP Act.</li>
+        </ul>
+      </div>
+
+      <div class="card highlight-indigo">
+        <span class="card-tag tag-purple">Sarvam AI Stack</span>
+        <h3>Human-Grade Indic Conversational Voice</h3>
+        <ul>
+          <li><strong>8 Indian Languages Supported:</strong> Speaks natural Hindi, Marathi, Telugu, Tamil, Kannada, Bengali, Gujarati, and Indian English.</li>
+          <li><strong>Sub-500ms Turn Latency:</strong> Real-time streaming speech-to-text and neural voice synthesis enable natural interruptions and fluid negotiation.</li>
+          <li><strong>Code-Mixed Dialects:</strong> Deeply handles conversational Hinglish and colloquial regional phrasing (festival cashflows, crop harvests, salary dates).</li>
+          <li><strong>Empathetic De-escalation:</strong> Never raises voice or threatens; maintains professional, dignity-first customer engagement at all times.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="voiceover-box" style="margin-bottom: 12px;">
+      <strong>Presenter Cue (0:30 – 1:05):</strong> "Saarthi is not another portal callers must log into. It sits headlessly behind FinnOne or LeadSquared. Using Bring Your Own Telephony, calls originate from your bank's own 140-series registered numbers with Truecaller Verified badges, speaking fluent regional languages at sub-500ms speed."
+    </div>
+
+    <div class="slide-footer">
+      <strong>Source & Legal Basis:</strong> NPCI National Automated Clearing House (NACH) Procedural Guidelines; Sarvam AI Indic Benchmarks; Saarthi Architecture Specification v2.1.
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 4: THE COMPLIANCE MOAT -->
+  <!-- ========================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-titles">
+        <h2>The Compliance Moat: Deterministic Policy Firewall</h2>
+        <p>Dual-Loop Propose-vs-Decide architecture eliminates generative AI hallucination risk and regulatory exposure</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="badge-timer">1:05 – 1:40 · THE MOAT</span>
+        <span class="slide-num">4 / 6</span>
+      </div>
+    </div>
+
+    <div class="slide-content" style="flex-direction: column; gap: 14px;">
+      <div class="card" style="padding: 18px 24px;">
+        <span class="card-tag tag-indigo">Deterministic Guardrail</span>
+        <h3 style="font-size: 18px; margin-bottom: 6px;">Propose-vs-Decide Dual-Loop Architecture</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #2B2438;">
+          Generative AI is strictly quarantined to speech understanding. It only proposes repayment options. Our board-approved <strong>Deterministic Policy Firewall</strong> (<code>collections_rules.yaml</code>) strictly decides and clamps all agreements. Autonomous loan waivers are mathematically blocked (clamped to ₹0); repayment extensions are capped strictly at $\le 7$ days.
+        </p>
+      </div>
+
+      <div class="card" style="padding: 18px 24px;">
+        <span class="card-tag tag-saffron">Fair Recovery Practices</span>
+        <h3 style="font-size: 18px; margin-bottom: 6px;">Strict 08:00–19:00 Window & Automated Hospicash Relief</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #2B2438;">
+          The engine mathematically rejects any call dispatch outside the RBI-mandated 08:00–19:00 IST window. Anti-coercion tripwires monitor live transcripts for prohibited threat words. Disclosures of hospitalization, critical illness, or bereavement instantly initiate a <strong>Sensitive Pause</strong> and auto-route insurance claims under the borrower's Hospicash rider.
+        </p>
+      </div>
+
+      <div class="card highlight-teal" style="padding: 18px 24px;">
+        <span class="card-tag tag-teal">Ombudsman Defensibility</span>
+        <h3 style="font-size: 18px; margin-bottom: 6px;">Tamper-Evident SHA-256 Cryptographic Evidence Pack</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #2B2438;">
+          Every borrower call produces an exportable, cryptographic SHA-256 evidence package containing verbatim transcripts, dual-channel audio recordings, policy rule citations, and timestamped decision traces—instantly verifiable before RBI Ombudsman inquiries.
+        </p>
+      </div>
+    </div>
+
+    <div class="voiceover-box" style="margin-bottom: 12px;">
+      <strong>Presenter Cue (1:05 – 1:40):</strong> "Generative AI only proposes options; our hardcoded policy engine decides and enforces rules. Unauthorized interest waivers are mathematically blocked. Medical emergencies trigger sensitive relief riders. Every call produces a cryptographic SHA-256 Evidence Pack ready for RBI ombudsman audits."
+    </div>
+
+    <div class="slide-footer">
+      <strong>Source & Legal Basis:</strong> RBI Master Direction on Digital Lending (Sec 5.2); ISO/IEC 27001 Audit Standard; Saarthi Deterministic Policy Engine (policies/collections_rules.yaml).
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 5: CASH-FLOW COACH & REPAYMENT GAINS -->
+  <!-- ========================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-titles">
+        <h2>Borrower Financial Health: Cash-Flow Check-Up & Incentives</h2>
+        <p>Consent-first Account Aggregator analytics turning 90 days of transactions into positive borrower savings</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="badge-timer">1:40 – 2:15 · INCENTIVES</span>
+        <span class="slide-num">5 / 6</span>
+      </div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card">
+        <span class="card-tag tag-teal">Instant Cash Saved</span>
+        <div class="metric-val" style="color: #0F9D8A;">Save ₹840.00</div>
+        <h3>Penalty Elimination</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #4A4458;">
+          Avoids ₹590 eNACH mandate return charge plus ₹250 penal late fee by clearing dues on or before the borrower's high-liquidity day.
+        </p>
+      </div>
+
+      <div class="card">
+        <span class="card-tag tag-purple">Early Debt Freedom</span>
+        <div class="metric-val" style="color: #2A2F8F;">Save ₹2,840</div>
+        <h3>Micro-Prepayment Cut</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #4A4458;">
+          Adding just ₹500/week cuts loan tenure by 1–2 months, slashing total interest paid without putting strain on basic household essentials.
+        </p>
+      </div>
+
+      <div class="card">
+        <span class="card-tag tag-saffron">Credit Upgrades</span>
+        <div class="metric-val" style="color: #D97706;">748+ CIBIL</div>
+        <h3>Credit Growth Protection</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #4A4458;">
+          Prevents a 40–60 point bureau penalty, unlocking eligibility for pre-approved MSME working capital top-ups of ₹50,000 at 2.5% lower APR.
+        </p>
+      </div>
+    </div>
+
+    <!-- WhatsApp Box -->
+    <div class="card highlight-teal" style="flex: none; padding: 18px 24px; margin-bottom: 12px;">
+      <span class="card-tag tag-teal">1-Click WhatsApp Notification (English & Hindi)</span>
+      <p style="font-size: 12.5px; line-height: 1.6; color: #2B2438;">
+        "Hi Sunita, clearing your overdue payment by Monday saves you ₹840 in bank bounce charges, cuts ₹2,840 in interest if you pay ₹500 extra weekly, and protects your 748+ CIBIL score for a pre-approved ₹50,000 working capital top-up. Tap here to pay safely: saarthi.embarko.app/pay/kirana_owner"
+      </p>
+    </div>
+
+    <div class="voiceover-box" style="margin-bottom: 12px;">
+      <strong>Presenter Cue (1:40 – 2:15):</strong> "We replace threats with positive financial gains. Our Cash-Flow Coach turns 90 days of Account Aggregator bank transactions into clear incentives: Save ₹840 in bounce fees, cut ₹2,840 in interest via micro-prepayments, and protect a 745+ CIBIL score for a ₹50,000 top-up credit line. Dispatched directly via WhatsApp in English and Hindi."
+    </div>
+
+    <div class="slide-footer">
+      <strong>Source & Legal Basis:</strong> RBI Account Aggregator Master Directions; SIDBI MSME Credit Health Index; Saarthi Cash-Flow Engine (/policies/coach.yaml).
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SLIDE 6: FOUR FITS & ENTERPRISE BUSINESS CASE -->
+  <!-- ========================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-titles">
+        <h2>Four Fits Strategy & Enterprise Business Case</h2>
+        <p>Superior software gross margins combined with an irresistible ROI for retail lending institutions</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="badge-timer">2:15 – 3:00 · ROI & CLOSE</span>
+        <span class="slide-num">6 / 6</span>
+      </div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card highlight-indigo">
+        <span class="card-tag tag-indigo">The Four Fits Matrix</span>
+        <h3>Strategic Architecture Alignment</h3>
+        <ul>
+          <li><strong>Product <-> Channel Fit Solved:</strong> Decoupled from standalone portal to invisible headless API. Deploys inside the lender's AWS Mumbai (<code>ap-south-1</code>) VPC, eliminating Infosec and DPDP objections.</li>
+          <li><strong>Channel <-> Model Fit Solved:</strong> Replaced low-margin per-minute billing with predictable enterprise licensing. BYOT direct SIP trunking eliminates 60% of telephony COGS, protecting &gt;80% software gross margins.</li>
+          <li><strong>Model <-> Market Fit:</strong> Outcompetes human BPO seat costs (₹20,000/mo) while delivering 100% compliance auditability.</li>
+        </ul>
+      </div>
+
+      <div class="card highlight-teal">
+        <span class="card-tag tag-teal">Empirical ROI (Per 10,000 Loans / Mo)</span>
+        <h3>Enterprise Business Case & Pricing</h3>
+        <ul>
+          <li><strong>220 bps Roll-Rate Reduction:</strong> Prevents ₹42.5 Lakhs in bad-debt provisions.</li>
+          <li><strong>60% Agency Cost Cut:</strong> Reduces collection agency OPEX from ₹2.1 Cr to ₹84 Lakhs/yr.</li>
+          <li><strong>Predictable Hybrid Pricing Tier:</strong>
+            <br>• <strong>Base Platform License:</strong> ₹24 Lakhs / yr (VPC deploy + Policy updates)
+            <br>• <strong>Success Surcharge:</strong> ₹75 per cured 1–30 DPD account (auto-reconciled)
+            <br>• <strong>Telephony:</strong> 0% Markup (Direct to Exotel/Tata at ~₹0.30/min)
+          </li>
+          <li><strong>48-Hour Sandbox Integration</strong> via standard REST webhooks.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="voiceover-box" style="margin-bottom: 12px;">
+      <strong>Presenter Cue (2:15 – 3:00):</strong> "For an NBFC managing 10,000 early delinquent loans a month, Saarthi prevents ₹42 Lakhs in bad-debt provisions while slashing collection agency costs by 60%. Priced simply at ₹24 Lakhs annual platform license plus ₹75 per cured account. We are live and ready for pilot integration within 48 hours. Thank you."
+    </div>
+
+    <div class="slide-footer">
+      <strong>Source & Legal Basis:</strong> Saarthi 25-Account Empirical Portfolio Simulation; TransUnion CIBIL Industry Roll-Rate Studies (Retail NBFC Segment, 2024).
+    </div>
+  </div>
+
+</body>
+</html>
+"""
+
+html_path = r"C:\Users\vajja\saarthi\saarthi_pitch_deck_3min.html"
+pdf_path = r"C:\Users\vajja\saarthi\saarthi_pitch_deck_3min.pdf"
+pdf_artifact_path = r"C:\Users\vajja\.gemini\antigravity\brain\378e15b6-7f1a-4039-8434-e51ecdd5dd6e\saarthi_pitch_deck_3min.pdf"
+
+with open(html_path, "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print(f"HTML presentation written to: {html_path}")
+
+chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+if not os.path.exists(chrome_path):
+    chrome_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+
+print(f"Using browser: {chrome_path}")
+cmd = [
+    chrome_path,
+    "--headless=new",
+    "--disable-gpu",
+    "--no-pdf-header-footer",
+    f"--print-to-pdf={pdf_path}",
+    html_path
+]
+
+res = subprocess.run(cmd, capture_output=True, text=True)
+print("Browser return code:", res.returncode)
+if os.path.exists(pdf_path):
+    size = os.path.getsize(pdf_path)
+    print(f"Successfully generated PDF: {pdf_path} ({size} bytes)")
+    import shutil
+    os.makedirs(os.path.dirname(pdf_artifact_path), exist_ok=True)
+    shutil.copy2(pdf_path, pdf_artifact_path)
+    print(f"Copied PDF to artifact dir: {pdf_artifact_path}")
+else:
+    print("PDF generation failed:", res.stderr)
