@@ -1,0 +1,638 @@
+{
+  "persona_id": "salaried_household",
+  "name": "Rajesh Sharma",
+  "account_type": "SAVINGS",
+  "bank_name": "Demo Bank Ltd.",
+  "masked_account": "XXXXXX8812",
+  "period_days": 90,
+  "label": "synthetic data; production uses RBI Account Aggregator consent via the lender",
+  "attributes": {
+    "business_type": "SALARIED",
+    "is_street_vendor": false,
+    "is_new_enterprise": false,
+    "has_udyam_registration": false,
+    "existing_loan": {
+      "lender_name": "Demo Lender A",
+      "lender_id": "demo_lender_a",
+      "loan_id": "LN-SALARY-1102",
+      "outstanding_principal_inr": 150000.0,
+      "interest_rate_apr": 18.0,
+      "remaining_tenure_months": 18,
+      "current_emi_inr": 9580.0,
+      "prepayment_charge_pct": 3.0,
+      "is_overdue": false,
+      "dpd": 0,
+      "has_hardship_flag": false
+    }
+  },
+  "transactions": [
+    {
+      "txn_id": "TXN-AA-1226",
+      "date": "2026-08-22",
+      "amount": 2388.92,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1227",
+      "date": "2026-08-23",
+      "amount": 745.12,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SWIGGY-ONLINE-FOOD-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1228",
+      "date": "2026-08-25",
+      "amount": 139.18,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1229",
+      "date": "2026-08-27",
+      "amount": 215.12,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1230",
+      "date": "2026-08-29",
+      "amount": 2703.07,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1231",
+      "date": "2026-08-29",
+      "amount": 1098.92,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "AMAZON-RETAIL-SHOPPING"
+    },
+    {
+      "txn_id": "TXN-AA-1232",
+      "date": "2026-08-30",
+      "amount": 1302.0,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "ZOMATO-DINING-OUT"
+    },
+    {
+      "txn_id": "TXN-AA-1233",
+      "date": "2026-08-31",
+      "amount": 140.94,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1234",
+      "date": "2026-09-01",
+      "amount": 62500.0,
+      "type": "CREDIT",
+      "mode": "NEFT",
+      "narration": "SALARY-CREDIT-TECH-INNOVATIONS-LTD"
+    },
+    {
+      "txn_id": "TXN-AA-1235",
+      "date": "2026-09-02",
+      "amount": 268.64,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1236",
+      "date": "2026-09-03",
+      "amount": 16500.0,
+      "type": "DEBIT",
+      "mode": "IMPS",
+      "narration": "HOUSE-RENT-TRANSFER-LANDLORD"
+    },
+    {
+      "txn_id": "TXN-AA-1237",
+      "date": "2026-09-04",
+      "amount": 219.39,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1238",
+      "date": "2026-09-05",
+      "amount": 9580.0,
+      "type": "DEBIT",
+      "mode": "NACH",
+      "narration": "DEMO-LENDER-A-PERSONAL-LOAN-EMI"
+    },
+    {
+      "txn_id": "TXN-AA-1239",
+      "date": "2026-09-05",
+      "amount": 2875.59,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1240",
+      "date": "2026-09-05",
+      "amount": 1114.52,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "AMAZON-RETAIL-SHOPPING"
+    },
+    {
+      "txn_id": "TXN-AA-1241",
+      "date": "2026-09-06",
+      "amount": 916.46,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SWIGGY-ONLINE-FOOD-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1242",
+      "date": "2026-09-08",
+      "amount": 3100.0,
+      "type": "DEBIT",
+      "mode": "BBPS",
+      "narration": "ELECTRICITY-WIFI-GAS-BILL-PAYMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1243",
+      "date": "2026-09-08",
+      "amount": 145.24,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1244",
+      "date": "2026-09-12",
+      "amount": 3384.68,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1245",
+      "date": "2026-09-13",
+      "amount": 1407.96,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "AMAZON-RETAIL-SHOPPING"
+    },
+    {
+      "txn_id": "TXN-AA-1246",
+      "date": "2026-09-15",
+      "amount": 260.5,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1247",
+      "date": "2026-09-16",
+      "amount": 262.35,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1248",
+      "date": "2026-09-18",
+      "amount": 165.08,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1249",
+      "date": "2026-09-19",
+      "amount": 2452.76,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1250",
+      "date": "2026-09-19",
+      "amount": 1271.87,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "AMAZON-RETAIL-SHOPPING"
+    },
+    {
+      "txn_id": "TXN-AA-1251",
+      "date": "2026-09-20",
+      "amount": 813.68,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SWIGGY-ONLINE-FOOD-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1252",
+      "date": "2026-09-21",
+      "amount": 187.77,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1253",
+      "date": "2026-09-22",
+      "amount": 120.57,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1254",
+      "date": "2026-09-25",
+      "amount": 238.6,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1255",
+      "date": "2026-09-26",
+      "amount": 2862.02,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1256",
+      "date": "2026-09-26",
+      "amount": 560.15,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SWIGGY-ONLINE-FOOD-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1257",
+      "date": "2026-09-29",
+      "amount": 125.76,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1258",
+      "date": "2026-09-30",
+      "amount": 208.4,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1259",
+      "date": "2026-10-01",
+      "amount": 62500.0,
+      "type": "CREDIT",
+      "mode": "NEFT",
+      "narration": "SALARY-CREDIT-TECH-INNOVATIONS-LTD"
+    },
+    {
+      "txn_id": "TXN-AA-1260",
+      "date": "2026-10-01",
+      "amount": 126.69,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1261",
+      "date": "2026-10-02",
+      "amount": 269.29,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1262",
+      "date": "2026-10-03",
+      "amount": 16500.0,
+      "type": "DEBIT",
+      "mode": "IMPS",
+      "narration": "HOUSE-RENT-TRANSFER-LANDLORD"
+    },
+    {
+      "txn_id": "TXN-AA-1263",
+      "date": "2026-10-03",
+      "amount": 3366.64,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1264",
+      "date": "2026-10-03",
+      "amount": 925.7,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "ZOMATO-DINING-OUT"
+    },
+    {
+      "txn_id": "TXN-AA-1265",
+      "date": "2026-10-05",
+      "amount": 9580.0,
+      "type": "DEBIT",
+      "mode": "NACH",
+      "narration": "DEMO-LENDER-A-PERSONAL-LOAN-EMI"
+    },
+    {
+      "txn_id": "TXN-AA-1266",
+      "date": "2026-10-05",
+      "amount": 209.58,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1267",
+      "date": "2026-10-08",
+      "amount": 3100.0,
+      "type": "DEBIT",
+      "mode": "BBPS",
+      "narration": "ELECTRICITY-WIFI-GAS-BILL-PAYMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1268",
+      "date": "2026-10-10",
+      "amount": 2484.08,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1269",
+      "date": "2026-10-10",
+      "amount": 1389.88,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "ZOMATO-DINING-OUT"
+    },
+    {
+      "txn_id": "TXN-AA-1270",
+      "date": "2026-10-12",
+      "amount": 237.85,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1271",
+      "date": "2026-10-13",
+      "amount": 268.93,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1272",
+      "date": "2026-10-17",
+      "amount": 2520.17,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1273",
+      "date": "2026-10-18",
+      "amount": 1465.78,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "BOOKMYSHOW-ENTERTAINMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1274",
+      "date": "2026-10-19",
+      "amount": 250.65,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1275",
+      "date": "2026-10-20",
+      "amount": 168.83,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1276",
+      "date": "2026-10-22",
+      "amount": 123.79,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1277",
+      "date": "2026-10-23",
+      "amount": 172.52,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1278",
+      "date": "2026-10-24",
+      "amount": 3237.22,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1279",
+      "date": "2026-10-25",
+      "amount": 1223.56,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "BOOKMYSHOW-ENTERTAINMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1280",
+      "date": "2026-10-28",
+      "amount": 124.42,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1281",
+      "date": "2026-10-30",
+      "amount": 212.89,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1282",
+      "date": "2026-10-31",
+      "amount": 3380.26,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1283",
+      "date": "2026-10-31",
+      "amount": 1176.4,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "AMAZON-RETAIL-SHOPPING"
+    },
+    {
+      "txn_id": "TXN-AA-1284",
+      "date": "2026-11-01",
+      "amount": 62500.0,
+      "type": "CREDIT",
+      "mode": "NEFT",
+      "narration": "SALARY-CREDIT-TECH-INNOVATIONS-LTD"
+    },
+    {
+      "txn_id": "TXN-AA-1285",
+      "date": "2026-11-02",
+      "amount": 216.99,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1286",
+      "date": "2026-11-03",
+      "amount": 16500.0,
+      "type": "DEBIT",
+      "mode": "IMPS",
+      "narration": "HOUSE-RENT-TRANSFER-LANDLORD"
+    },
+    {
+      "txn_id": "TXN-AA-1287",
+      "date": "2026-11-04",
+      "amount": 212.25,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1288",
+      "date": "2026-11-05",
+      "amount": 9580.0,
+      "type": "DEBIT",
+      "mode": "NACH",
+      "narration": "DEMO-LENDER-A-PERSONAL-LOAN-EMI"
+    },
+    {
+      "txn_id": "TXN-AA-1289",
+      "date": "2026-11-05",
+      "amount": 233.41,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1290",
+      "date": "2026-11-06",
+      "amount": 268.09,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1291",
+      "date": "2026-11-07",
+      "amount": 2846.14,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1292",
+      "date": "2026-11-08",
+      "amount": 3100.0,
+      "type": "DEBIT",
+      "mode": "BBPS",
+      "narration": "ELECTRICITY-WIFI-GAS-BILL-PAYMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1293",
+      "date": "2026-11-10",
+      "amount": 131.2,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1294",
+      "date": "2026-11-12",
+      "amount": 170.23,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1295",
+      "date": "2026-11-14",
+      "amount": 3063.71,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "SUPERMARKET-WEEKLY-GROCERIES-RETAIL"
+    },
+    {
+      "txn_id": "TXN-AA-1296",
+      "date": "2026-11-14",
+      "amount": 874.75,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "BOOKMYSHOW-ENTERTAINMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1297",
+      "date": "2026-11-15",
+      "amount": 1282.07,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "ZOMATO-DINING-OUT"
+    },
+    {
+      "txn_id": "TXN-AA-1298",
+      "date": "2026-11-16",
+      "amount": 226.39,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1299",
+      "date": "2026-11-17",
+      "amount": 239.7,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1300",
+      "date": "2026-11-18",
+      "amount": 211.06,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    },
+    {
+      "txn_id": "TXN-AA-1301",
+      "date": "2026-11-19",
+      "amount": 253.4,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "METRO-SMART-CARD-RECHARGE-TRANSPORT"
+    }
+  ]
+}

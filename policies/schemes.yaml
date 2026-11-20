@@ -1,0 +1,69 @@
+# Government & Statutory Credit Schemes Catalog
+# All assessments output "may be eligible" or "not eligible" with deterministic reasons. Never "approved".
+version: "1.0.0"
+updated_at: "2026-11-20"
+disclaimer: "Verify with the lender or official portal before applying."
+
+schemes:
+  - id: "pm_svanidhi"
+    name: "PM Street Vendor's AtmaNirbhar Nidhi (PM SVANidhi)"
+    who_it_is_for: "Urban and peri-urban street vendors vending prior to March 24, 2020 or holding a Vending Certificate / ID Card from Urban Local Body (ULB)."
+    eligibility_rules:
+      requires_street_vendor: true
+      allows_fixed_premises: false
+    what_it_gives: "Tranche 1: ₹10,000; Tranche 2: ₹20,000; Tranche 3: ₹50,000 working capital loans with 7% interest subsidy and up to ₹1,200 annual digital transaction cashback."
+    catch: "Strictly limited to street vendors holding an official ULB Vending Certificate / Letter of Recommendation. Fixed retail stores, kirana shops, or commercial establishments are strictly NOT eligible."
+    official_url: "https://pmsvanidhi.mohua.gov.in/"
+    last_verified: "2026-08-15"
+
+  - id: "mudra_pmmy"
+    name: "Pradhan Mantri MUDRA Yojana (PMMY)"
+    who_it_is_for: "Non-corporate, non-farm small/micro enterprises engaged in manufacturing, trading, or service activities."
+    eligibility_rules:
+      requires_non_farm_micro_enterprise: true
+      categories:
+        shishu: "Up to ₹50,000"
+        kishore: "₹50,000 to ₹5,00,000"
+        tarun: "₹5,00,000 to ₹10,00,000"
+        tarun_plus: "Up to ₹20,00,000 (for previous Tarun borrowers who repaid)"
+    what_it_gives: "Collateral-free business loans up to ₹20 lakh with no processing charges for Shishu category loans."
+    catch: "Interest rate is not fixed by the government; lending banks and NBFCs determine interest rates based on their internal commercial risk assessment and borrower credit profile."
+    official_url: "https://www.mudra.org.in/"
+    last_verified: "2026-09-01"
+
+  - id: "rbi_collateral_free_mse"
+    name: "Collateral-Free MSE Lending up to ₹20 Lakh (RBI Mandatory Guideline)"
+    who_it_is_for: "Micro and Small Enterprises (MSEs) holding a valid Udyam Registration Certificate borrowing from Scheduled Commercial Banks."
+    eligibility_rules:
+      requires_mse_status: true
+      requires_udyam: true
+      max_sanction_inr: 2000000.0
+      effective_date: "2026-04-01"
+    what_it_gives: "Scheduled Commercial Banks are mandated not to accept collateral security in the case of loans up to ₹20 lakh extended to units in the MSE sector."
+    catch: "Applies to Scheduled Commercial Banks; NBFCs may evaluate risk independently. Borrower must possess a valid Udyam Registration Certificate and maintain satisfactory credit conduct."
+    official_url: "https://www.rbi.org.in/"
+    last_verified: "2026-10-01"
+
+  - id: "cgtmse"
+    name: "Credit Guarantee Fund Trust for Micro and Small Enterprises (CGTMSE)"
+    who_it_is_for: "New and existing Micro and Small Enterprises seeking debt without providing third-party guarantee or collateral security."
+    eligibility_rules:
+      requires_mse_status: true
+      max_guarantee_cover_inr: 50000000.0
+    what_it_gives: "Provides 75% to 85% credit guarantee coverage to lending institutions against borrower default."
+    catch: "CGTMSE is a guarantee cover issued to the lender to mitigate default risk, NOT a direct cash subsidy or debt waiver to the borrower. Borrower is liable for full repayment plus an Annual Guarantee Fee (AGF) of 0.37%–1.35%."
+    official_url: "https://www.cgtmse.in/"
+    last_verified: "2026-09-10"
+
+  - id: "pmegp"
+    name: "Prime Minister's Employment Generation Programme (PMEGP)"
+    who_it_is_for: "Individual entrepreneurs establishing NEW micro-enterprises in manufacturing or service sectors to generate employment."
+    eligibility_rules:
+      requires_new_unit_only: true
+      existing_enterprise_eligible: false
+      max_project_cost_manufacturing: 5000000.0
+      max_project_cost_service: 2000000.0
+    what_it_gives: "Margin money subsidy of 15% to 35% on project cost administered through KVIC, KVIB, and District Industries Centres (DIC)."
+    catch: "Assistance is strictly for setting up NEW micro-enterprises. Existing shops, businesses seeking working capital expansion, or loan refinancing are strictly NOT eligible."
+    official_url: "https://www.kviconline.gov.in/pmegpeportal/"
+    last_verified: "2026-08-20"

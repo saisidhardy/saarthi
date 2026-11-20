@@ -4,7 +4,7 @@
 > **Track 3 · Autonomous AI Teammates | Paytm Build for India AI Hackathon**  
 > Built on **Sarvam Indic AI Stack** (Sarvam-105B, Saaras:v3, Bulbul:v3) · Python 3.12 + FastAPI + SQLite + Tailwind CSS
 
-[![Tests: 24 Passed](https://img.shields.io/badge/pytest-24%2F24%20passing-emerald)](https://github.com/saisidhardy/saarthi)
+[![Tests: 32 Passed](https://img.shields.io/badge/pytest-32%2F32%20passing-emerald)](https://github.com/saisidhardy/saarthi)
 [![Compliance: Supports RBI Rules](https://img.shields.io/badge/RBI%20Conduct-Enforces%20Lender%20Policy%20(Demo)-teal)](https://github.com/saisidhardy/saarthi)
 [![Simulated Engine: Active](https://img.shields.io/badge/Engine-Deterministic%20Policy%20Firewall-blue)](https://github.com/saisidhardy/saarthi)
 
@@ -15,6 +15,10 @@
 * **🏢 Enterprise Operations Platform (Main App):**  
   👉 **[https://saarthi.embarko.app/](https://saarthi.embarko.app/)**  
   *Production SaaS console for multi-lender operations: CRM borrower registry, multi-lender tenant switching (Demo Lender A, Demo Lender B, Demo Lender C), PBX simulated telephony voice stream with audio waveform, multi-turn transcripts with Indic script + translation notes, and simulated payment rails.*
+
+* **🌱 Cash-Flow Coach & Financial Health Check-Up (V5 Prototype):**  
+  👉 **[https://saarthi.embarko.app/coach](https://saarthi.embarko.app/coach)**  
+  *Separate opt-in portal: 90-day Account Aggregator cashflow analysis, explainable safe-to-pay capacity, statutory scheme matching (PM SVANidhi, MUDRA, MSE, CGTMSE, PMEGP), and refinance evaluation with 4 hard safety blocks.*
 
 * **🔬 Policy Firewall & Architecture Inspection View:**  
   👉 **[https://saarthi.embarko.app/inspect](https://saarthi.embarko.app/inspect)**  
@@ -177,3 +181,24 @@ Saarthi operates as an autonomous collections agency platform serving multiple i
 **Compliance Wording:**  
 *Enforces lender policy (demo); supports RBI conduct rules.*  
 All payment operations are simulated on-screen for demonstration. No real VPA links or live banking transactions are executed in demo mode.
+
+---
+
+## 8. V5 Prototype: Cash-Flow Coach & Health Check-Up
+
+A separate opt-in portal operated under the **RBI Account Aggregator (AA) framework** to assist borrowers in distress. **Never inside a recovery call, never to pressure payment.**
+
+### Core Capabilities:
+1. **Consent-First Architecture:** Plain-language disclosure, 30-day validity, one-click revocation, and cryptographic logging (`AA-CONSENT-XXXXX`) into the Evidence Pack. If consent is revoked or missing, financial data is locked.
+2. **Deterministic Safe-to-Pay Capacity:** Computes weekly capacity strictly from the worst-quartile inflow:
+   $$\text{Capacity per Week} = \text{Worst-Quartile Inflow} - \text{Essential Outflows} - (15\% \text{ Volatility Buffer})$$
+   The LLM never sets payment amounts.
+3. **Editable Taxonomy & Self-Baseline:** Neutral spend comparison against the borrower's own 3-month median (no peer comparisons, no judgment). The borrower can toggle categories between `Essential`, `Flexible`, and `Ignore`, dynamically updating safe-to-pay headroom.
+4. **Statutory Schemes Matcher (`policies/schemes.yaml`):** Evaluates eligibility for PM SVANidhi (street vendors only), MUDRA PMMY, RBI Collateral-Free MSE lending up to ₹20 lakh, CGTMSE credit guarantee cover, and PMEGP (new units only). All outputs use *"may be eligible / not eligible"* with exact reasons.
+5. **Refinance Feasibility & 4 Hard Safety Blocks:**
+   * **Block 1:** New EMI > Safe Capacity
+   * **Block 2:** Total New Cost $\ge$ Existing Remaining Cost
+   * **Block 3:** Active Sensitive-Event / Hardship Flag
+   * **Block 4:** New Loan from Same Lender to Clear Overdue (Evergreening Prevention)
+6. **Data-Grounded Advisor Observations:** Identifies empirical timing patterns (weekend sales share %, supplier cycle troughs, cashflow variance) as discussion questions for human credit counselors with zero artificial ROI promises.
+

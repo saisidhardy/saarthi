@@ -1,0 +1,62 @@
+[
+  {
+    "offer_id": "OFFER-NBFC-REFINANCE-01",
+    "lender_id": "demo_lender_b",
+    "lender_name": "Demo Lender B (MSME & Working Capital)",
+    "product_name": "MSME Working Capital Balance Transfer",
+    "min_amount_inr": 25000.0,
+    "max_amount_inr": 100000.0,
+    "interest_rate_apr": 16.5,
+    "tenure_months": 12,
+    "processing_fee_pct": 1.5,
+    "target_personas": ["kirana_owner", "agri_trader"],
+    "requires_hardship_clear": true,
+    "allows_overdue_refinance": false,
+    "description": "Lower APR working capital refinance with weekly UPI AutoPay debit schedule"
+  },
+  {
+    "offer_id": "OFFER-SALARY-REFINANCE-02",
+    "lender_id": "demo_lender_a",
+    "lender_name": "Demo Lender A (Retail NBFC)",
+    "product_name": "Prime Personal Debt Consolidation",
+    "min_amount_inr": 50000.0,
+    "max_amount_inr": 300000.0,
+    "interest_rate_apr": 13.5,
+    "tenure_months": 24,
+    "processing_fee_pct": 1.0,
+    "target_personas": ["salaried_household"],
+    "requires_hardship_clear": true,
+    "allows_overdue_refinance": false,
+    "description": "Pre-approved salary-linked personal loan refinance with reduced monthly EMI"
+  },
+  {
+    "offer_id": "OFFER-EXPENSIVE-TENURE-03",
+    "lender_id": "demo_lender_c",
+    "lender_name": "Demo Lender C (Microfinance & Rural)",
+    "product_name": "Extended Micro-Term Top-Up",
+    "min_amount_inr": 20000.0,
+    "max_amount_inr": 60000.0,
+    "interest_rate_apr": 27.5,
+    "tenure_months": 36,
+    "processing_fee_pct": 3.0,
+    "target_personas": ["kirana_owner", "agri_trader"],
+    "requires_hardship_clear": true,
+    "allows_overdue_refinance": false,
+    "description": "High-tenure micro loan (triggers higher-cost block in refinance calculator)"
+  },
+  {
+    "offer_id": "OFFER-SAME-LENDER-OVERDUE-04",
+    "lender_id": "demo_lender_a",
+    "lender_name": "Demo Lender A (Retail NBFC)",
+    "product_name": "Internal Top-Up Clear-Overdue Loan",
+    "min_amount_inr": 20000.0,
+    "max_amount_inr": 80000.0,
+    "interest_rate_apr": 23.0,
+    "tenure_months": 12,
+    "processing_fee_pct": 2.0,
+    "target_personas": ["kirana_owner"],
+    "requires_hardship_clear": false,
+    "allows_overdue_refinance": true,
+    "description": "Internal same-lender loan to clear overdue debt (triggers evergreening block)"
+  }
+]

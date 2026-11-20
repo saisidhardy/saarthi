@@ -6,18 +6,200 @@
   <title>Saarthi Enterprise Collections Cloud | Operations & Recovery Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #060911; }
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
-    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #0b1120; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #334155; }
-    
+    <style>
+    :root {
+      --bg:            #F7F6F2;   /* page background, warm off-white */
+      --surface:       #FFFFFF;   /* cards, sidebar, top bar */
+      --border:        #DEDBD2;
+      --text:          #1C2B2A;
+      --text-muted:    #5B6B69;
+      --accent:        #0F766E;   /* deep teal: primary button, active tab, selected row border, progress bar */
+      --accent-soft:   #E3F3F0;   /* selected row, rule-ID tags, info chips */
+      --accent-text:   #0B524C;   /* text on accent-soft */
+      --warn-bg:       #FBE9C6;   /* Hospicash, T-24h */
+      --warn-text:     #7A4A05;
+      --danger-bg:     #FBE0DC;   /* Escalated, failed checks */
+      --danger-text:   #8F2A1D;
+
+      --font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      font-family: var(--font-family) !important;
+      transition: all 150ms ease-in-out;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg) !important;
+      color: var(--text) !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      line-height: 1.5;
+    }
+
+    /* Font Weights Strictly 400 and 500 Only */
+    h1, h2, h3, h4, h5, h6, b, strong, th,
+    .font-bold, .font-semibold, .font-black, .font-extrabold, .font-medium {
+      font-weight: 500 !important;
+    }
+    .font-normal, span, p, td, li, input, select, textarea {
+      font-weight: 400 !important;
+    }
+
+    /* Strict Font Sizes: 12 / 14 / 16 / 24 / 32 */
+    .text-xs, .text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\], .text-\[11\.5px\] {
+      font-size: 12px !important;
+    }
+    .text-sm, .text-\[13px\] {
+      font-size: 14px !important;
+    }
+    .text-base {
+      font-size: 16px !important;
+    }
+    .text-lg, .text-xl, .text-2xl {
+      font-size: 24px !important;
+    }
+    .text-3xl, .text-4xl, .text-5xl {
+      font-size: 32px !important;
+    }
+
+    /* Global Light Theme Surface & Background Overrides */
+    body, html {
+      background-color: var(--bg) !important;
+    }
+    aside, header, nav, .bg-slate-900, .bg-slate-950, .bg-slate-900\/90, .bg-slate-950\/60,
+    .bg-slate-950\/40, .bg-slate-950\/50, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-900\/80 {
+      background-color: var(--surface) !important;
+    }
+    .bg-slate-800, .bg-slate-800\/60, .bg-slate-800\/40, .bg-slate-800\/80, .bg-slate-850 {
+      background-color: var(--bg) !important;
+    }
+
+    /* Border Overrides */
+    .border-slate-800, .border-slate-700, .border-slate-800\/80, .border-slate-700\/60, .border-slate-700\/50,
+    .border-slate-900, .divide-slate-800, .divide-slate-800\/60 {
+      border-color: var(--border) !important;
+    }
+
+    /* Text Color Overrides (Strict contrast > 4.5:1) */
+    .text-white, .text-slate-100, .text-slate-200, .text-slate-300, h1, h2, h3, h4, th {
+      color: var(--text) !important;
+    }
+    .text-slate-400, .text-slate-500, .text-slate-600 {
+      color: var(--text-muted) !important;
+    }
+
+    /* Accent Overrides: DEEP TEAL is the ONLY brand color */
+    .bg-indigo-600, .bg-indigo-500, .bg-teal-600, .bg-emerald-600, .hover\:bg-indigo-500:hover,
+    .hover\:bg-teal-500:hover, .hover\:bg-emerald-500:hover {
+      background-color: var(--accent) !important;
+      color: #FFFFFF !important;
+    }
+    .text-indigo-400, .text-indigo-300, .text-indigo-500, .text-teal-400, .text-teal-300, .text-emerald-400, .text-emerald-300 {
+      color: var(--accent) !important;
+    }
+    .border-indigo-500, .border-indigo-600, .border-teal-500, .border-emerald-500 {
+      border-color: var(--accent) !important;
+    }
+    .bg-indigo-950, .bg-indigo-950\/40, .bg-indigo-950\/30, .bg-teal-950, .bg-teal-950\/40,
+    .bg-indigo-500\/10, .bg-indigo-500\/20, .bg-teal-500\/10, .bg-teal-500\/20, .bg-emerald-500\/10, .bg-emerald-500\/20 {
+      background-color: var(--accent-soft) !important;
+      color: var(--accent-text) !important;
+    }
+
+    /* Status Colors ONLY: Amber for Warnings / Sensitive, Red for Danger / Failures */
+    .bg-amber-500\/10, .bg-amber-500\/20, .bg-amber-950, .bg-amber-950\/60, .bg-amber-950\/80 {
+      background-color: var(--warn-bg) !important;
+      color: var(--warn-text) !important;
+      border-color: var(--warn-bg) !important;
+    }
+    .text-amber-400, .text-amber-300, .text-amber-500 {
+      color: var(--warn-text) !important;
+    }
+    .bg-rose-500\/10, .bg-rose-500\/20, .bg-rose-950, .bg-rose-950\/60, .bg-rose-950\/80, .bg-rose-600 {
+      background-color: var(--danger-bg) !important;
+      color: var(--danger-text) !important;
+      border-color: var(--danger-bg) !important;
+    }
+    .text-rose-400, .text-rose-300, .text-rose-500 {
+      color: var(--danger-text) !important;
+    }
+
+    /* Button System:
+       Primary: solid teal (Send Token UPI)
+       Secondary: white with border (AutoPay Mandate, File Hospicash)
+       Tertiary: plain text (Clear Settlement)
+    */
+    .btn-primary, button.btn-primary {
+      background-color: var(--accent) !important;
+      color: #FFFFFF !important;
+      font-weight: 500 !important;
+      border: 1px solid var(--accent) !important;
+      border-radius: 8px !important;
+      padding: 6px 14px !important;
+      cursor: pointer;
+      transition: all 150ms ease-in-out !important;
+    }
+    .btn-primary:hover {
+      background-color: #0b524c !important;
+      border-color: #0b524c !important;
+    }
+    .btn-secondary, button.btn-secondary {
+      background-color: var(--surface) !important;
+      color: var(--text) !important;
+      border: 1px solid var(--border) !important;
+      font-weight: 500 !important;
+      border-radius: 8px !important;
+      padding: 6px 14px !important;
+      cursor: pointer;
+      transition: all 150ms ease-in-out !important;
+    }
+    .btn-secondary:hover {
+      background-color: var(--bg) !important;
+      border-color: var(--accent) !important;
+    }
+    .btn-tertiary, button.btn-tertiary {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-muted) !important;
+      font-weight: 500 !important;
+      padding: 6px 10px !important;
+      cursor: pointer;
+      transition: all 150ms ease-in-out !important;
+    }
+    .btn-tertiary:hover {
+      color: var(--text) !important;
+    }
+
+    /* Selection & Table Styling */
+    ::selection {
+      background-color: var(--accent-soft) !important;
+      color: var(--accent-text) !important;
+    }
+    tr.selected-row, tr[aria-selected="true"] {
+      background-color: var(--accent-soft) !important;
+      border-left: 3px solid var(--accent) !important;
+    }
+    tr:hover {
+      background-color: var(--bg) !important;
+    }
+
+    /* Phone Bezel in Light Theme */
+    .phone-bezel {
+      border: 8px solid var(--border) !important;
+      background-color: var(--surface) !important;
+      box-shadow: 0 10px 30px rgba(28, 43, 42, 0.08) !important;
+    }
+    .whatsapp-bg {
+      background-color: #ECE5DD !important;
+      background-image: none !important;
+    }
+
+    /* Waveform Animation */
     @keyframes waveBar {
       0%, 100% { height: 6px; }
-      50% { height: 26px; }
+      50% { height: 24px; }
     }
     .wave-active .w-bar-1 { animation: waveBar 0.8s infinite 0.1s ease-in-out; }
     .wave-active .w-bar-2 { animation: waveBar 0.8s infinite 0.25s ease-in-out; }
@@ -25,22 +207,22 @@
     .wave-active .w-bar-4 { animation: waveBar 0.8s infinite 0.2s ease-in-out; }
     .wave-active .w-bar-5 { animation: waveBar 0.8s infinite 0.35s ease-in-out; }
 
-    @keyframes pulseRing {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.15); opacity: 0.2; }
-      100% { transform: scale(0.95); opacity: 0.8; }
-    }
-    .pulse-ring { animation: pulseRing 2s infinite ease-in-out; }
+    /* Custom Scrollbar for Warm Light Theme */
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: var(--bg); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-    /* Phone frame simulation */
-    .phone-bezel {
-      border: 8px solid #1e293b;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px #334155;
+    /* Skeleton Loaders */
+    .skeleton-loader {
+      background: linear-gradient(90deg, #F0EEE9 25%, #E6E4DE 50%, #F0EEE9 75%);
+      background-size: 200% 100%;
+      animation: skeletonShimmer 1.5s infinite;
+      border-radius: 6px;
     }
-    .whatsapp-bg {
-      background-color: #0b141a;
-      background-image: radial-gradient(#1f2c34 1px, transparent 1px);
-      background-size: 16px 16px;
+    @keyframes skeletonShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
   </style>
 </head>
@@ -131,6 +313,14 @@
       <button onclick="openTab('liveproof')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
         <i class="fa-solid fa-microchip text-indigo-400"></i>
         <span>Live Proof & Counters</span>
+      </button>
+
+      <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Borrower Financial Health</div>
+
+      <button onclick="openTab('coach')" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 font-medium text-left transition">
+        <i class="fa-solid fa-heart-pulse text-emerald-400"></i>
+        <span>Cash-Flow Check-Up</span>
+        <span class="ml-auto text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">V5 COACH</span>
       </button>
 
       <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-4">Governance & Compliance</div>
@@ -373,6 +563,9 @@
           <button id="tabBtn-liveproof" onclick="switchConsoleTab('liveproof')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
             <i class="fa-solid fa-microchip text-indigo-400"></i> Live Proof
           </button>
+          <button id="tabBtn-coach" onclick="switchConsoleTab('coach')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-heart-pulse text-emerald-400"></i> Cash-Flow Check-Up
+          </button>
           <button id="tabBtn-compliance" onclick="switchConsoleTab('compliance')" class="py-2.5 text-slate-400 hover:text-slate-200 flex items-center gap-1.5 shrink-0">
             <i class="fa-solid fa-scale-balanced text-indigo-300"></i> Compliance
           </button>
@@ -381,30 +574,44 @@
         <!-- TAB 1: TELEPHONY AUDIO & CALL TRANSCRIPT STREAM -->
         <div id="consoleTab-telephony" class="flex-1 flex flex-col overflow-hidden">
           
-          <!-- Telephony PBX Station with Animated Audio Waveform -->
-          <div class="p-3 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+          <!-- Telephony PBX Station with Animated Audio Waveform & Demo Voice Switcher (English, Hindi, Telugu) -->
+          <div class="p-3 border-b flex flex-wrap items-center justify-between gap-3 shrink-0" style="background-color: var(--surface); border-color: var(--border);">
             <div class="flex items-center gap-3">
-              <button id="audioControlBtn" onclick="togglePlayCallAudio()" class="w-9 h-9 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 transition transform active:scale-95 shrink-0">
+              <button id="audioControlBtn" onclick="togglePlayCallAudio()" class="w-9 h-9 rounded-full text-white flex items-center justify-center transition transform active:scale-95 shrink-0" style="background-color: var(--accent); box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);" title="Play/Pause Voice Stream">
                 <i id="audioControlIcon" class="fa-solid fa-play ml-0.5 text-xs"></i>
               </button>
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-white">Audio Stream</span>
-                  <span id="voiceLanguageBadge" class="text-[10px] font-mono px-2 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                    Sarvam Bulbul:v3 (Devanagari)
+                  <span class="text-xs font-medium" style="color: var(--text);">Audio Stream</span>
+                  <span id="voiceLanguageBadge" class="text-xs font-medium px-2 py-0.5 rounded" style="background-color: var(--accent-soft); color: var(--accent-text);">
+                    Neural Human Voice
                   </span>
                 </div>
-                <p id="audioTelemetryStatus" class="text-[10.5px] text-slate-400 mt-0.5">Click Play to listen to authenticated Indic voice recording</p>
+                <p id="audioTelemetryStatus" class="text-xs mt-0.5" style="color: var(--text-muted);">Click Play or choose an English / Hindi / Telugu demo below</p>
               </div>
             </div>
 
+            <!-- Demo Voice Quick Actions: English, Hindi, Telugu -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-xs font-medium mr-1" style="color: var(--text-muted);">Voice Demo:</span>
+              <button onclick="playVoiceDemo('english')" class="px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1.5 hover:shadow-sm" style="background-color: var(--surface); color: var(--text); border: 1px solid var(--border);" title="Play English Voice Demo">
+                <span>🇬🇧 English</span>
+              </button>
+              <button onclick="playVoiceDemo('hindi')" class="px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1.5 hover:shadow-sm" style="background-color: var(--surface); color: var(--text); border: 1px solid var(--border);" title="Play Hindi Voice Demo">
+                <span>🇮🇳 Hindi</span>
+              </button>
+              <button onclick="playVoiceDemo('telugu')" class="px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1.5 hover:shadow-sm" style="background-color: var(--surface); color: var(--text); border: 1px solid var(--border);" title="Play Telugu Voice Demo">
+                <span>🇮🇳 Telugu</span>
+              </button>
+            </div>
+
             <!-- Waveform Visualizer -->
-            <div id="waveformVisualizer" class="flex items-center gap-1 h-6 px-2.5 bg-slate-950/60 rounded-lg border border-slate-800/80">
-              <span class="w-1 h-2 bg-indigo-400 rounded-full w-bar-1"></span>
-              <span class="w-1 h-3 bg-indigo-400 rounded-full w-bar-2"></span>
-              <span class="w-1 h-4 bg-teal-400 rounded-full w-bar-3"></span>
-              <span class="w-1 h-3 bg-indigo-400 rounded-full w-bar-4"></span>
-              <span class="w-1 h-2 bg-indigo-400 rounded-full w-bar-5"></span>
+            <div id="waveformVisualizer" class="flex items-center gap-1 h-6 px-2.5 rounded-lg border" style="background-color: var(--bg); border-color: var(--border);">
+              <span class="w-1 h-2 rounded-full w-bar-1" style="background-color: var(--accent);"></span>
+              <span class="w-1 h-3 rounded-full w-bar-2" style="background-color: var(--accent);"></span>
+              <span class="w-1 h-4 rounded-full w-bar-3" style="background-color: var(--accent);"></span>
+              <span class="w-1 h-3 rounded-full w-bar-4" style="background-color: var(--accent);"></span>
+              <span class="w-1 h-2 rounded-full w-bar-5" style="background-color: var(--accent);"></span>
             </div>
           </div>
 
@@ -710,6 +917,22 @@
               <span class="text-[9.5px] text-emerald-400 font-mono">estimated</span>
             </div>
           </div>
+        </div>
+
+        <!-- TAB: CASH-FLOW CHECK-UP (V5 COACH) -->
+        <div id="consoleTab-coach" class="hidden flex-1 flex flex-col overflow-hidden bg-slate-950">
+          <div class="p-3 bg-slate-900 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <span class="text-xs font-bold text-white">Cash-Flow Check-Up & Advisor Assist (V5 Prototype)</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">SEPARATE OPT-IN SCREEN</span>
+            </div>
+            <a href="/coach" target="_blank" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+              <span>Open Standalone Window</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+          <iframe id="coachIframe" src="/coach" class="w-full flex-1 border-0 custom-scroll min-h-[500px]"></iframe>
         </div>
 
         <!-- TAB 2: SETTLEMENT & RESTRUCTURING DETAILS -->
@@ -1574,7 +1797,7 @@
 
     // TABS IN NBFC CONSOLE
     function switchConsoleTab(tabKey) {
-      ['telephony', 'settlement', 'compliance', 'callplan', 'batchaudit', 'outcomes', 'liveproof'].forEach(k => {
+      ['telephony', 'settlement', 'compliance', 'callplan', 'batchaudit', 'outcomes', 'liveproof', 'coach'].forEach(k => {
         const pane = document.getElementById(`consoleTab-${k}`);
         const btn = document.getElementById(`tabBtn-${k}`);
         if (pane && btn) {
@@ -2456,81 +2679,109 @@
     }
 
     // AUDIO PLAYBACK (Bulbul:v3 or SpeechSynthesis)
-    async function togglePlayCallAudio() {
-      if (!selectedAccount || !selectedAccount.transcript) return;
+    
+    // ==========================================
+    // VOICE AGENT DEMO RUNNER (ENGLISH, HINDI, TELUGU)
+    // ==========================================
+    async function playVoiceDemo(lang) {
+      const langKey = lang.toLowerCase();
       const icon = document.getElementById('audioControlIcon');
       const wave = document.getElementById('waveformVisualizer');
       const statusEl = document.getElementById('audioTelemetryStatus');
+      const badge = document.getElementById('voiceLanguageBadge');
 
       if (isPlayingAudio) {
         if (audioPlayer) audioPlayer.pause();
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         isPlayingAudio = false;
-        icon.className = "fa-solid fa-play ml-0.5 text-xs";
-        wave.classList.remove('wave-active');
-        statusEl.innerText = "Audio playback paused";
-        return;
       }
 
-      const agentMsgs = selectedAccount.transcript.filter(t => t.speaker === 'agent');
-      if (agentMsgs.length === 0) {
-        alert("No agent speech available to play.");
-        return;
+      let accId = '2'; // Hindi default
+      let displayLang = 'Hindi';
+      let voiceSpeaker = 'hi-IN-SwaraNeural';
+      let demoPhrase = 'नमस्ते राजेश जी, मैं सारथी हूँ, डेमो लेंडर ए की ओर से आपकी ईएमआई के संदर्भ में एआई कॉल कर रही हूँ। आपके अनुरोध पर पच्चीस सौ रुपये का अग्रिम टोकन स्वीकार कर लिया गया है, और शेष राशि के लिए शुक्रवार का ऑटो-पे मैंडेट शेड्यूल कर दिया गया है।';
+
+      if (langKey === 'english') {
+        accId = '4'; // Vikram Malhotra
+        displayLang = 'English';
+        voiceSpeaker = 'en-IN-NeerjaNeural';
+        demoPhrase = 'Hello Mr. Malhotra, this is Saarthi, an automated AI recovery assistant calling on behalf of Demo Lender A regarding your overdue loan repayment. As per our board-approved policy, autonomous waivers are not permitted, but we can offer an extension of up to 7 days.';
+      } else if (langKey === 'telugu') {
+        accId = '23'; // Kavitha Reddy
+        displayLang = 'Telugu';
+        voiceSpeaker = 'te-IN-ShrutiNeural';
+        demoPhrase = 'నమస్కారం కవిత గారు, నేను సారథి, డెమో లెండర్ బి తరపున మీ ఈఎంఐ చెల్లింపు కోసం మాట్లాడుతున్నాను. శుక్రవారం నాడు ముప్పై రెండు వేల రూపాయల పూర్తి చెల్లింపు కోసం మీ ప్రామిస్ టు పే నమోదు చేయబడింది. ధన్యవాదాలు.';
       }
 
-      const lastTurn = agentMsgs[agentMsgs.length - 1];
-      statusEl.innerText = `Connecting to ${selectedAccount.language || 'Indic'} voice PBX stream...`;
+      // Jump to that preset account in UI
+      jumpToPreset(accId);
+
+      badge.innerText = `${displayLang} Voice (${voiceSpeaker})`;
+      statusEl.innerText = `Connecting to ${displayLang} neural voice stream...`;
       wave.classList.add('wave-active');
       icon.className = "fa-solid fa-pause text-xs";
       isPlayingAudio = true;
 
+      // 1. Play static high-fidelity MP3 stream
       try {
-        const res = await fetch('/api/voice/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: lastTurn.text,
-            language: selectedAccount.language || 'Hindi',
-            speaker: 'priya'
-          })
-        });
-        const data = await res.json();
-        if (data.audio_base64) {
-          audioPlayer = new Audio(`data:${data.mime_type || 'audio/mp3'};base64,${data.audio_base64}`);
-          audioPlayer.onended = () => {
-            isPlayingAudio = false;
-            icon.className = "fa-solid fa-play ml-0.5 text-xs";
-            wave.classList.remove('wave-active');
-            statusEl.innerText = "Audio stream finished";
-          };
-          audioPlayer.play();
-          statusEl.innerText = `Playing ${data.voice_name || 'Studio Neural Voice'} (${selectedAccount.language}) - Human Inflection`;
-          return;
-        }
-      } catch (err) {
-        console.warn("Speech playback fallback:", err);
-      }
-
-      // Web Speech Fallback
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(lastTurn.text);
-        if (selectedAccount.language === 'Marathi') utter.lang = 'mr-IN';
-        else if (selectedAccount.language === 'Telugu') utter.lang = 'te-IN';
-        else if (selectedAccount.language === 'Tamil') utter.lang = 'ta-IN';
-        else if (selectedAccount.language === 'Kannada') utter.lang = 'kn-IN';
-        else if (selectedAccount.language === 'Hindi') utter.lang = 'hi-IN';
-        else utter.lang = 'en-IN';
-        utter.onend = () => {
+        const audioUrl = `/api/voice/demo-audio/${langKey}`;
+        if (audioPlayer) audioPlayer.pause();
+        audioPlayer = new Audio(audioUrl);
+        audioPlayer.onended = () => {
           isPlayingAudio = false;
           icon.className = "fa-solid fa-play ml-0.5 text-xs";
           wave.classList.remove('wave-active');
-          statusEl.innerText = "Audio stream finished";
+          statusEl.innerText = `${displayLang} voice playback completed`;
         };
-        window.speechSynthesis.speak(utter);
-        statusEl.innerText = `Playing synthesized voice audio (${selectedAccount.language})`;
+        audioPlayer.onerror = () => {
+          console.warn("Static audio error, trying Web Speech API...");
+          speakWithWebSpeech(demoPhrase, langKey);
+        };
+        await audioPlayer.play();
+        statusEl.innerText = `Playing ${displayLang} Neural Voice Demo (${voiceSpeaker})`;
+        return;
+      } catch (err) {
+        console.warn("Direct play error:", err);
+        speakWithWebSpeech(demoPhrase, langKey);
       }
     }
+
+    function speakWithWebSpeech(text, langKey) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      if (langKey === 'telugu') utter.lang = 'te-IN';
+      else if (langKey === 'hindi') utter.lang = 'hi-IN';
+      else utter.lang = 'en-IN';
+      utter.rate = 0.95;
+      utter.onend = () => {
+        isPlayingAudio = false;
+        document.getElementById('audioControlIcon').className = "fa-solid fa-play ml-0.5 text-xs";
+        document.getElementById('waveformVisualizer').classList.remove('wave-active');
+        document.getElementById('audioTelemetryStatus').innerText = "Voice playback completed";
+      };
+      window.speechSynthesis.speak(utter);
+    }
+
+    async function togglePlayCallAudio() {
+      if (isPlayingAudio) {
+        if (audioPlayer) audioPlayer.pause();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        isPlayingAudio = false;
+        document.getElementById('audioControlIcon').className = "fa-solid fa-play ml-0.5 text-xs";
+        document.getElementById('waveformVisualizer').classList.remove('wave-active');
+        document.getElementById('audioTelemetryStatus').innerText = "Playback paused";
+        return;
+      }
+
+      let lang = (selectedAccount && selectedAccount.language) ? selectedAccount.language.toLowerCase() : 'hindi';
+      if (lang.includes('te')) lang = 'telugu';
+      else if (lang.includes('en')) lang = 'english';
+      else lang = 'hindi';
+
+      await playVoiceDemo(lang);
+    }
+
 
     // 1-CLICK SETTLEMENT ACTIONS
     function dispatchTokenPayment() {

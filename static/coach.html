@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saarthi | Cash-Flow Coach & Financial Health Check-Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    :root {
+      --bg:            #F7F6F2;   /* page background, warm off-white */
+      --surface:       #FFFFFF;   /* cards, sidebar, top bar */
+      --border:        #DEDBD2;
+      --text:          #1C2B2A;
+      --text-muted:    #5B6B69;
+      --accent:        #0F766E;   /* deep teal: primary button, active tab, selected row border, progress bar */
+      --accent-soft:   #E3F3F0;   /* selected row, rule-ID tags, info chips */
+      --accent-text:   #0B524C;   /* text on accent-soft */
+      --warn-bg:       #FBE9C6;   /* Hospicash, T-24h */
+      --warn-text:     #7A4A05;
+      --danger-bg:     #FBE0DC;   /* Escalated, failed checks */
+      --danger-text:   #8F2A1D;
+
+      --font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      font-family: var(--font-family) !important;
+      transition: all 150ms ease-in-out;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg) !important;
+      color: var(--text) !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      line-height: 1.5;
+    }
+
+    /* Font Weights Strictly 400 and 500 Only */
+    h1, h2, h3, h4, h5, h6, b, strong, th,
+    .font-bold, .font-semibold, .font-black, .font-extrabold, .font-medium {
+      font-weight: 500 !important;
+    }
+    .font-normal, span, p, td, li, input, select, textarea {
+      font-weight: 400 !important;
+    }
+
+    /* Strict Font Sizes: 12 / 14 / 16 / 24 / 32 */
+    .text-xs, .text-\[9px\], .text-\[9\.5px\], .text-\[10px\], .text-\[10\.5px\], .text-\[11px\] {
+      font-size: 12px !important;
+    }
+    .text-sm, .text-\[13px\] {
+      font-size: 14px !important;
+    }
+    .text-base {
+      font-size: 16px !important;
+    }
+    .text-lg, .text-xl, .text-2xl {
+      font-size: 24px !important;
+    }
+    .text-3xl, .text-4xl, .text-5xl {
+      font-size: 32px !important;
+    }
+
+    /* Surface & Background Overrides */
+    body, html {
+      background-color: var(--bg) !important;
+    }
+    aside, header, nav, .bg-slate-900, .bg-slate-950, .bg-slate-900\/90, .bg-slate-950\/60,
+    .bg-slate-950\/40, .bg-slate-950\/50, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-900\/80 {
+      background-color: var(--surface) !important;
+    }
+    .bg-slate-800, .bg-slate-800\/60, .bg-slate-800\/40, .bg-slate-800\/80 {
+      background-color: var(--bg) !important;
+    }
+
+    /* Border Overrides */
+    .border-slate-800, .border-slate-700, .border-slate-800\/80, .border-slate-700\/60, .border-slate-900,
+    .divide-slate-800, .divide-slate-800\/60 {
+      border-color: var(--border) !important;
+    }
+
+    /* Text Color Overrides */
+    .text-white, .text-slate-100, .text-slate-200, .text-slate-300, h1, h2, h3, h4, th {
+      color: var(--text) !important;
+    }
+    .text-slate-400, .text-slate-500, .text-slate-600 {
+      color: var(--text-muted) !important;
+    }
+
+    /* Accent Overrides: DEEP TEAL is the ONLY brand color */
+    .bg-indigo-600, .bg-teal-600, .bg-emerald-600, .hover\:bg-emerald-500:hover, .hover\:bg-indigo-500:hover {
+      background-color: var(--accent) !important;
+      color: #FFFFFF !important;
+    }
+    .text-emerald-400, .text-emerald-300, .text-teal-400, .text-indigo-400 {
+      color: var(--accent) !important;
+    }
+    .border-emerald-500, .border-emerald-500\/30, .border-emerald-500\/40, .border-teal-500 {
+      border-color: var(--accent) !important;
+    }
+    .bg-emerald-500\/20, .bg-emerald-500\/10, .bg-emerald-950\/60, .bg-emerald-950\/20, .bg-indigo-950\/30 {
+      background-color: var(--accent-soft) !important;
+      color: var(--accent-text) !important;
+    }
+
+    /* Status Colors ONLY */
+    .bg-amber-500\/20, .bg-amber-500\/10, .bg-amber-950 {
+      background-color: var(--warn-bg) !important;
+      color: var(--warn-text) !important;
+      border-color: var(--warn-bg) !important;
+    }
+    .text-amber-300, .text-amber-400, .text-amber-500 {
+      color: var(--warn-text) !important;
+    }
+    .bg-rose-500\/20, .bg-rose-950\/80, .bg-rose-950\/60, .bg-rose-600 {
+      background-color: var(--danger-bg) !important;
+      color: var(--danger-text) !important;
+      border-color: var(--danger-bg) !important;
+    }
+    .text-rose-400, .text-rose-300, .text-rose-500 {
+      color: var(--danger-text) !important;
+    }
+
+    /* Custom Scrollbar */
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: var(--bg); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-50 px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2.5 text-white hover:text-emerald-400 transition">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <div>
+          <span class="font-bold text-base tracking-tight text-white">Saarthi Cash-Flow Coach</span>
+          <span class="text-[10px] text-emerald-400 font-mono block -mt-0.5">V5 Opt-In Health Check-Up</span>
+        </div>
+      </a>
+      <span class="hidden md:inline-block text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+        Separate Opt-In Screen · Never in Recovery Call
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Persona Switcher -->
+      <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1">
+        <span class="text-xs text-slate-400">Persona:</span>
+        <select id="personaSelector" onchange="onPersonaChanged()" class="bg-transparent text-xs text-emerald-400 font-medium focus:outline-none cursor-pointer">
+          <option value="kirana_owner" class="bg-slate-900 text-white">Sunita Patil (Kirana Owner)</option>
+          <option value="salaried_household" class="bg-slate-900 text-white">Rajesh Sharma (Salaried Household)</option>
+          <option value="agri_trader" class="bg-slate-900 text-white">Manjunath Gowda (Agri Trader)</option>
+        </select>
+      </div>
+
+      <a href="/" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span class="hidden sm:inline">Back to Operations Console</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Notice Banner -->
+  <div class="bg-emerald-950/40 border-b border-emerald-800/40 px-4 py-2 text-center text-xs text-emerald-300 flex items-center justify-center gap-2">
+    <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+    <span><strong>Synthetic Data:</strong> Production uses RBI Account Aggregator (AA) consent via the lender. Never inside a recovery call, never to pressure payment.</span>
+  </div>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- 1. CONSENT FIRST CARD -->
+    <section id="consentSection" class="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl transition-all">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1.5 max-w-3xl">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="consentIndicator"></span>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              Borrower Consent Protocol
+              <span id="consentBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">CONSENT REQUIRED</span>
+            </h2>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            With your explicit consent, Saarthi analyzes 90 days of past bank transaction records from the Account Aggregator to calculate a realistic safe-to-pay capacity, evaluate public financial support schemes, and simulate loan refinance options. This check-up is completely voluntary, never occurs inside a recovery call, and is never used to pressure repayment.
+          </p>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 pt-1">
+            <span><i class="fa-solid fa-database text-slate-500 mr-1"></i> Data: 90 Days Synthetic AA Records</span>
+            <span><i class="fa-solid fa-clock text-slate-500 mr-1"></i> Duration: 30 Days (Revocable anytime)</span>
+            <span><i class="fa-solid fa-ban text-rose-400 mr-1"></i> No SMS parsing · No phone data access</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0" id="consentActionButtons">
+          <button id="btnGrantConsent" onclick="toggleConsent(true)" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-900/30 flex items-center gap-2 transition">
+            <i class="fa-solid fa-check"></i>
+            <span>Grant 30-Day Consent</span>
+          </button>
+          <button id="btnRevokeConsent" onclick="toggleConsent(false)" class="hidden px-4 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-800 text-rose-300 text-xs font-semibold flex items-center gap-2 transition">
+            <i class="fa-solid fa-xmark"></i>
+            <span>Revoke Consent Anytime</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Consent Log Info -->
+      <div id="consentMetadataBox" class="hidden mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex flex-wrap items-center justify-between gap-2">
+        <span id="consentIdDisplay">Consent ID: AA-CONSENT-PENDING</span>
+        <span id="consentExpiryDisplay">Expires: Pending</span>
+        <span class="text-emerald-400"><i class="fa-solid fa-lock text-emerald-400 mr-1"></i> Cryptographically logged in Tamper-Evident Evidence Pack</span>
+      </div>
+    </section>
+
+    <!-- UNCONSENTED PLACEHOLDER VIEW -->
+    <div id="unconsentedPlaceholder" class="p-12 text-center rounded-2xl bg-slate-900/40 border border-dashed border-slate-800 space-y-3">
+      <div class="w-14 h-14 rounded-2xl bg-slate-800/80 mx-auto flex items-center justify-center text-slate-500 text-2xl">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-300">Financial Records Locked</h3>
+      <p class="text-xs text-slate-400 max-w-md mx-auto">
+        No transaction records, capacity calculations, or scheme recommendations are visible without explicit borrower consent. Please click <strong>"Grant 30-Day Consent"</strong> above to proceed with the check-up.
+      </p>
+    </div>
+
+    <!-- MAIN COACH DASHBOARD (VISIBLE ONLY WHEN CONSENTED) -->
+    <div id="coachDashboard" class="hidden space-y-6">
+
+      <!-- Borrower Account Summary Strip -->
+      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="text-xs text-slate-400">Borrower Account Profile</div>
+          <div class="text-base font-bold text-white flex items-center gap-2">
+            <span id="borrowerNameDisplay">Sunita Patil</span>
+            <span id="accountTypeDisplay" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">CURRENT · XXXXXX4091</span>
+            <span id="bankNameDisplay" class="text-xs text-slate-400">Demo Bank Ltd.</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 text-xs">
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Analysis Period</span>
+            <span class="font-bold text-slate-200">Past 90 Days</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Worst-Quartile Inflow</span>
+            <span id="worstQInflowDisplay" class="font-bold text-emerald-400">₹0</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">Essential Outflows</span>
+            <span id="essentialOutflowDisplay" class="font-bold text-rose-400">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. INFLOW PATTERN & VOLATILITY CHART -->
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        
+        <!-- Left: Weekly Inflow vs Essential Outflow Bars -->
+        <div class="lg:col-span-2 p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-simple text-emerald-400"></i>
+              90-Day Weekly Cash Inflow Profile
+            </h3>
+            <span class="text-[11px] text-slate-400">13 Weekly Cycles</span>
+          </div>
+
+          <!-- Inflow Bars Graphic -->
+          <div class="space-y-2 pt-2" id="weeklyBarsContainer">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800">
+            <div class="flex items-center gap-4">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Weekly Inflow</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-600"></span> 25th Percentile Baseline</span>
+            </div>
+            <span id="volatilityMetricDisplay" class="font-mono text-slate-300">Volatility (CV): 0.24</span>
+          </div>
+        </div>
+
+        <!-- Right: Day of Week & Worst/Best Week Card -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
+              <i class="fa-solid fa-calendar-week text-indigo-400"></i>
+              Day-of-Week Cashflow Profile
+            </h3>
+            
+            <div class="space-y-2 text-xs" id="dayOfWeekContainer">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Highlight Box -->
+          <div class="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Weekend Inflow Share:</span>
+              <span id="weekendShareDisplay" class="font-bold text-emerald-400">48.2%</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400">Peak Inflow Day:</span>
+              <span id="peakDayDisplay" class="font-bold text-indigo-400">Saturday</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-700/50">
+              <span>Worst Week:</span>
+              <span id="worstWeekDisplay" class="font-mono text-amber-300">Week 4 (₹0)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. SAFE-TO-PAY CAPACITY CARD (HIGHLIGHT HERO) -->
+      <section class="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-slate-900 border border-emerald-500/30 shadow-xl space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Deterministic Policy Engine</span>
+              <h3 class="text-base font-bold text-white">Safe-to-Pay Repayment Capacity</h3>
+            </div>
+            <p class="text-xs text-slate-300">
+              Calibrated strictly to the <strong>worst-quartile weekly inflow</strong> to guarantee payment feasibility without draining emergency liquidity. The LLM never sets payment amounts.
+            </p>
+          </div>
+
+          <div class="text-right shrink-0">
+            <div class="text-xs text-slate-400">Safe Capacity Per Week</div>
+            <div class="text-3xl font-extrabold text-emerald-400" id="finalWeeklyCapacityDisplay">₹0.00</div>
+            <div class="text-xs text-slate-400 font-mono" id="monthlyEquivalentDisplay">~₹0.00 / month</div>
+          </div>
+        </div>
+
+        <!-- Formula Breakdown (Tap on hover) -->
+        <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800 text-xs space-y-2">
+          <div class="flex items-center justify-between font-mono text-[11px] text-slate-400">
+            <span class="text-emerald-400 font-bold"><i class="fa-solid fa-calculator mr-1.5"></i> Explainable Formula:</span>
+            <span>Worst-Quartile Inflow - Essential Outflows - (15% Volatility Buffer)</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-800/80 text-center font-mono">
+            <div class="p-2 rounded bg-slate-900 border border-slate-800">
+              <span class="block text-[10px] text-slate-400">25th Percentile Inflow</span>
+              <span id="formulaInflow" class="text-sm font-bold text-slate-200">₹0</span>
+            </div>
+            <div class="p-2 rounded bg-slate-900 border border-slate-800">
+              <span class="block text-[10px] text-slate-400">- Essential Outflows</span>
+              <span id="formulaOutflow" class="text-sm font-bold text-rose-300">₹0</span>
+            </div>
+            <div class="p-2 rounded bg-slate-900 border border-slate-800">
+              <span class="block text-[10px] text-slate-400">- 15% Safety Buffer</span>
+              <span id="formulaBuffer" class="text-sm font-bold text-amber-300">₹0</span>
+            </div>
+            <div class="p-2 rounded bg-emerald-950/60 border border-emerald-500/40">
+              <span class="block text-[10px] text-emerald-300">= Weekly Capacity</span>
+              <span id="formulaResult" class="text-sm font-bold text-emerald-400">₹0</span>
+            </div>
+          </div>
+          <p id="capacityExplanationText" class="text-[11px] text-slate-400 italic pt-1"></p>
+        </div>
+      </section>
+
+      <!-- 4. CATEGORIES BREAKDOWN (EDITABLE) -->
+      <section class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-tags text-cyan-400"></i>
+              Expense Classification & Self-Baseline
+            </h3>
+            <p class="text-xs text-slate-400">
+              Neutral comparison against your OWN 3-month median (no peer benchmarks, no judgments). Toggle roles to re-calculate capacity.
+            </p>
+          </div>
+          <span class="text-[11px] text-slate-400 font-mono">Taxonomy: Fixed Collections Rules</span>
+        </div>
+
+        <div class="overflow-x-auto custom-scroll">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-[11px] text-slate-400 font-semibold">
+                <th class="py-2.5 px-3">Expense Category</th>
+                <th class="py-2.5 px-3">90-Day Total</th>
+                <th class="py-2.5 px-3">Monthly Average</th>
+                <th class="py-2.5 px-3">Self-Baseline Trend</th>
+                <th class="py-2.5 px-3">Current Role</th>
+                <th class="py-2.5 px-3 text-right">Borrower Edit</th>
+              </tr>
+            </thead>
+            <tbody id="categoriesTableBody" class="divide-y divide-slate-800/60 font-mono">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5. GOVERNMENT & STATUTORY SCHEMES MATCHER -->
+      <section class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-landmark text-amber-400"></i>
+              Public Financial Support & Credit Schemes Matcher
+            </h3>
+            <p class="text-xs text-slate-400">
+              Evaluates statutory government schemes from <code>/policies/schemes.yaml</code>. Outputs "may be eligible" or "not eligible" with exact reasons; never "approved".
+            </p>
+          </div>
+          <span class="text-[11px] text-amber-400/90 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded">
+            Verify with lender before applying
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="schemesCardsContainer">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- 6. REFINANCE CALCULATOR (EDITABLE WITH 4 HARD BLOCKS) -->
+      <section class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-arrows-split-up-and-left text-indigo-400"></i>
+              Refinance Feasibility & Hard Safety Blocks
+            </h3>
+            <p class="text-xs text-slate-400">
+              Evaluates genuine savings vs. candidate offers from <code>/data/preapproved_offers.json</code>. Enforces 4 hard block rules against predatory restructuring or evergreening.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
+          
+          <!-- Existing Loan Card -->
+          <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-3 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white">Current Outstanding Loan</span>
+              <span id="existingLoanIdBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">LN-4091</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-[11px] font-mono">
+              <div>
+                <span class="text-slate-500 block">Outstanding Balance:</span>
+                <span id="existingBalDisplay" class="font-bold text-slate-200">₹40,000.00</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Current EMI:</span>
+                <span id="existingEmiDisplay" class="font-bold text-slate-200">₹5,460.00 / mo</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Current APR:</span>
+                <span id="existingAprDisplay" class="font-bold text-slate-200">24.0%</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Remaining Tenure:</span>
+                <span id="existingTenureDisplay" class="font-bold text-slate-200">8 Months</span>
+              </div>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+              <span class="text-slate-400">Total Remaining Outflow:</span>
+              <span id="existingTotalCostDisplay" class="font-bold text-rose-400 font-mono">₹43,680.00</span>
+            </div>
+          </div>
+
+          <!-- Candidate Refinance Offer Picker & Comparison -->
+          <div class="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-3 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white">Pre-Approved Offer Comparison</span>
+              <select id="refinanceOfferSelect" onchange="onRefinanceOfferSelected()" class="bg-slate-900 border border-slate-700 text-xs text-indigo-300 rounded px-2 py-1">
+                <!-- Populated by JS -->
+              </select>
+            </div>
+
+            <!-- Block Warning Alert (If Blocked) -->
+            <div id="refinanceBlockBanner" class="hidden p-3 rounded-xl bg-rose-950/80 border border-rose-600 text-rose-200 text-xs space-y-1">
+              <div class="font-bold flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+                <span id="refinanceBlockTitle">REFINANCE BLOCKED BY SAFETY POLICY</span>
+              </div>
+              <ul id="refinanceBlockReasonsList" class="list-disc list-inside text-[11px] space-y-0.5 text-rose-300/90">
+              </ul>
+            </div>
+
+            <!-- Comparison Metrics -->
+            <div class="grid grid-cols-2 gap-3 text-[11px] font-mono pt-1">
+              <div>
+                <span class="text-slate-500 block">New Monthly EMI:</span>
+                <span id="newEmiDisplay" class="font-bold text-slate-200">₹0.00</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Upfront Fees:</span>
+                <span id="upfrontFeesDisplay" class="font-bold text-slate-200">₹0.00</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Net Total Savings:</span>
+                <span id="netSavingsDisplay" class="font-bold text-emerald-400">₹0.00</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Break-Even Month:</span>
+                <span id="breakEvenDisplay" class="font-bold text-cyan-400">0.0 Months</span>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+              <span class="text-slate-400">Policy Verdict:</span>
+              <span id="refinanceVerdictDisplay" class="font-bold text-slate-300 text-xs">Evaluating...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. OBSERVATIONS FOR A HUMAN ADVISOR (NO ROI PROMISES) -->
+      <section class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-user-tie text-emerald-400"></i>
+              Data-Grounded Observations for Human Advisor
+            </h3>
+            <p class="text-xs text-slate-400">
+              Empirical patterns formatted as questions to explore with the borrower. Zero artificial ROI promises.
+            </p>
+          </div>
+          <button onclick="dispatchAdvisorHandoff()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 transition shrink-0">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Handoff to Human Advisor Desk</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1" id="advisorObservationsContainer">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div id="handoffConfirmationBanner" class="hidden p-3 rounded-xl bg-emerald-950/60 border border-emerald-600 text-emerald-300 text-xs flex items-center justify-between">
+          <span id="handoffTicketText">Ticket generated successfully.</span>
+          <span class="text-[10px] text-emerald-400">Logged to Evidence Pack</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 border-t border-slate-800 px-6 py-4 mt-8 text-center text-xs text-slate-500">
+    <p><strong>Information, not financial advice.</strong> Saarthi Cash-Flow Coach is a deterministic analytical tool supporting informed borrower decisions under the RBI Account Aggregator framework.</p>
+  </footer>
+
+  <!-- SCRIPT CONTROLLER -->
+  <script>
+    let currentPersona = 'kirana_owner';
+    let currentAnalysis = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCoachData();
+    });
+
+    async function onPersonaChanged() {
+      currentPersona = document.getElementById('personaSelector').value;
+      await loadCoachData();
+    }
+
+    async function loadCoachData() {
+      try {
+        const res = await fetch(`/api/coach/analysis?persona_id=${currentPersona}`);
+        const data = await res.json();
+        currentAnalysis = data;
+
+        if (data.consent_required) {
+          renderUnconsentedState(data);
+        } else {
+          renderConsentedDashboard(data);
+        }
+      } catch (err) {
+        console.error("Coach load error:", err);
+      }
+    }
+
+    function renderUnconsentedState(data) {
+      document.getElementById('consentBadge').innerText = "CONSENT REQUIRED";
+      document.getElementById('consentBadge').className = "text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+      document.getElementById('consentIndicator').className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse";
+      document.getElementById('btnGrantConsent').classList.remove('hidden');
+      document.getElementById('btnRevokeConsent').classList.add('hidden');
+      document.getElementById('consentMetadataBox').classList.add('hidden');
+
+      document.getElementById('unconsentedPlaceholder').classList.remove('hidden');
+      document.getElementById('coachDashboard').classList.add('hidden');
+    }
+
+    function renderConsentedDashboard(data) {
+      document.getElementById('consentBadge').innerText = "ACTIVE CONSENT";
+      document.getElementById('consentBadge').className = "text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+      document.getElementById('consentIndicator').className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+      document.getElementById('btnGrantConsent').classList.add('hidden');
+      document.getElementById('btnRevokeConsent').classList.remove('hidden');
+
+      const meta = data.consent_info || {};
+      document.getElementById('consentIdDisplay').innerText = `Consent ID: ${meta.consent_id || 'AA-ACTIVE'}`;
+      document.getElementById('consentExpiryDisplay').innerText = `Valid Until: ${(meta.expires_at || '').substring(0, 10)}`;
+      document.getElementById('consentMetadataBox').classList.remove('hidden');
+
+      document.getElementById('unconsentedPlaceholder').classList.add('hidden');
+      document.getElementById('coachDashboard').classList.remove('hidden');
+
+      // Top strip
+      document.getElementById('borrowerNameDisplay').innerText = data.name || 'Borrower';
+      document.getElementById('accountTypeDisplay').innerText = `${data.account_type} · ${data.masked_account}`;
+      document.getElementById('bankNameDisplay').innerText = data.bank_name;
+
+      const inflow = data.inflow_pattern || {};
+      const cap = data.capacity_plan || {};
+
+      document.getElementById('worstQInflowDisplay').innerText = `₹${(inflow.worst_quartile_weekly_inflow || 0).toLocaleString('en-IN')}`;
+      document.getElementById('essentialOutflowDisplay').innerText = `₹${(cap.essential_outflows_inr || 0).toLocaleString('en-IN')}`;
+
+      // Weekly Inflow Bars
+      renderWeeklyBars(inflow.weekly_inflows || [], inflow.worst_quartile_weekly_inflow || 0);
+      document.getElementById('volatilityMetricDisplay').innerText = `Volatility (CV): ${inflow.volatility_cv || 0}`;
+
+      // Day of Week
+      renderDayProfile(inflow.day_of_week_profile || {});
+      document.getElementById('weekendShareDisplay').innerText = `${inflow.weekend_share_pct || 0}%`;
+      document.getElementById('peakDayDisplay').innerText = inflow.peak_day || 'Weekend';
+      const ww = inflow.worst_week || {};
+      document.getElementById('worstWeekDisplay').innerText = `Week ${ww.week_number || 1} (₹${(ww.inflow_inr || 0).toLocaleString('en-IN')})`;
+
+      // Safe-to-pay capacity
+      document.getElementById('finalWeeklyCapacityDisplay').innerText = `₹${(cap.final_weekly_capacity_inr || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+      document.getElementById('monthlyEquivalentDisplay').innerText = `~₹${(cap.monthly_equivalent_inr || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})} / month`;
+      document.getElementById('formulaInflow').innerText = `₹${(cap.worst_quartile_weekly_inflow_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('formulaOutflow').innerText = `₹${(cap.essential_outflows_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('formulaBuffer').innerText = `₹${(cap.safety_buffer_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('formulaResult').innerText = `₹${(cap.final_weekly_capacity_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('capacityExplanationText').innerText = cap.explanation || '';
+
+      // Categories
+      renderCategories(data.categories_summary || {});
+
+      // Schemes
+      renderSchemes(data.matched_schemes || []);
+
+      // Refinance Options
+      renderRefinanceSection(data.refinance_options || []);
+
+      // Advisor Observations
+      renderAdvisorObservations(data.advisor_observations || []);
+    }
+
+    function renderWeeklyBars(inflows, q1) {
+      const container = document.getElementById('weeklyBarsContainer');
+      container.innerHTML = '';
+      const maxVal = Math.max(...inflows, 1000);
+
+      inflows.forEach((amt, idx) => {
+        const pct = Math.min(100, (amt / maxVal) * 100);
+        const isQ1 = amt <= q1;
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 text-[11px] font-mono';
+        row.innerHTML = `
+          <span class="w-12 text-slate-400">Wk ${idx + 1}</span>
+          <div class="flex-1 bg-slate-800 rounded-full h-3 overflow-hidden flex items-center">
+            <div class="${isQ1 ? 'bg-amber-500' : 'bg-emerald-500'} h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+          </div>
+          <span class="w-20 text-right ${isQ1 ? 'text-amber-300 font-bold' : 'text-slate-300'}">₹${amt.toLocaleString('en-IN')}</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderDayProfile(dayMap) {
+      const container = document.getElementById('dayOfWeekContainer');
+      container.innerHTML = '';
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+      days.forEach(d => {
+        const item = dayMap[d] || { amount_inr: 0, share_pct: 0 };
+        const isWeekend = (d === 'Sat' || d === 'Sun');
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between py-0.5';
+        row.innerHTML = `
+          <span class="${isWeekend ? 'font-bold text-emerald-400' : 'text-slate-400'}">${d}</span>
+          <div class="flex items-center gap-2 font-mono">
+            <span class="text-slate-300">₹${item.amount_inr.toLocaleString('en-IN')}</span>
+            <span class="text-[10px] text-slate-500 w-10 text-right">${item.share_pct}%</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderCategories(cats) {
+      const tbody = document.getElementById('categoriesTableBody');
+      tbody.innerHTML = '';
+
+      for (const [catId, info] of Object.entries(cats)) {
+        const isEssential = (info.role === 'essential');
+        const isFlexible = (info.role === 'flexible');
+        const isIgnore = (info.role === 'ignore');
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-sans font-medium text-white flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full ${isEssential ? 'bg-rose-400' : isFlexible ? 'bg-cyan-400' : 'bg-slate-500'}"></span>
+            ${info.display_name}
+          </td>
+          <td class="py-2.5 px-3 text-slate-300">₹${info.total_inr.toLocaleString('en-IN')}</td>
+          <td class="py-2.5 px-3 text-slate-300">₹${info.monthly_avg_inr.toLocaleString('en-IN')}</td>
+          <td class="py-2.5 px-3 text-[11px] text-slate-400">
+            ₹${info.monthly_avg_inr.toLocaleString('en-IN')} vs 3-mo median (neutral self-baseline)
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="text-[10px] px-2 py-0.5 rounded font-mono ${
+              isEssential ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
+              isFlexible ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
+              'bg-slate-700 text-slate-300'
+            }">
+              ${info.role.toUpperCase()}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            <div class="inline-flex rounded-lg bg-slate-800 p-0.5 text-[10px]">
+              <button onclick="overrideCategory('${catId}', 'essential')" class="px-2 py-0.5 rounded ${isEssential ? 'bg-rose-600 text-white font-bold' : 'text-slate-400 hover:text-white'}">Essential</button>
+              <button onclick="overrideCategory('${catId}', 'flexible')" class="px-2 py-0.5 rounded ${isFlexible ? 'bg-cyan-600 text-white font-bold' : 'text-slate-400 hover:text-white'}">Flexible</button>
+              <button onclick="overrideCategory('${catId}', 'ignore')" class="px-2 py-0.5 rounded ${isIgnore ? 'bg-slate-600 text-white font-bold' : 'text-slate-400 hover:text-white'}">Ignore</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function overrideCategory(catId, newRole) {
+      try {
+        const res = await fetch('/api/coach/override-category', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            persona_id: currentPersona,
+            category: catId,
+            role: newRole
+          })
+        });
+        const data = await res.json();
+        currentAnalysis = data;
+        renderConsentedDashboard(data);
+      } catch (err) {
+        console.error("Override category err:", err);
+      }
+    }
+
+    function renderSchemes(schemes) {
+      const container = document.getElementById('schemesCardsContainer');
+      container.innerHTML = '';
+
+      schemes.forEach(s => {
+        const isEligible = (s.eligibility_verdict === 'may be eligible');
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border flex flex-col justify-between space-y-3 ${
+          isEligible ? 'bg-emerald-950/20 border-emerald-500/40' : 'bg-slate-950/60 border-slate-800'
+        }`;
+
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-xs text-white leading-snug">${s.name}</h4>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded shrink-0 ${
+                isEligible ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'
+              }">
+                ${s.eligibility_verdict.toUpperCase()}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-relaxed">${s.what_it_gives}</p>
+            <div class="p-2 rounded bg-slate-900 border border-slate-800/80 text-[10px] space-y-1">
+              <span class="text-amber-400 font-bold block"><i class="fa-solid fa-circle-info mr-1"></i> Essential Catch:</span>
+              <p class="text-slate-400 leading-normal">${s.catch}</p>
+            </div>
+            <div class="text-[10px] text-slate-400 space-y-0.5">
+              ${s.reasons.map(r => `<div class="flex items-start gap-1"><i class="fa-solid ${isEligible ? 'fa-check text-emerald-400' : 'fa-xmark text-slate-500'} mt-0.5"></i> <span>${r}</span></div>`).join('')}
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[10px]">
+            <span class="text-slate-500">Verified: ${s.last_verified}</span>
+            <a href="${s.official_url}" target="_blank" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium">
+              Official Portal <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderRefinanceSection(refinanceOptions) {
+      const select = document.getElementById('refinanceOfferSelect');
+      select.innerHTML = '';
+
+      refinanceOptions.forEach((opt, idx) => {
+        const c = opt.candidate_offer;
+        const optEl = document.createElement('option');
+        optEl.value = idx;
+        optEl.innerText = `${c.product_name} (${c.interest_rate_apr}% APR, ${c.tenure_months}m)`;
+        select.appendChild(optEl);
+      });
+
+      if (refinanceOptions.length > 0) {
+        showRefinanceOfferDetails(refinanceOptions[0]);
+      }
+    }
+
+    function onRefinanceOfferSelected() {
+      const idx = document.getElementById('refinanceOfferSelect').value;
+      if (currentAnalysis && currentAnalysis.refinance_options) {
+        showRefinanceOfferDetails(currentAnalysis.refinance_options[idx]);
+      }
+    }
+
+    function showRefinanceOfferDetails(opt) {
+      if (!opt) return;
+      const ex = opt.existing_loan || {};
+      const can = opt.candidate_offer || {};
+      const comp = opt.comparison || {};
+
+      document.getElementById('existingBalDisplay').innerText = `₹${(ex.outstanding_principal_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('existingEmiDisplay').innerText = `₹${(ex.current_emi_inr || 0).toLocaleString('en-IN')} / mo`;
+      document.getElementById('existingAprDisplay').innerText = `${ex.interest_rate_apr}%`;
+      document.getElementById('existingTenureDisplay').innerText = `${ex.remaining_tenure_months} Months`;
+      document.getElementById('existingTotalCostDisplay').innerText = `₹${(ex.total_remaining_cost_inr || 0).toLocaleString('en-IN')}`;
+
+      document.getElementById('newEmiDisplay').innerText = `₹${(can.new_monthly_emi_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('upfrontFeesDisplay').innerText = `₹${(can.upfront_fees_total_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('netSavingsDisplay').innerText = `₹${(comp.net_savings_inr || 0).toLocaleString('en-IN')}`;
+      document.getElementById('breakEvenDisplay').innerText = comp.break_even_month !== null ? `${comp.break_even_month} Months` : 'N/A';
+      document.getElementById('refinanceVerdictDisplay').innerText = comp.verdict;
+
+      const banner = document.getElementById('refinanceBlockBanner');
+      const list = document.getElementById('refinanceBlockReasonsList');
+      list.innerHTML = '';
+
+      if (comp.is_blocked) {
+        banner.classList.remove('hidden');
+        (comp.block_reasons || []).forEach(b => {
+          const li = document.createElement('li');
+          li.innerText = b.reason;
+          list.appendChild(li);
+        });
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function renderAdvisorObservations(obs) {
+      const container = document.getElementById('advisorObservationsContainer');
+      container.innerHTML = '';
+
+      obs.forEach(o => {
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-2';
+        card.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+            <span class="font-bold text-white text-xs">${o.topic}</span>
+          </div>
+          <p class="text-slate-300 text-[11px] leading-relaxed">${o.observation}</p>
+          <div class="p-2 rounded bg-indigo-950/30 border border-indigo-800/40 text-[11px] text-indigo-300">
+            <strong>Question to Discuss:</strong> ${o.question_to_discuss}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function toggleConsent(granted) {
+      try {
+        const res = await fetch('/api/coach/consent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            persona_id: currentPersona,
+            granted: granted,
+            purpose: "AFFORDABLE_REPAYMENT_ASSESSMENT"
+          })
+        });
+        await res.json();
+        await loadCoachData();
+      } catch (err) {
+        console.error("Consent toggle err:", err);
+      }
+    }
+
+    async function dispatchAdvisorHandoff() {
+      try {
+        const res = await fetch('/api/coach/advisor-handoff', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            persona_id: currentPersona,
+            notes: "Borrower requested financial check-up review and assistance exploring collateral-free MSE limits."
+          })
+        });
+        const data = await res.json();
+        const banner = document.getElementById('handoffConfirmationBanner');
+        banner.classList.remove('hidden');
+        document.getElementById('handoffTicketText').innerText = `Handoff Ticket ${data.ticket_id} created for ${data.borrower_name} under ${data.routing}.`;
+      } catch (err) {
+        console.error("Handoff err:", err);
+      }
+    }
+  </script>
+</body>
+</html>

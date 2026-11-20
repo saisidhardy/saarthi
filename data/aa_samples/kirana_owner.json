@@ -1,0 +1,1834 @@
+{
+  "persona_id": "kirana_owner",
+  "name": "Sunita Patil (Shree Ganesh Kirana)",
+  "account_type": "CURRENT",
+  "bank_name": "Demo Bank Ltd.",
+  "masked_account": "XXXXXX4091",
+  "period_days": 90,
+  "label": "synthetic data; production uses RBI Account Aggregator consent via the lender",
+  "attributes": {
+    "business_type": "RETAIL_KIRANA",
+    "is_street_vendor": false,
+    "is_new_enterprise": false,
+    "enterprise_age_years": 4.5,
+    "has_udyam_registration": true,
+    "udyam_category": "MICRO",
+    "annual_turnover_inr": 2400000.0,
+    "existing_loan": {
+      "lender_name": "Demo Lender A",
+      "lender_id": "demo_lender_a",
+      "loan_id": "LN-KIRANA-4091",
+      "outstanding_principal_inr": 40000.0,
+      "interest_rate_apr": 24.0,
+      "remaining_tenure_months": 8,
+      "current_emi_inr": 5460.0,
+      "prepayment_charge_pct": 2.0,
+      "is_overdue": true,
+      "overdue_amount_inr": 10920.0,
+      "dpd": 18,
+      "has_hardship_flag": false
+    }
+  },
+  "transactions": [
+    {
+      "txn_id": "TXN-AA-1001",
+      "date": "2026-08-21",
+      "amount": 2160.48,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1002",
+      "date": "2026-08-21",
+      "amount": 1440.32,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1003",
+      "date": "2026-08-21",
+      "amount": 2089.86,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1004",
+      "date": "2026-08-22",
+      "amount": 2402.14,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1005",
+      "date": "2026-08-22",
+      "amount": 1601.42,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1006",
+      "date": "2026-08-23",
+      "amount": 2141.39,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1007",
+      "date": "2026-08-23",
+      "amount": 1427.59,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1008",
+      "date": "2026-08-24",
+      "amount": 1824.02,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1009",
+      "date": "2026-08-24",
+      "amount": 1216.01,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1010",
+      "date": "2026-08-25",
+      "amount": 1117.54,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1011",
+      "date": "2026-08-25",
+      "amount": 745.03,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1012",
+      "date": "2026-08-25",
+      "amount": 11030.47,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "METRO-CASH-CARRY-SUPPLIER-PAYMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1013",
+      "date": "2026-08-26",
+      "amount": 1982.18,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1014",
+      "date": "2026-08-26",
+      "amount": 1321.46,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1015",
+      "date": "2026-08-27",
+      "amount": 1357.76,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1016",
+      "date": "2026-08-27",
+      "amount": 905.17,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1017",
+      "date": "2026-08-28",
+      "amount": 2520.89,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1018",
+      "date": "2026-08-28",
+      "amount": 1680.59,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1019",
+      "date": "2026-08-28",
+      "amount": 2243.16,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1020",
+      "date": "2026-08-29",
+      "amount": 3427.98,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1021",
+      "date": "2026-08-29",
+      "amount": 2285.32,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1022",
+      "date": "2026-08-30",
+      "amount": 2520.2,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1023",
+      "date": "2026-08-30",
+      "amount": 1680.13,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1024",
+      "date": "2026-08-30",
+      "amount": 819.92,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "FAMILY-RESTAURANT-WEEKEND-OUTING"
+    },
+    {
+      "txn_id": "TXN-AA-1025",
+      "date": "2026-08-31",
+      "amount": 1196.86,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1026",
+      "date": "2026-08-31",
+      "amount": 797.91,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1027",
+      "date": "2026-09-01",
+      "amount": 1532.31,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1028",
+      "date": "2026-09-01",
+      "amount": 1021.54,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1029",
+      "date": "2026-09-01",
+      "amount": 11907.69,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "ITC-LIMITED-WHOLESALE-STOCK-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1030",
+      "date": "2026-09-02",
+      "amount": 1999.46,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1031",
+      "date": "2026-09-02",
+      "amount": 1332.97,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1032",
+      "date": "2026-09-03",
+      "amount": 2306.13,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1033",
+      "date": "2026-09-03",
+      "amount": 1537.42,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1034",
+      "date": "2026-09-03",
+      "amount": 5460.0,
+      "type": "DEBIT",
+      "mode": "NACH",
+      "narration": "DEMO-LENDER-A-LOAN-EMI-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1035",
+      "date": "2026-09-04",
+      "amount": 2090.21,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1036",
+      "date": "2026-09-04",
+      "amount": 1393.47,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1037",
+      "date": "2026-09-04",
+      "amount": 1551.81,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1038",
+      "date": "2026-09-05",
+      "amount": 3256.0,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1039",
+      "date": "2026-09-05",
+      "amount": 2170.67,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1040",
+      "date": "2026-09-05",
+      "amount": 11000.0,
+      "type": "DEBIT",
+      "mode": "IMPS",
+      "narration": "RENT-TRANSFER-SHARMA-COMMERCIAL-SHOP"
+    },
+    {
+      "txn_id": "TXN-AA-1041",
+      "date": "2026-09-06",
+      "amount": 3167.08,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1042",
+      "date": "2026-09-06",
+      "amount": 2111.39,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1043",
+      "date": "2026-09-07",
+      "amount": 1913.19,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1044",
+      "date": "2026-09-07",
+      "amount": 1275.46,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1045",
+      "date": "2026-09-07",
+      "amount": 8000.0,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "WAGES-SHOP-ASSISTANT-RAMESH"
+    },
+    {
+      "txn_id": "TXN-AA-1046",
+      "date": "2026-09-08",
+      "amount": 2321.38,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1047",
+      "date": "2026-09-08",
+      "amount": 1547.59,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1048",
+      "date": "2026-09-08",
+      "amount": 15487.22,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "METRO-CASH-CARRY-SUPPLIER-PAYMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1049",
+      "date": "2026-09-09",
+      "amount": 1430.25,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1050",
+      "date": "2026-09-09",
+      "amount": 953.5,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1051",
+      "date": "2026-09-10",
+      "amount": 1284.94,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1052",
+      "date": "2026-09-10",
+      "amount": 856.63,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1053",
+      "date": "2026-09-10",
+      "amount": 2350.0,
+      "type": "DEBIT",
+      "mode": "BBPS",
+      "narration": "MSEDCL-ELECTRICITY-BILL-COMMERCIAL"
+    },
+    {
+      "txn_id": "TXN-AA-1054",
+      "date": "2026-09-11",
+      "amount": 2372.54,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1055",
+      "date": "2026-09-11",
+      "amount": 1581.69,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1056",
+      "date": "2026-09-11",
+      "amount": 1520.37,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1057",
+      "date": "2026-09-12",
+      "amount": 3319.76,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1058",
+      "date": "2026-09-12",
+      "amount": 2213.17,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1059",
+      "date": "2026-09-13",
+      "amount": 3291.55,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1060",
+      "date": "2026-09-13",
+      "amount": 2194.37,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1061",
+      "date": "2026-09-14",
+      "amount": 1285.89,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1062",
+      "date": "2026-09-14",
+      "amount": 857.26,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1063",
+      "date": "2026-09-15",
+      "amount": 1420.13,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1064",
+      "date": "2026-09-15",
+      "amount": 946.76,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1065",
+      "date": "2026-09-15",
+      "amount": 15977.74,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "HINDUSTAN-UNILEVER-DISTRIBUTOR-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1066",
+      "date": "2026-09-16",
+      "amount": 2141.99,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1067",
+      "date": "2026-09-16",
+      "amount": 1428.0,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1068",
+      "date": "2026-09-17",
+      "amount": 1368.6,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1069",
+      "date": "2026-09-17",
+      "amount": 912.4,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1070",
+      "date": "2026-09-18",
+      "amount": 3658.9,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1071",
+      "date": "2026-09-18",
+      "amount": 2439.27,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1072",
+      "date": "2026-09-18",
+      "amount": 1681.4,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1073",
+      "date": "2026-09-19",
+      "amount": 2375.72,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1074",
+      "date": "2026-09-19",
+      "amount": 1583.82,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1075",
+      "date": "2026-09-20",
+      "amount": 3812.95,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1076",
+      "date": "2026-09-20",
+      "amount": 2541.97,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1077",
+      "date": "2026-09-20",
+      "amount": 760.49,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "FAMILY-RESTAURANT-WEEKEND-OUTING"
+    },
+    {
+      "txn_id": "TXN-AA-1078",
+      "date": "2026-09-21",
+      "amount": 2194.7,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1079",
+      "date": "2026-09-21",
+      "amount": 1463.13,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1080",
+      "date": "2026-09-22",
+      "amount": 1260.02,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1081",
+      "date": "2026-09-22",
+      "amount": 840.01,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1082",
+      "date": "2026-09-22",
+      "amount": 10477.41,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "ITC-LIMITED-WHOLESALE-STOCK-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1083",
+      "date": "2026-09-23",
+      "amount": 2211.26,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1084",
+      "date": "2026-09-23",
+      "amount": 1474.17,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1085",
+      "date": "2026-09-24",
+      "amount": 1536.12,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1086",
+      "date": "2026-09-24",
+      "amount": 1024.08,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1087",
+      "date": "2026-09-25",
+      "amount": 3020.58,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1088",
+      "date": "2026-09-25",
+      "amount": 2013.72,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1089",
+      "date": "2026-09-25",
+      "amount": 1309.09,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1090",
+      "date": "2026-09-26",
+      "amount": 3779.98,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1091",
+      "date": "2026-09-26",
+      "amount": 2519.99,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1092",
+      "date": "2026-09-27",
+      "amount": 3275.28,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1093",
+      "date": "2026-09-27",
+      "amount": 2183.52,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1094",
+      "date": "2026-09-28",
+      "amount": 1831.48,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1095",
+      "date": "2026-09-28",
+      "amount": 1220.98,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1096",
+      "date": "2026-09-29",
+      "amount": 1560.84,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1097",
+      "date": "2026-09-29",
+      "amount": 1040.56,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1098",
+      "date": "2026-09-29",
+      "amount": 16472.85,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "ITC-LIMITED-WHOLESALE-STOCK-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1099",
+      "date": "2026-09-30",
+      "amount": 1937.16,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1100",
+      "date": "2026-09-30",
+      "amount": 1291.44,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1101",
+      "date": "2026-10-01",
+      "amount": 1938.96,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1102",
+      "date": "2026-10-01",
+      "amount": 1292.64,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1103",
+      "date": "2026-10-02",
+      "amount": 3541.9,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1104",
+      "date": "2026-10-02",
+      "amount": 2361.26,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1105",
+      "date": "2026-10-02",
+      "amount": 2122.32,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1106",
+      "date": "2026-10-03",
+      "amount": 2160.95,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1107",
+      "date": "2026-10-03",
+      "amount": 1440.64,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1108",
+      "date": "2026-10-03",
+      "amount": 5460.0,
+      "type": "DEBIT",
+      "mode": "NACH",
+      "narration": "DEMO-LENDER-A-LOAN-EMI-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1109",
+      "date": "2026-10-04",
+      "amount": 2261.62,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1110",
+      "date": "2026-10-04",
+      "amount": 1507.75,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1111",
+      "date": "2026-10-04",
+      "amount": 797.15,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "FAMILY-RESTAURANT-WEEKEND-OUTING"
+    },
+    {
+      "txn_id": "TXN-AA-1112",
+      "date": "2026-10-05",
+      "amount": 2304.58,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1113",
+      "date": "2026-10-05",
+      "amount": 1536.39,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1114",
+      "date": "2026-10-05",
+      "amount": 11000.0,
+      "type": "DEBIT",
+      "mode": "IMPS",
+      "narration": "RENT-TRANSFER-SHARMA-COMMERCIAL-SHOP"
+    },
+    {
+      "txn_id": "TXN-AA-1115",
+      "date": "2026-10-06",
+      "amount": 1719.68,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1116",
+      "date": "2026-10-06",
+      "amount": 1146.45,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1117",
+      "date": "2026-10-06",
+      "amount": 10244.88,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "ITC-LIMITED-WHOLESALE-STOCK-ORDER"
+    },
+    {
+      "txn_id": "TXN-AA-1118",
+      "date": "2026-10-07",
+      "amount": 1272.58,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1119",
+      "date": "2026-10-07",
+      "amount": 848.38,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1120",
+      "date": "2026-10-07",
+      "amount": 8000.0,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "WAGES-SHOP-ASSISTANT-RAMESH"
+    },
+    {
+      "txn_id": "TXN-AA-1121",
+      "date": "2026-10-08",
+      "amount": 1759.62,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1122",
+      "date": "2026-10-08",
+      "amount": 1173.08,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1123",
+      "date": "2026-10-09",
+      "amount": 3903.95,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1124",
+      "date": "2026-10-09",
+      "amount": 2602.63,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1125",
+      "date": "2026-10-09",
+      "amount": 1918.73,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1126",
+      "date": "2026-10-10",
+      "amount": 1962.07,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1127",
+      "date": "2026-10-10",
+      "amount": 1308.05,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1128",
+      "date": "2026-10-10",
+      "amount": 2350.0,
+      "type": "DEBIT",
+      "mode": "BBPS",
+      "narration": "MSEDCL-ELECTRICITY-BILL-COMMERCIAL"
+    },
+    {
+      "txn_id": "TXN-AA-1129",
+      "date": "2026-10-11",
+      "amount": 3818.04,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1130",
+      "date": "2026-10-11",
+      "amount": 2545.36,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1131",
+      "date": "2026-10-12",
+      "amount": 1381.71,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1132",
+      "date": "2026-10-12",
+      "amount": 921.14,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1133",
+      "date": "2026-10-13",
+      "amount": 2186.29,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1134",
+      "date": "2026-10-13",
+      "amount": 1457.53,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1135",
+      "date": "2026-10-13",
+      "amount": 16128.65,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "METRO-CASH-CARRY-SUPPLIER-PAYMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1136",
+      "date": "2026-10-14",
+      "amount": 2108.19,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1137",
+      "date": "2026-10-14",
+      "amount": 1405.46,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1138",
+      "date": "2026-10-15",
+      "amount": 1241.77,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1139",
+      "date": "2026-10-15",
+      "amount": 827.85,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1140",
+      "date": "2026-10-16",
+      "amount": 3965.19,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1141",
+      "date": "2026-10-16",
+      "amount": 2643.46,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1142",
+      "date": "2026-10-16",
+      "amount": 1398.15,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1143",
+      "date": "2026-10-17",
+      "amount": 3804.46,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1144",
+      "date": "2026-10-17",
+      "amount": 2536.3,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1145",
+      "date": "2026-10-18",
+      "amount": 4003.02,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1146",
+      "date": "2026-10-18",
+      "amount": 2668.68,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1147",
+      "date": "2026-10-19",
+      "amount": 1978.32,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1148",
+      "date": "2026-10-19",
+      "amount": 1318.88,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1149",
+      "date": "2026-10-20",
+      "amount": 2333.89,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1150",
+      "date": "2026-10-20",
+      "amount": 1555.93,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1151",
+      "date": "2026-10-20",
+      "amount": 14049.15,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "AMUL-DAIRY-PRODUCTS-WHOLESALE-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1152",
+      "date": "2026-10-21",
+      "amount": 1232.47,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1153",
+      "date": "2026-10-21",
+      "amount": 821.64,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1154",
+      "date": "2026-10-22",
+      "amount": 1160.67,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1155",
+      "date": "2026-10-22",
+      "amount": 773.78,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1156",
+      "date": "2026-10-23",
+      "amount": 3190.75,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1157",
+      "date": "2026-10-23",
+      "amount": 2127.16,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1158",
+      "date": "2026-10-23",
+      "amount": 1476.14,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1159",
+      "date": "2026-10-24",
+      "amount": 1935.53,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1160",
+      "date": "2026-10-24",
+      "amount": 1290.35,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1161",
+      "date": "2026-10-25",
+      "amount": 3283.18,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1162",
+      "date": "2026-10-25",
+      "amount": 2188.79,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1163",
+      "date": "2026-10-25",
+      "amount": 897.98,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "FAMILY-RESTAURANT-WEEKEND-OUTING"
+    },
+    {
+      "txn_id": "TXN-AA-1164",
+      "date": "2026-10-26",
+      "amount": 1169.28,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1165",
+      "date": "2026-10-26",
+      "amount": 779.52,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1166",
+      "date": "2026-10-27",
+      "amount": 1430.88,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1167",
+      "date": "2026-10-27",
+      "amount": 953.92,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1168",
+      "date": "2026-10-27",
+      "amount": 12897.9,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "HINDUSTAN-UNILEVER-DISTRIBUTOR-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1169",
+      "date": "2026-10-28",
+      "amount": 1386.18,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1170",
+      "date": "2026-10-28",
+      "amount": 924.12,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1171",
+      "date": "2026-10-29",
+      "amount": 2097.45,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1172",
+      "date": "2026-10-29",
+      "amount": 1398.3,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1173",
+      "date": "2026-10-30",
+      "amount": 2123.74,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1174",
+      "date": "2026-10-30",
+      "amount": 1415.83,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1175",
+      "date": "2026-10-30",
+      "amount": 1990.78,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1176",
+      "date": "2026-10-31",
+      "amount": 2834.93,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1177",
+      "date": "2026-10-31",
+      "amount": 1889.95,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1178",
+      "date": "2026-11-01",
+      "amount": 3785.89,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1179",
+      "date": "2026-11-01",
+      "amount": 2523.92,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1180",
+      "date": "2026-11-01",
+      "amount": 759.4,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "FAMILY-RESTAURANT-WEEKEND-OUTING"
+    },
+    {
+      "txn_id": "TXN-AA-1181",
+      "date": "2026-11-02",
+      "amount": 1156.37,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1182",
+      "date": "2026-11-02",
+      "amount": 770.91,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1183",
+      "date": "2026-11-03",
+      "amount": 2088.75,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1184",
+      "date": "2026-11-03",
+      "amount": 1392.5,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1185",
+      "date": "2026-11-03",
+      "amount": 10264.88,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "HINDUSTAN-UNILEVER-DISTRIBUTOR-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1186",
+      "date": "2026-11-03",
+      "amount": 5460.0,
+      "type": "DEBIT",
+      "mode": "NACH",
+      "narration": "DEMO-LENDER-A-LOAN-EMI-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1187",
+      "date": "2026-11-04",
+      "amount": 1755.72,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1188",
+      "date": "2026-11-04",
+      "amount": 1170.48,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1189",
+      "date": "2026-11-05",
+      "amount": 1611.57,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1190",
+      "date": "2026-11-05",
+      "amount": 1074.38,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1191",
+      "date": "2026-11-05",
+      "amount": 11000.0,
+      "type": "DEBIT",
+      "mode": "IMPS",
+      "narration": "RENT-TRANSFER-SHARMA-COMMERCIAL-SHOP"
+    },
+    {
+      "txn_id": "TXN-AA-1192",
+      "date": "2026-11-06",
+      "amount": 2919.28,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1193",
+      "date": "2026-11-06",
+      "amount": 1946.18,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1194",
+      "date": "2026-11-06",
+      "amount": 2249.38,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1195",
+      "date": "2026-11-07",
+      "amount": 2877.16,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1196",
+      "date": "2026-11-07",
+      "amount": 1918.11,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1197",
+      "date": "2026-11-07",
+      "amount": 8000.0,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "WAGES-SHOP-ASSISTANT-RAMESH"
+    },
+    {
+      "txn_id": "TXN-AA-1198",
+      "date": "2026-11-08",
+      "amount": 2131.48,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1199",
+      "date": "2026-11-08",
+      "amount": 1420.99,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1200",
+      "date": "2026-11-09",
+      "amount": 2300.94,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1201",
+      "date": "2026-11-09",
+      "amount": 1533.96,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1202",
+      "date": "2026-11-10",
+      "amount": 1289.55,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1203",
+      "date": "2026-11-10",
+      "amount": 859.7,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1204",
+      "date": "2026-11-10",
+      "amount": 12899.49,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "HINDUSTAN-UNILEVER-DISTRIBUTOR-DEBIT"
+    },
+    {
+      "txn_id": "TXN-AA-1205",
+      "date": "2026-11-10",
+      "amount": 2350.0,
+      "type": "DEBIT",
+      "mode": "BBPS",
+      "narration": "MSEDCL-ELECTRICITY-BILL-COMMERCIAL"
+    },
+    {
+      "txn_id": "TXN-AA-1206",
+      "date": "2026-11-11",
+      "amount": 2217.08,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1207",
+      "date": "2026-11-11",
+      "amount": 1478.05,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1208",
+      "date": "2026-11-12",
+      "amount": 1557.51,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1209",
+      "date": "2026-11-12",
+      "amount": 1038.34,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1210",
+      "date": "2026-11-13",
+      "amount": 2492.84,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1211",
+      "date": "2026-11-13",
+      "amount": 1661.89,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1212",
+      "date": "2026-11-13",
+      "amount": 2140.88,
+      "type": "DEBIT",
+      "mode": "UPI",
+      "narration": "HOUSEHOLD-GROCERIES-MEDICINES-APOLLO"
+    },
+    {
+      "txn_id": "TXN-AA-1213",
+      "date": "2026-11-14",
+      "amount": 2536.14,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1214",
+      "date": "2026-11-14",
+      "amount": 1690.76,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1215",
+      "date": "2026-11-15",
+      "amount": 3987.81,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1216",
+      "date": "2026-11-15",
+      "amount": 2658.54,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1217",
+      "date": "2026-11-16",
+      "amount": 1275.04,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1218",
+      "date": "2026-11-16",
+      "amount": 850.03,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1219",
+      "date": "2026-11-17",
+      "amount": 1354.3,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1220",
+      "date": "2026-11-17",
+      "amount": 902.87,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1221",
+      "date": "2026-11-17",
+      "amount": 9909.38,
+      "type": "DEBIT",
+      "mode": "NEFT",
+      "narration": "METRO-CASH-CARRY-SUPPLIER-PAYMENT"
+    },
+    {
+      "txn_id": "TXN-AA-1222",
+      "date": "2026-11-18",
+      "amount": 1152.03,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1223",
+      "date": "2026-11-18",
+      "amount": 768.02,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    },
+    {
+      "txn_id": "TXN-AA-1224",
+      "date": "2026-11-19",
+      "amount": 1713.59,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PAYTM-QR-RETAIL-CREDIT"
+    },
+    {
+      "txn_id": "TXN-AA-1225",
+      "date": "2026-11-19",
+      "amount": 1142.39,
+      "type": "CREDIT",
+      "mode": "UPI",
+      "narration": "UPI-SETTLE-PHONEPE-MERCHANT-INFLOW"
+    }
+  ]
+}

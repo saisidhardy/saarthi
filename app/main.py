@@ -10,7 +10,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, List, Literal
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, Response, Query, UploadFile, File, Form
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -33,6 +33,16 @@ from services.sarvam import FALLBACK_MP3_B64, sarvam_service, LANGUAGE_SPEAKER_M
 from services.call_plan import generate_call_plan_from_csv, export_call_plan_csv
 from services.batch_audit import audit_batch_transcripts_csv, export_batch_audit_csv
 from services.outcomes import analyze_outcomes_csv
+from services.coach import (
+    get_available_personas,
+    get_consent,
+    record_consent,
+    run_full_cashflow_coach,
+    calculate_refinance_comparison,
+    CATEGORY_OVERRIDES,
+    load_preapproved_offers,
+    get_persona_raw_data
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -832,6 +842,24 @@ async def text_to_speech(req: TTSRequest):
         "voice_name": voice_name
     }
 
+@app.get("/api/voice/demo-audio/{language}")
+def get_demo_audio(language: str):
+    lang_lower = language.lower()
+    fname_map = {
+        "english": "demo_english.mp3",
+        "en": "demo_english.mp3",
+        "hindi": "demo_hindi.mp3",
+        "hi": "demo_hindi.mp3",
+        "telugu": "demo_telugu.mp3",
+        "te": "demo_telugu.mp3"
+    }
+    fname = fname_map.get(lang_lower, "demo_hindi.mp3")
+    fpath = os.path.join(STATIC_DIR, "audio", fname)
+    if os.path.exists(fpath):
+        from fastapi.responses import FileResponse
+        return FileResponse(fpath, media_type="audio/mpeg")
+    raise HTTPException(status_code=404, detail="Audio file not found")
+
 
 # ==================== TELEPHONY BRIDGE (EXOTEL & TWILIO PSTN) ====================
 
@@ -1081,6 +1109,121 @@ def api_sarvam_live_status():
         "speakers_mapping": LANGUAGE_SPEAKER_MAP
     }
 
+# ==========================================
+# 16. CASH-FLOW COACH (V5 Delta - Separate Opt-In Prototype)
+# ==========================================
+class CoachConsentRequest(BaseModel):
+    persona_id: str
+    granted: bool
+    purpose: Optional[str] = "AFFORDABLE_REPAYMENT_ASSESSMENT"
+
+class CoachOverrideRequest(BaseModel):
+    persona_id: str
+    category: str
+    role: str # "essential", "flexible", "ignore"
+
+class CoachRefinanceRequest(BaseModel):
+    persona_id: str
+    candidate_offer: Dict[str, Any]
+
+class CoachHandoffRequest(BaseModel):
+    persona_id: str
+    notes: Optional[str] = ""
+
+@app.get("/api/coach/personas")
+def api_coach_personas():
+    return {"personas": get_available_personas()}
+
+@app.get("/api/coach/consent")
+def api_coach_get_consent(persona_id: str = "kirana_owner"):
+    return get_consent(persona_id)
+
+@app.post("/api/coach/consent")
+def api_coach_record_consent(req: CoachConsentRequest):
+    record = record_consent(req.persona_id, granted=req.granted, purpose=req.purpose or "AFFORDABLE_REPAYMENT_ASSESSMENT")
+    
+    # Optional mapping to active loan cases in evidence pack
+    persona_case_map = {
+        "kirana_owner": "1",
+        "salaried_household": "2",
+        "agri_trader": "25"
+    }
+    case_id = persona_case_map.get(req.persona_id)
+    if case_id:
+        case = get_case(case_id, workflow_id="collections")
+        if case:
+            case.data["aa_consent"] = record
+            case.add_trace(
+                agent="CashFlowCoach",
+                action="Account Aggregator Consent Updated",
+                summary=f"Consent status for {req.persona_id}: {record['status']} (ID: {record['consent_id']})",
+                badge="Consent"
+            )
+            save_case(case)
+            
+    return record
+
+@app.get("/api/coach/analysis")
+def api_coach_analysis(persona_id: str = "kirana_owner"):
+    return run_full_cashflow_coach(persona_id)
+
+@app.post("/api/coach/override-category")
+def api_coach_override_category(req: CoachOverrideRequest):
+    if req.persona_id not in CATEGORY_OVERRIDES:
+        CATEGORY_OVERRIDES[req.persona_id] = {}
+    CATEGORY_OVERRIDES[req.persona_id][req.category] = req.role
+    return run_full_cashflow_coach(req.persona_id)
+
+@app.post("/api/coach/refinance-evaluate")
+def api_coach_refinance_evaluate(req: CoachRefinanceRequest):
+    raw = get_persona_raw_data(req.persona_id)
+    if not raw:
+        raise HTTPException(status_code=404, detail="Persona not found")
+    existing_loan = raw.get("attributes", {}).get("existing_loan", {})
+    
+    # Get weekly capacity
+    analysis = run_full_cashflow_coach(req.persona_id)
+    weekly_cap = 1000.0
+    if not analysis.get("consent_required"):
+        weekly_cap = analysis.get("capacity_plan", {}).get("final_weekly_capacity_inr", 1000.0)
+        
+    return calculate_refinance_comparison(existing_loan, req.candidate_offer, weekly_cap)
+
+@app.post("/api/coach/advisor-handoff")
+def api_coach_advisor_handoff(req: CoachHandoffRequest):
+    analysis = run_full_cashflow_coach(req.persona_id)
+    if analysis.get("consent_required"):
+        raise HTTPException(status_code=403, detail="Borrower consent required before handing off to human advisor.")
+        
+    handoff_ticket = {
+        "ticket_id": f"ADV-HANDOFF-{datetime.now().strftime('%Y%m%d%H%M')}-{req.persona_id[:4].upper()}",
+        "created_at": datetime.now().isoformat(),
+        "persona_id": req.persona_id,
+        "borrower_name": analysis.get("name"),
+        "account_masked": analysis.get("masked_account"),
+        "weekly_capacity_inr": analysis.get("capacity_plan", {}).get("final_weekly_capacity_inr"),
+        "monthly_capacity_inr": analysis.get("capacity_plan", {}).get("monthly_equivalent_inr"),
+        "questions_to_discuss": analysis.get("advisor_observations", []),
+        "agent_notes": req.notes,
+        "status": "QUEUED_FOR_HUMAN_CREDIT_ADVISOR",
+        "routing": "Credit Counseling & Structured Solutions Desk"
+    }
+    
+    persona_case_map = {"kirana_owner": "1", "salaried_household": "2", "agri_trader": "25"}
+    case_id = persona_case_map.get(req.persona_id)
+    if case_id:
+        case = get_case(case_id, workflow_id="collections")
+        if case:
+            case.add_trace(
+                agent="HumanAdvisorDesk",
+                action="Cash-Flow Advisor Handoff Dispatched",
+                summary=f"Ticket {handoff_ticket['ticket_id']} queued for credit advisor with {len(handoff_ticket['questions_to_discuss'])} data-grounded observations.",
+                badge="Handoff"
+            )
+            save_case(case)
+            
+    return handoff_ticket
+
 STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 
 @app.get("/", response_class=HTMLResponse)
@@ -1102,5 +1245,15 @@ def inspection_page():
         with open(index_file, "r", encoding="utf-8") as f:
             return f.read()
     return "<h1>Saarthi Policy Firewall & Inspection View</h1>"
+
+@app.get("/coach", response_class=HTMLResponse)
+@app.get("/checkup", response_class=HTMLResponse)
+@app.get("/cashflow-coach", response_class=HTMLResponse)
+def coach_portal():
+    coach_file = os.path.join(STATIC_DIR, "coach.html")
+    if os.path.exists(coach_file):
+        with open(coach_file, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>Saarthi Cash-Flow Coach</h1>"
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

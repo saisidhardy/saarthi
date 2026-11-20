@@ -1,0 +1,56 @@
+# Cash-Flow Coach Policy & Classification Rules
+version: "1.0.0"
+updated_at: "2026-11-20"
+label: "Lender-Configurable Cash-Flow Coach Guidelines"
+
+taxonomy:
+  stock_supplier:
+    display_name: "Stock & Supplier Purchases"
+    default_role: "essential"
+    keywords: ["metro", "unilever", "itc", "amul", "parle", "distributor", "wholesale", "supplier", "depot", "seeds", "fertilizer", "stock", "raw material"]
+  rent:
+    display_name: "Commercial & House Rent"
+    default_role: "essential"
+    keywords: ["rent", "landlord", "commercial shop", "premises", "warehouse", "cold storage"]
+  utilities:
+    display_name: "Utilities & Bills"
+    default_role: "essential"
+    keywords: ["electricity", "msedcl", "bbps", "bill", "power", "wifi", "broadband", "gas", "water"]
+  wages:
+    display_name: "Staff Wages & Salaries"
+    default_role: "essential"
+    keywords: ["wage", "wages", "salary paid", "assistant", "staff", "helper"]
+  loan_emis:
+    display_name: "Existing Loan EMIs"
+    default_role: "essential"
+    keywords: ["emi", "loan", "nach", "nbfc", "bank emi", "repayment", "finance"]
+  household_essentials:
+    display_name: "Household Essentials & Groceries"
+    default_role: "essential"
+    keywords: ["grocery", "groceries", "supermarket", "apollo", "medplus", "pharmacy", "medical", "medicine", "vegetables", "milk", "school fee"]
+  transport:
+    display_name: "Transport & Logistics"
+    default_role: "essential"
+    keywords: ["metro card", "transit", "petrol", "diesel", "fuel", "freight", "transport", "logistics", "auto", "uber", "ola", "tractor"]
+  flexible:
+    display_name: "Flexible & Discretionary"
+    default_role: "flexible"
+    keywords: ["swiggy", "zomato", "restaurant", "dining", "amazon", "flipkart", "bookmyshow", "entertainment", "movie", "outing", "shopping"]
+  transfers:
+    display_name: "Transfers & Misc"
+    default_role: "ignore"
+    keywords: ["self transfer", "fund transfer", "to savings", "to current"]
+  other:
+    display_name: "Other Debits"
+    default_role: "flexible"
+    keywords: []
+
+buffer_pct: 0.15 # 15% safety buffer subtracted from worst-quartile weekly inflow
+min_capacity_per_week_inr: 500.0 # Floor weekly capacity to ensure repayment feasibility
+max_capacity_share_of_inflow: 0.40 # Hard cap: weekly plan never exceeds 40% of worst-quartile inflow
+
+consent:
+  validity_days: 30
+  purpose: "AFFORDABLE_REPAYMENT_ASSESSMENT"
+  terms_summary: "90-day transaction analysis for affordable repayment planning, public scheme matching, and refinance simulation."
+  regulatory_source: "RBI Account Aggregator (AA) Framework"
