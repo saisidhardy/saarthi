@@ -453,25 +453,33 @@
 </head>
 <body class="text-slate-100 min-h-screen flex antialiased selection:bg-indigo-600 selection:text-white overflow-hidden">
 
-  <!-- LEFT ENTERPRISE NAVIGATION SIDEBAR -->
-  <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-30 select-none">
+  <!-- LEFT ENTERPRISE NAVIGATION SIDEBAR (Collapsible, Draggable Resizer, Full Scroll) -->
+  <aside id="appSidebar" class="relative bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 z-30 select-none h-screen max-h-screen transition-[width] duration-150 ease-out" style="width: 260px; min-width: 0;">
     
+    <!-- Drag Resize Splitter Handle -->
+    <div id="sidebarResizeHandle" class="absolute top-0 right-0 w-2 h-full cursor-col-resize hover:bg-indigo-500/50 active:bg-indigo-600 transition-colors z-40 select-none" title="Drag left/right to resize sidebar, double-click to toggle"></div>
+
     <!-- Workspace Brand Header -->
-    <div class="p-4 border-b border-slate-800 flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl  justify-center shadow-lg shadow-indigo-600/30 shrink-0">
-        <i class="fa-solid fa-building-columns text-white text-base"></i>
-      </div>
-      <div class="overflow-hidden">
-        <div class="flex items-center gap-1.5">
-          <span class="text-sm font-black tracking-tight text-white">Saarthi</span>
-          <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AGENCY</span>
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style="background-color: var(--indigo);">
+          <i class="fa-solid fa-building-columns text-white text-sm"></i>
         </div>
-        <p class="text-[10px] text-slate-400 truncate">Multi-Lender AI Recovery Cloud</p>
+        <div class="overflow-hidden">
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm font-black tracking-tight text-white">Saarthi</span>
+            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">AGENCY</span>
+          </div>
+          <p class="text-[10px] text-slate-400 truncate">Multi-Lender AI Recovery Cloud</p>
+        </div>
       </div>
+      <button id="btnSidebarCollapse" onclick="toggleSidebarCollapse()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition shrink-0" title="Collapse Sidebar">
+        <i id="sidebarCollapseIcon" class="fa-solid fa-angles-left text-xs"></i>
+      </button>
     </div>
 
     <!-- Multi-Lender Agency Switcher -->
-    <div class="px-3.5 py-2.5 border-b border-slate-800 bg-slate-950/70">
+    <div class="px-3.5 py-2.5 border-b border-slate-800 bg-slate-950/70 shrink-0">
       <label class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
         <i class="fa-solid fa-network-wired text-indigo-400 mr-1"></i> Serving Lender Tenant:
       </label>
@@ -484,7 +492,7 @@
     </div>
 
     <!-- Navigation Menu Items -->
-    <nav class="flex-1 overflow-y-auto custom-scroll p-3 space-y-1 text-xs">
+    <nav class="flex-1 overflow-y-auto custom-scroll p-3 space-y-1 text-xs min-h-0">
       <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 py-1.5 mt-1">Portfolio Operations</div>
       
       <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-indigo-600 text-white font-semibold shadow-md shadow-indigo-600/20 text-left transition">
@@ -585,14 +593,20 @@
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
     
     <!-- TOP APP HEADER -->
-    <header class="bg-slate-900 border-b border-slate-800 px-5 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
-      <div>
-        <div class="flex items-center gap-2 text-[11px] text-slate-400">
-          <span>Portfolio</span>
-          <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
-          <span class="text-white font-medium">Early Delinquency (1–30 DPD)</span>
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <button id="btnHeaderToggleSidebar" onclick="toggleSidebarCollapse()" class="px-2.5 py-1.5 rounded-lg text-white hover:bg-white/20 transition flex items-center gap-1.5 text-xs font-semibold border border-white/25 shrink-0" title="Toggle Navigation Sidebar">
+          <i class="fa-solid fa-bars"></i>
+          <span class="hidden md:inline">Sidebar</span>
+        </button>
+        <div>
+          <div class="flex items-center gap-2 text-[11px] text-slate-400">
+            <span>Portfolio</span>
+            <i class="fa-solid fa-chevron-right text-[9px] text-slate-600"></i>
+            <span class="text-white font-medium" id="headerLenderBreadcrumb">All Lenders · Early Delinquency (1–30 DPD)</span>
+          </div>
+          <h2 class="text-base font-extrabold text-white tracking-tight mt-0.5" id="headerLenderTitle">NBFC Recovery Operations Hub</h2>
         </div>
-        <h2 class="text-base font-extrabold text-white tracking-tight mt-0.5">NBFC Recovery Operations Hub</h2>
       </div>
 
       <!-- Live Telemetry & Quick Action Controls -->
@@ -1891,6 +1905,11 @@
       currentTenant = val;
       const tenant = LENDER_TENANTS[val] || LENDER_TENANTS.all;
 
+      const hBread = document.getElementById('headerLenderBreadcrumb');
+      if (hBread) hBread.innerText = `${tenant.shortName} · Early Delinquency (1–30 DPD)`;
+      const hTitle = document.getElementById('headerLenderTitle');
+      if (hTitle) hTitle.innerText = `${tenant.shortName} Operations Hub`;
+
       const cVpa = document.getElementById('consoleVpaTag');
       if (cVpa) cVpa.innerText = tenant.vpa || "Unset (Simulate payment only)";
 
@@ -1912,7 +1931,7 @@
       // If active account not in this tenant's list, pick first visible
       const visible = getCurrentlyVisibleAccounts();
       if (visible.length > 0) {
-        const isStillVisible = selectedAccount && visible.some(a => a.id === selectedAccount.id);
+        const isStillVisible = selectedAccount && visible.some(a => String(a.id) === String(selectedAccount.id));
         if (!isStillVisible) {
           selectAccount(visible[0].id);
         }
@@ -1931,7 +1950,7 @@
           const accLender = (a.data && a.data.lender_id) || a.lender_id;
           if (accLender !== currentTenant) return false;
         }
-        const matchesQ = !q || a.customer_name.toLowerCase().includes(q) || a.id.includes(q) || (a.phone && a.phone.includes(q));
+        const matchesQ = !q || a.customer_name.toLowerCase().includes(q) || String(a.id).includes(q) || (a.phone && String(a.phone).includes(q));
         if (!matchesQ) return false;
         if (activeFilter === 'overdue') return a.dpd > 0;
         if (activeFilter === 'pre_due') return a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H');
@@ -1947,6 +1966,100 @@
       if (badge) badge.innerText = `${filtered.length} Accounts`;
       const qBadge = document.getElementById('navBadgeQueue');
       if (qBadge) qBadge.innerText = filtered.length;
+    }
+
+    // SIDEBAR MOBILITY & RESIZING CONTROLS
+    let isSidebarCollapsed = false;
+    let lastExpandedWidth = '260px';
+
+    function initSidebarResizer() {
+      const sidebar = document.getElementById('appSidebar');
+      const handle = document.getElementById('sidebarResizeHandle');
+      if (!sidebar || !handle) return;
+
+      let isResizing = false;
+      let startX = 0;
+      let startWidth = 260;
+
+      handle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        startX = e.clientX;
+        startWidth = sidebar.offsetWidth;
+        sidebar.style.transition = 'none';
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        const currentWidth = startWidth + (e.clientX - startX);
+        if (currentWidth < 90) {
+          sidebar.style.width = '0px';
+          sidebar.style.overflow = 'hidden';
+          sidebar.style.border = 'none';
+          isSidebarCollapsed = true;
+          const floatBtn = document.getElementById('floatingSidebarToggle');
+          if (floatBtn) floatBtn.classList.remove('hidden');
+        } else {
+          isSidebarCollapsed = false;
+          sidebar.style.overflow = '';
+          sidebar.style.border = '';
+          const clamped = Math.max(160, Math.min(500, currentWidth));
+          sidebar.style.width = `${clamped}px`;
+          const floatBtn = document.getElementById('floatingSidebarToggle');
+          if (floatBtn) floatBtn.classList.add('hidden');
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isResizing) {
+          isResizing = false;
+          sidebar.style.transition = '';
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+          try {
+            if (!isSidebarCollapsed && parseInt(sidebar.style.width) >= 160) {
+              localStorage.setItem('saarthi_sidebar_width', sidebar.style.width);
+            }
+          } catch (_) {}
+        }
+      });
+
+      handle.addEventListener('dblclick', () => {
+        toggleSidebarCollapse();
+      });
+
+      try {
+        const saved = localStorage.getItem('saarthi_sidebar_width');
+        if (saved && parseInt(saved) >= 160) {
+          sidebar.style.width = saved;
+        }
+      } catch (_) {}
+    }
+
+    function toggleSidebarCollapse() {
+      const sidebar = document.getElementById('appSidebar');
+      const floatBtn = document.getElementById('floatingSidebarToggle');
+      const icon = document.getElementById('sidebarCollapseIcon');
+      if (!sidebar) return;
+
+      isSidebarCollapsed = !isSidebarCollapsed;
+      if (isSidebarCollapsed) {
+        lastExpandedWidth = sidebar.style.width || '260px';
+        sidebar.style.width = '0px';
+        sidebar.style.minWidth = '0px';
+        sidebar.style.overflow = 'hidden';
+        sidebar.style.border = 'none';
+        if (floatBtn) floatBtn.classList.remove('hidden');
+        if (icon) icon.className = "fa-solid fa-angles-right text-xs";
+        showToast("Sidebar Collapsed", "Full screen workspace active. Click Sidebar button or floating toggle to reopen.");
+      } else {
+        sidebar.style.overflow = '';
+        sidebar.style.border = '';
+        sidebar.style.width = lastExpandedWidth;
+        if (floatBtn) floatBtn.classList.add('hidden');
+        if (icon) icon.className = "fa-solid fa-angles-left text-xs";
+      }
     }
 
     function startClock() {
@@ -2253,11 +2366,13 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      initSidebarResizer();
       startClock();
       await fetchMetrics();
       await loadAllAccounts();
-      if (accounts.length > 0) {
-        selectAccount(accounts[0].id);
+      const visible = getCurrentlyVisibleAccounts();
+      if (visible.length > 0) {
+        selectAccount(visible[0].id);
       }
     });
 
@@ -2280,10 +2395,7 @@
       try {
         const res = await fetch('/api/cases?workflow_id=collections');
         accounts = await res.json();
-        document.getElementById('accountCountBadge').innerText = `${accounts.length} Accounts`;
-        const qBadge = document.getElementById('navBadgeQueue');
-        if (qBadge) qBadge.innerText = accounts.length;
-        renderAccountsTable();
+        applyFilters();
       } catch (err) {
         console.error("Accounts load error:", err);
       }
@@ -2305,32 +2417,19 @@
       applyFilters();
     }
 
-    function applyFilters() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const filtered = accounts.filter(a => {
-        const matchesQ = !q || a.customer_name.toLowerCase().includes(q) || a.id.includes(q) || (a.phone && a.phone.includes(q));
-        if (!matchesQ) return false;
-
-        if (activeFilter === 'overdue') return a.dpd > 0;
-        if (activeFilter === 'pre_due') return a.trigger_type === 'PRE_DUE_T24H' || (a.data && a.data.trigger_type === 'PRE_DUE_T24H');
-        if (activeFilter === 'hospicash') return isHospicashCase(a);
-        return true;
-      });
-      renderAccountsTable(filtered);
-    }
-
     // RENDER TABLE
-    function renderAccountsTable(list = accounts) {
+    function renderAccountsTable(list = null) {
+      const targetList = list !== null ? list : getCurrentlyVisibleAccounts();
       const container = document.getElementById('accountsTableContainer');
       container.innerHTML = '';
 
-      if (list.length === 0) {
+      if (targetList.length === 0) {
         container.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">No borrower accounts match current criteria</div>`;
         return;
       }
 
-      list.forEach(a => {
-        const isSelected = selectedAccount && selectedAccount.id === a.id;
+      targetList.forEach(a => {
+        const isSelected = selectedAccount && String(selectedAccount.id) === String(a.id);
         const amt = Number(a.amount_due || (a.data && a.data.amount_due) || 0);
         const dpd = a.dpd || (a.data && a.data.dpd) || 0;
         const lang = a.language || 'Hindi';
@@ -2422,7 +2521,16 @@
           showToast(`Executing Scenario ${sKey.toUpperCase()}`, `Running multi-turn dialogue, policy rules & payment rails...`);
           const sRes = await fetch(`/api/events/scenario/${sKey}`, { method: 'POST' });
           selectedAccount = await sRes.json();
-          await loadAllAccounts();
+          const accLender = (selectedAccount.data && selectedAccount.data.lender_id) || selectedAccount.lender_id;
+          if (accLender && currentTenant !== 'all' && currentTenant !== accLender) {
+            const sel = document.getElementById('lenderTenantSelect');
+            if (sel) {
+              sel.value = accLender;
+              switchLenderTenant(accLender);
+            }
+          } else {
+            await loadAllAccounts();
+          }
           await fetchMetrics();
           renderConsoleDetails();
           renderBorrowerPhoneView();
@@ -3207,6 +3315,11 @@
       window.open(`/api/cases/${selectedAccount.id}/evidence-pack?workflow_id=collections`, '_blank');
     }
   </script>
+  <!-- Floating Sidebar Toggle (Visible when Sidebar is Collapsed) -->
+  <button id="floatingSidebarToggle" onclick="toggleSidebarCollapse()" class="fixed bottom-4 left-4 z-50 px-3.5 py-2.5 rounded-xl text-white font-semibold text-xs flex items-center gap-2 shadow-2xl hidden transition-all transform hover:scale-105" style="background-color: var(--indigo); border: 1px solid rgba(255, 255, 255, 0.4);" title="Open Navigation Sidebar">
+    <i class="fa-solid fa-bars"></i>
+    <span>Open Sidebar</span>
+  </button>
   <!-- Global Persistent Audio Stream Player -->
   <audio id="globalAudioPlayer" preload="auto" class="hidden"></audio>
 </body>
